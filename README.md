@@ -26,11 +26,13 @@ A evolução entre as atividades segue um arco claro:
 
 ## Status da entrega
 
-| Atividade | Status | Porta | Principais recursos |
-|-----------|:------:|:-----:|---------------------|
-| [Atividade 1](atividade-1/) | Concluída | `8001` | `getmempoolinfo` · `getrawmempool` · distribuição de fee rate (low/medium/high) · `getblockchaininfo` · lag de sincronização |
-| [Atividade 2](atividade-2/) | Concluída | `8002` | Listener `pyzmq` (rawblock + rawtx) · buffer em `deque` · taxa de eventos · comparação `bestblockhash` × último ZMQ |
-| [Atividade 3](atividade-3/) | Concluída | `8003` | Carregamento de wallets · PSBT (`walletcreatefundedpsbt → walletprocesspsbt → finalizepsbt → sendrawtransaction`) · interpretação `broadcast → mempool → confirmed` |
+| Atividade | Status | Principais recursos |
+|-----------|--------|---------------------|
+| [Atividade 1](atividade-1/) | Concluída | RPC, mempool summary, blockchain lag |
+| [Atividade 2](atividade-2/) | Concluída, requer ZMQ ativo | rawtx/rawblock, eventos recentes, comparação RPC/ZMQ |
+| [Atividade 3](atividade-3/) | Concluída, requer wallets em regtest | múltiplas wallets, PSBT, tx interpretada, wallet status |
+
+Portas locais (uvicorn): Atividade 1 → `8001` · Atividade 2 → `8002` · Atividade 3 → `8003`.
 
 Os três backends seguem o mesmo padrão estrutural: `app/main.py` (rotas FastAPI) + `app/rpc_client.py` (cliente JSON-RPC dedicado) + módulos de domínio + frontend estático servido pelo próprio FastAPI.
 
@@ -144,6 +146,8 @@ docker compose up --build
 ```
 
 > Requer `.env` preenchido em cada `atividade-*/`. O Bitcoin Core continua rodando no host.
+>
+> **Importante (Docker)**: dentro de um container, `127.0.0.1` aponta para o **próprio container**, não para o host onde o `bitcoind` está rodando. Ao usar `docker compose`, edite cada `atividade-*/.env` para `BTC_RPC_HOST=host.docker.internal` (e `ZMQ_RAWBLOCK_ENDPOINT=tcp://host.docker.internal:28332` / `ZMQ_RAWTX_ENDPOINT=tcp://host.docker.internal:28333` na Atividade 2). O `docker-compose.yml` já mapeia `host.docker.internal` para o gateway do host via `extra_hosts`. Em execução local com uvicorn (sem Docker), mantenha `127.0.0.1`.
 
 ---
 
@@ -227,3 +231,27 @@ Detalhes (instalação, deploy permanente em VPS, firewall): [`docs/deploy-cloud
 ## Licença
 
 [MIT](LICENSE) © 2026 Pedro Neves
+
+---
+
+## Texto de entrega
+
+Para envio no canal CoreCraft:
+
+```
+Nome: Pedro Neves
+GitHub: https://github.com/btcneves/corecraft
+
+Atividade 1:
+https://github.com/btcneves/corecraft/tree/main/atividade-1
+
+Atividade 2:
+https://github.com/btcneves/corecraft/tree/main/atividade-2
+
+Atividade 3:
+https://github.com/btcneves/corecraft/tree/main/atividade-3
+
+Observações:
+Repositório único organizado conforme exigido, com backend, frontend, documentação,
+integração Bitcoin Core via RPC/ZMQ quando aplicável e instruções de execução local/externa.
+```

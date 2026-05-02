@@ -44,6 +44,24 @@ corecraft/
   - `LICENSE` MIT adicionado.
   - READMEs por atividade padronizados (cabeçalho, objetivo, arquitetura, endpoints, exemplos, limitações, checklist).
 
+## Auditoria final
+
+- **Data**: 2026-05-02
+- **Correções aplicadas (rodada de finalização)**:
+  - `atividade-{1,2,3}/backend/app/rpc_client.py`: payload `jsonrpc` mudou de `"1.1"` para `"2.0"`. Bitcoin Core ≥31 rejeita `"1.1"` com `RPC error -32600: JSON-RPC version not supported`. Descoberto durante a validação ao vivo. Sem este fix, todos os endpoints retornavam 503.
+  - `atividade-3/backend/app/tx_service.py`: `get_tx()` prioriza `tracked["wallet"]` sobre a wallet selecionada — consultar uma tx antiga não quebra mais ao trocar de wallet.
+  - `atividade-2/backend/app/event_service.py`: API passou a retornar `divergence: null` + `status: waiting_for_zmq_block` + `message` quando o ZMQ ainda não recebeu blocos; `status: compared` quando há comparação real.
+  - `atividade-2/frontend/app.js`: consome o novo campo `status`; banner de divergência só aparece em `status === "compared" && divergence === true`.
+  - `docker-compose.yml`: `extra_hosts: ["host.docker.internal:host-gateway"]` em cada serviço; README explica que `BTC_RPC_HOST=host.docker.internal` é necessário ao rodar via Docker.
+  - `README.md`: tabela de status no formato exigido (Atividade 1/2/3 com observações de pré-requisito); bloco "Texto de entrega" adicionado **ao final** do README (depois de "Licença"), além de continuar em `docs/entrega.md`.
+- **Testes executados**: ver [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md) — 9 endpoints, ciclo PSBT completo (`broadcast → mempool → confirmed`), evidência do bug fix da Atividade 3, path 503.
+- **Testes pendentes**: nenhum.
+- **Riscos restantes**:
+  - Estado em memória zera ao reiniciar o uvicorn — decisão de design (não há banco de dados); txid continua consultável via RPC mesmo após reset porque `gettransaction` lê da wallet.
+  - `tx_per_second` da Atividade 2 baseia-se na janela do buffer, não em janela deslizante real (limitação documentada).
+  - `docker compose` não foi testado neste host (Docker indisponível); a configuração `extra_hosts` é padrão e está coerente com `docker-compose v2.1+`.
+- **Status final**: pronto para entrega.
+
 ## Checklist final
 - [x] README.md profissional na raiz (sem texto de entrega na home)
 - [x] Tabela de status no README raiz

@@ -34,11 +34,16 @@ def send_tx(to_address: str, amount: float, wallet_name: str, tracked_txs: dict)
 
 def get_tx(txid: str, wallet_name: str | None, tracked_txs: dict) -> dict:
     n_rpc = rpc_node()
+    tracked = tracked_txs.get(txid)
+
+    # Prioriza a wallet original que enviou a tx; cai para a wallet
+    # selecionada apenas quando a tx nunca passou por este backend.
+    effective_wallet = tracked["wallet"] if tracked else wallet_name
 
     gettx_result = None
-    if wallet_name:
+    if effective_wallet:
         try:
-            gettx_result = rpc_wallet(wallet_name).call("gettransaction", txid)
+            gettx_result = rpc_wallet(effective_wallet).call("gettransaction", txid)
         except RPCError:
             pass
 
@@ -48,6 +53,4 @@ def get_tx(txid: str, wallet_name: str | None, tracked_txs: dict) -> dict:
     except RPCError:
         pass
 
-    tracked = tracked_txs.get(txid)
-
-    return interpret(txid, wallet_name, gettx_result, mempool_entry, tracked)
+    return interpret(txid, effective_wallet, gettx_result, mempool_entry, tracked)

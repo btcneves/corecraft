@@ -22,9 +22,20 @@ def get_latest(store: EventStore) -> dict:
 
 def get_state_comparison(store: EventStore, rpc: BitcoinRPC) -> dict:
     best_block = rpc.call("getbestblockhash")
-    last_seen  = store.last_block_hash()
+    last_seen = store.last_block_hash()
+
+    if last_seen is None:
+        return {
+            "best_block": best_block,
+            "last_seen_block": None,
+            "divergence": None,
+            "status": "waiting_for_zmq_block",
+            "message": "Nenhum bloco observado via ZMQ ainda.",
+        }
+
     return {
-        "best_block":      best_block,
+        "best_block": best_block,
         "last_seen_block": last_seen,
-        "divergence":      best_block != last_seen,
+        "divergence": best_block != last_seen,
+        "status": "compared",
     }

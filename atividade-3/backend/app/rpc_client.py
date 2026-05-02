@@ -21,7 +21,7 @@ class BitcoinRPC:
         self._auth = HTTPBasicAuth(user, password)
 
     def call(self, method: str, *params):
-        payload = {"jsonrpc": "1.1", "id": method, "method": method, "params": list(params)}
+        payload = {"jsonrpc": "2.0", "id": method, "method": method, "params": list(params)}
         try:
             resp = requests.post(self._url, json=payload, auth=self._auth, timeout=10)
         except requests.exceptions.ConnectionError as exc:

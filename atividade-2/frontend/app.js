@@ -70,14 +70,13 @@ async function fetchStateComparison() {
     setText('best-block', fmtHash(d.best_block));
     setText(
       'last-seen-block',
-      d.last_seen_block ? fmtHash(d.last_seen_block) : '— (ZMQ ainda não recebeu blocos)'
+      d.last_seen_block ? fmtHash(d.last_seen_block) : '— (aguardando evento ZMQ)'
     );
 
-    // Só mostrar banner quando há divergência REAL: ambos os hashes existem e diferem.
-    // Se o ZMQ ainda não viu nenhum bloco, não é divergência — é estado inicial.
+    // O backend distingue "comparado" de "aguardando ZMQ" via d.status.
+    // Banner aparece SÓ quando há divergência real (status compared + divergence true).
     const banner = document.getElementById('divergence-banner');
-    const realDivergence = d.best_block && d.last_seen_block && d.best_block !== d.last_seen_block;
-    if (realDivergence) {
+    if (d.status === 'compared' && d.divergence === true) {
       banner.classList.remove('hidden');
     } else {
       banner.classList.add('hidden');
