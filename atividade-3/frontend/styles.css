@@ -1,0 +1,201 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #0f1117;
+  color: #e2e8f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 2rem 2rem 1rem;
+  border-bottom: 1px solid #1e2535;
+}
+
+header h1 { font-size: 1.6rem; font-weight: 700; color: #f7931a; }
+
+.badge {
+  font-size: 0.75rem;
+  background: #f7931a22;
+  color: #f7931a;
+  border: 1px solid #f7931a55;
+  border-radius: 4px;
+  padding: 2px 8px;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+.subtitle { color: #94a3b8; margin-top: 0.25rem; font-size: 0.9rem; }
+
+main {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.card {
+  background: #1a2035;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 1.5rem;
+  flex: 1 1 300px;
+  min-width: 260px;
+}
+
+.card.wide { flex: 1 1 100%; }
+
+.card h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f7931a;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.note {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.card-body { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #2d374830;
+}
+
+.label { color: #94a3b8; font-size: 0.875rem; }
+
+.value { font-weight: 600; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-row label { font-size: 0.8rem; color: #94a3b8; }
+
+.form-row input,
+.form-row select {
+  background: #0f1117;
+  border: 1px solid #2d3748;
+  border-radius: 6px;
+  color: #e2e8f0;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-row input:focus,
+.form-row select:focus { border-color: #f7931a; }
+
+button {
+  margin-top: 0.5rem;
+  background: #f7931a;
+  color: #0f1117;
+  border: none;
+  border-radius: 6px;
+  padding: 0.55rem 1.25rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover:not(:disabled) { background: #e07a10; }
+button:disabled { background: #374151; color: #6b7280; cursor: not-allowed; }
+
+.send-result {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  background: #14532d22;
+  border: 1px solid #22c55e55;
+  border-radius: 6px;
+  color: #86efac;
+  font-size: 0.8rem;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.card-error {
+  margin-top: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  background: #7f1d1d22;
+  border: 1px solid #ef444455;
+  border-radius: 6px;
+  color: #fca5a5;
+  font-size: 0.8rem;
+}
+
+.hint { font-size: 0.75rem; color: #64748b; }
+
+.hidden { display: none; }
+
+.empty-msg { color: #475569; font-size: 0.85rem; padding: 0.5rem 0; }
+
+/* TX table */
+.tx-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+
+.tx-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+  border-bottom: 1px solid #2d3748;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.tx-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid #1e2535;
+  vertical-align: top;
+}
+
+.tx-table tr:last-child td { border-bottom: none; }
+
+.tx-table .txid { font-family: monospace; }
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.status-broadcast { background: #1e3a5f; color: #93c5fd; }
+.status-mempool   { background: #451a03; color: #fdba74; }
+.status-confirmed { background: #14532d; color: #86efac; }
+.status-unknown   { background: #1f2937; color: #9ca3af; }
+
+.warn-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #78350f;
+  color: #fde68a;
+  font-size: 0.65rem;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: #475569;
+  border-top: 1px solid #1e2535;
+}
