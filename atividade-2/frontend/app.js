@@ -67,11 +67,17 @@ async function fetchStateComparison() {
     }
     hideError('err-comparison');
     const d = await res.json();
-    setText('best-block',      fmtHash(d.best_block));
-    setText('last-seen-block', fmtHash(d.last_seen_block));
+    setText('best-block', fmtHash(d.best_block));
+    setText(
+      'last-seen-block',
+      d.last_seen_block ? fmtHash(d.last_seen_block) : '— (ZMQ ainda não recebeu blocos)'
+    );
 
+    // Só mostrar banner quando há divergência REAL: ambos os hashes existem e diferem.
+    // Se o ZMQ ainda não viu nenhum bloco, não é divergência — é estado inicial.
     const banner = document.getElementById('divergence-banner');
-    if (d.divergence) {
+    const realDivergence = d.best_block && d.last_seen_block && d.best_block !== d.last_seen_block;
+    if (realDivergence) {
       banner.classList.remove('hidden');
     } else {
       banner.classList.add('hidden');
