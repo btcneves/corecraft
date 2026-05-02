@@ -1,0 +1,45 @@
+services:
+  atividade-1:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./atividade-1/backend:/app
+      - ./atividade-1/frontend:/frontend
+      - ./atividade-1/.env:/app/.env:ro
+    command: >
+      sh -c "pip install -r requirements.txt -q &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8001"
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  atividade-2:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./atividade-2/backend:/app
+      - ./atividade-2/frontend:/frontend
+      - ./atividade-2/.env:/app/.env:ro
+    command: >
+      sh -c "pip install -r requirements.txt -q &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8002"
+    ports:
+      - "8002:8002"
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  atividade-3:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./atividade-3/backend:/app
+      - ./atividade-3/frontend:/frontend
+      - ./atividade-3/.env:/app/.env:ro
+    command: >
+      sh -c "pip install -r requirements.txt -q &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8003"
+    ports:
+      - "8003:8003"
+    environment:
+      - PYTHONUNBUFFERED=1
