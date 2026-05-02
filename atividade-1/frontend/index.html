@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoreCraft — Atividade 1: Mempool Snapshot</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>CoreCraft <span class="badge">Atividade 1</span></h1>
+    <p class="subtitle">Snapshot inteligente da mempool via RPC</p>
+  </header>
+
+  <main>
+    <!-- Card: Mempool Intelligence -->
+    <section class="card" id="card-mempool">
+      <h2>Mempool Intelligence</h2>
+      <div class="card-body">
+        <div class="stat-row">
+          <span class="label">Transações</span>
+          <span class="value" id="tx-count">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Fee média</span>
+          <span class="value" id="avg-fee">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Fee mínima</span>
+          <span class="value" id="min-fee">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Fee máxima</span>
+          <span class="value" id="max-fee">—</span>
+        </div>
+        <div class="dist-section">
+          <p class="dist-label">Distribuição de fee rate</p>
+          <div class="dist-bar-wrap">
+            <div class="dist-bar low"  id="bar-low"  style="width:0%"></div>
+            <div class="dist-bar med"  id="bar-med"  style="width:0%"></div>
+            <div class="dist-bar high" id="bar-high" style="width:0%"></div>
+          </div>
+          <div class="dist-legend">
+            <span class="legend-item low">Baixo (&lt;10)</span>
+            <span class="legend-item med">Médio (10–50)</span>
+            <span class="legend-item high">Alto (&gt;50)</span>
+          </div>
+          <div class="dist-counts">
+            <span id="cnt-low">0</span> /
+            <span id="cnt-med">0</span> /
+            <span id="cnt-high">0</span>
+          </div>
+        </div>
+      </div>
+      <p class="card-error hidden" id="err-mempool"></p>
+    </section>
+
+    <!-- Card: Node Sync Status -->
+    <section class="card" id="card-lag">
+      <h2>Node Sync Status</h2>
+      <div class="card-body">
+        <div class="stat-row">
+          <span class="label">Blocos</span>
+          <span class="value" id="blocks">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Headers</span>
+          <span class="value" id="headers">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Lag</span>
+          <span class="value" id="lag">—</span>
+        </div>
+      </div>
+      <p class="card-error hidden" id="err-lag"></p>
+    </section>
+  </main>
+
+  <footer>
+    <span id="last-update">Aguardando dados…</span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
