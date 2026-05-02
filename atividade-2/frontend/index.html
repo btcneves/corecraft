@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoreCraft — Atividade 2: Eventos ZMQ</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>CoreCraft <span class="badge">Atividade 2</span></h1>
+    <p class="subtitle">Eventos em tempo real via ZMQ</p>
+  </header>
+
+  <!-- Divergence banner -->
+  <div id="divergence-banner" class="divergence-banner hidden">
+    ⚠ Divergência detectada: o último bloco visto via ZMQ difere do bestblockhash via RPC
+  </div>
+
+  <main>
+    <!-- Event Activity -->
+    <section class="card">
+      <h2>Event Activity</h2>
+      <div class="card-body">
+        <div class="stat-row">
+          <span class="label">Transações recebidas</span>
+          <span class="value" id="tx-observed">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Blocos recebidos</span>
+          <span class="value" id="blocks-observed">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Taxa de eventos</span>
+          <span class="value" id="tx-per-second">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Último evento</span>
+          <span class="value small" id="last-event-time">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- State Comparison -->
+    <section class="card">
+      <h2>State Comparison</h2>
+      <div class="card-body">
+        <div class="stat-row">
+          <span class="label">Best block (RPC)</span>
+          <span class="value hash" id="best-block">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="label">Último bloco (ZMQ)</span>
+          <span class="value hash" id="last-seen-block">—</span>
+        </div>
+      </div>
+      <p class="card-error hidden" id="err-comparison"></p>
+    </section>
+
+    <!-- Latest Events -->
+    <section class="card wide">
+      <h2>Últimos Eventos</h2>
+      <div class="events-grid">
+        <div class="events-col">
+          <h3>Blocos</h3>
+          <ul id="list-blocks" class="event-list"><li class="empty">Aguardando blocos…</li></ul>
+        </div>
+        <div class="events-col">
+          <h3>Transações</h3>
+          <ul id="list-txs" class="event-list"><li class="empty">Aguardando transações…</li></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="last-update">Aguardando dados…</span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
