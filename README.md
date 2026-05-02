@@ -80,14 +80,18 @@ corecraft/
 │   └── README.md
 │
 ├── docs/
+│   ├── architecture.md           decisões de design e trade-offs
 │   ├── setup-bitcoin-core.md     bitcoin.conf, regtest, wallets, ZMQ
 │   ├── rpc-zmq.md                conceitos RPC vs ZMQ
 │   ├── deploy-vps.md             Ubuntu 22.04 + tmux + ufw
 │   ├── deploy-cloudflare-tunnel.md  exposição pública
-│   └── entrega.md                smoke tests + texto de envio
+│   ├── smoke-tests.md            smoke tests curl por atividade
+│   └── validacao-ao-vivo.md      evidências de validação em regtest real
 │
+├── CHANGELOG.md                  histórico de versões e correções
+├── CONTRIBUTING.md               guia de contribuição
+├── SECURITY.md                   política de segurança
 ├── docker-compose.yml            (opcional) sobe os 3 backends
-├── CLAUDE.md                     decisões de design
 ├── LICENSE                       MIT
 ├── .gitignore
 └── README.md
@@ -166,7 +170,7 @@ docker compose up --build
 | POST | `/tx/send` | 3 | Cria, assina e transmite tx via PSBT |
 | GET | `/tx/{txid}` | 3 | Estado interpretado da transação |
 
-Smoke tests completos com `curl`: [`docs/entrega.md`](docs/entrega.md).
+Smoke tests completos com `curl`: [`docs/smoke-tests.md`](docs/smoke-tests.md).
 
 ---
 
@@ -174,11 +178,13 @@ Smoke tests completos com `curl`: [`docs/entrega.md`](docs/entrega.md).
 
 | Documento | Conteúdo |
 |-----------|----------|
+| [`docs/architecture.md`](docs/architecture.md) | Decisões de design, padrões de implementação e trade-offs |
 | [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md) | `bitcoin.conf`, regtest, wallets, ZMQ, geração de saldo |
 | [`docs/rpc-zmq.md`](docs/rpc-zmq.md) | Conceitos: pull (RPC) vs push (ZMQ) e justificativa por atividade |
 | [`docs/deploy-vps.md`](docs/deploy-vps.md) | Deploy em VPS Ubuntu 22.04 com `tmux` e `ufw` |
 | [`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md) | Exposição pública via Cloudflare Tunnel ou ngrok |
-| [`docs/entrega.md`](docs/entrega.md) | Smoke tests `curl` por atividade + texto de envio |
+| [`docs/smoke-tests.md`](docs/smoke-tests.md) | Smoke tests `curl` por atividade |
+| [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md) | Saída completa de validação contra Bitcoin Core v31.0 |
 
 Cada atividade tem seu próprio README detalhado:
 
@@ -195,7 +201,7 @@ Cada atividade tem seu próprio README detalhado:
 - **PSBT na Atividade 3.** Fluxo `walletcreatefundedpsbt → walletprocesspsbt → finalizepsbt → sendrawtransaction` para o Core cuidar de seleção de UTXO e fee.
 - **Erro 503 estruturado.** Quando o nó está offline, todas as rotas que dependem dele retornam `{"detail": {"error": "node_unavailable", "detail": "..."}}` com HTTP 503.
 - **Frontend isolado.** Cada atividade tem HTML/CSS/JS próprios; nenhum framework. URLs relativas — funciona com tunnel sem alterar JS.
-- **Decisões completas em [`CLAUDE.md`](CLAUDE.md).**
+- **Decisões de arquitetura completas em [`docs/architecture.md`](docs/architecture.md).**
 
 ---
 
@@ -232,26 +238,3 @@ Detalhes (instalação, deploy permanente em VPS, firewall): [`docs/deploy-cloud
 
 [MIT](LICENSE) © 2026 Pedro Neves
 
----
-
-## Texto de entrega
-
-Para envio no canal CoreCraft:
-
-```
-Nome: Pedro Neves
-GitHub: https://github.com/btcneves/corecraft
-
-Atividade 1:
-https://github.com/btcneves/corecraft/tree/main/atividade-1
-
-Atividade 2:
-https://github.com/btcneves/corecraft/tree/main/atividade-2
-
-Atividade 3:
-https://github.com/btcneves/corecraft/tree/main/atividade-3
-
-Observações:
-Repositório único organizado conforme exigido, com backend, frontend, documentação,
-integração Bitcoin Core via RPC/ZMQ quando aplicável e instruções de execução local/externa.
-```
