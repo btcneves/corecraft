@@ -256,34 +256,6 @@ Demo pública executada em 2026-05-03 via Cloudflare Tunnel:
 
 ---
 
-## Formato de envio
-
-```
-Nome: Pedro Neves
-GitHub: https://github.com/btcneves/corecraft
-
-Atividade 1:
-https://github.com/btcneves/corecraft/tree/main/atividade-1
-
-Atividade 2:
-https://github.com/btcneves/corecraft/tree/main/atividade-2
-
-Atividade 3:
-https://github.com/btcneves/corecraft/tree/main/atividade-3
-
-Observações:
-Repositório único organizado conforme exigido, com backend, frontend,
-documentação, integração Bitcoin Core via RPC/ZMQ quando aplicável e
-validação real em Bitcoin Core v31.0.0 no modo regtest.
-
-Demonstração pública:
-Atividade 1: https://administrators-humanitarian-define-author.trycloudflare.com
-Atividade 2: https://dice-garcia-hub-particular.trycloudflare.com
-Atividade 3: https://move-after-salaries-kde.trycloudflare.com
-```
-
----
-
 ## Licença
 
 [MIT](LICENSE) © 2026 Pedro Neves
