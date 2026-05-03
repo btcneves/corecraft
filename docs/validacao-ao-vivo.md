@@ -8,6 +8,137 @@ Execução real contra `bitcoind -regtest` no host (Bitcoin Core v31.0). Todos o
 
 ---
 
+## Ambiente de validação
+
+| Campo | Valor |
+|-------|-------|
+| Sistema operacional | Linux (Ubuntu) |
+| Python | 3.12 |
+| Bitcoin Core | v31.0.0 (`/Satoshi:31.0.0/`) |
+| Rede | `regtest` |
+| RPC host | `127.0.0.1` |
+| RPC port | `18443` |
+| ZMQ rawblock | `tcp://127.0.0.1:28332` (`pubrawblock`) |
+| ZMQ rawtx | `tcp://127.0.0.1:28333` (`pubrawtx`) |
+| Backend Atividade 1 | http://127.0.0.1:8001 |
+| Backend Atividade 2 | http://127.0.0.1:8002 |
+| Backend Atividade 3 | http://127.0.0.1:8003 |
+| URL pública | Ainda não registrada. Ver `docs/deploy-cloudflare-tunnel.md` e `docs/deploy-vps.md`. |
+
+---
+
+## Checklist de validação
+
+- [x] Bitcoin Core rodando
+- [x] RPC respondendo
+- [x] ZMQ configurado
+- [x] Wallets criadas/carregadas
+- [x] Atividade 1 validada
+- [x] Atividade 2 validada
+- [x] Atividade 3 validada
+- [x] Frontend acessível (local)
+- [ ] URL pública/tunnel testado
+
+---
+
+## Comandos Bitcoin Core
+
+```bash
+bitcoin-cli -regtest getblockchaininfo
+bitcoin-cli -regtest getmempoolinfo
+bitcoin-cli -regtest getrawmempool true
+bitcoin-cli -regtest getbestblockhash
+bitcoin-cli -regtest getzmqnotifications
+bitcoin-cli -regtest listwalletdir
+bitcoin-cli -regtest listwallets
+```
+
+---
+
+## Preparação de wallets em regtest
+
+```bash
+bitcoin-cli -regtest createwallet wallet1
+bitcoin-cli -regtest createwallet wallet2
+
+ADDR=$(bitcoin-cli -regtest -rpcwallet=wallet1 getnewaddress)
+bitcoin-cli -regtest generatetoaddress 101 $ADDR
+
+bitcoin-cli -regtest -rpcwallet=wallet1 getwalletinfo
+bitcoin-cli -regtest -rpcwallet=wallet1 listunspent
+```
+
+---
+
+## Smoke tests — Atividade 1
+
+```bash
+curl http://127.0.0.1:8001/api/mempool/summary
+curl http://127.0.0.1:8001/api/blockchain/lag
+```
+
+Campos esperados — `/api/mempool/summary`: `tx_count`, `total_vsize`, `avg_fee_rate`, `min_fee_rate`, `max_fee_rate`, `fee_distribution.low`, `fee_distribution.medium`, `fee_distribution.high`
+
+Campos esperados — `/api/blockchain/lag`: `blocks`, `headers`, `lag`
+
+---
+
+## Smoke tests — Atividade 2
+
+```bash
+curl http://127.0.0.1:8002/api/events/summary
+curl http://127.0.0.1:8002/api/events/latest
+curl http://127.0.0.1:8002/api/events/state-comparison
+```
+
+Campos esperados — `/api/events/summary`: `blocks_observed`, `tx_observed`, `last_event_time`, `tx_per_second`
+
+Campos esperados — `/api/events/latest`: `blocks[]`, `txs[]`
+
+Campos esperados — `/api/events/state-comparison`: `best_block`, `last_seen_block`, `divergence`, `status`
+
+Para gerar eventos:
+
+```bash
+ADDR=$(bitcoin-cli -regtest -rpcwallet=wallet1 getnewaddress)
+bitcoin-cli -regtest generatetoaddress 1 $ADDR
+
+ADDR2=$(bitcoin-cli -regtest -rpcwallet=wallet2 getnewaddress)
+bitcoin-cli -regtest -rpcwallet=wallet1 sendtoaddress $ADDR2 0.001
+```
+
+---
+
+## Smoke tests — Atividade 3
+
+```bash
+curl http://127.0.0.1:8003/wallets
+
+curl -X POST http://127.0.0.1:8003/wallet/select \
+  -H "Content-Type: application/json" \
+  -d '{"wallet":"wallet1"}'
+
+curl http://127.0.0.1:8003/wallet/status
+
+curl -X POST http://127.0.0.1:8003/tx/send \
+  -H "Content-Type: application/json" \
+  -d '{"to_address":"ENDERECO_REGTEST","amount":0.001}'
+
+curl http://127.0.0.1:8003/tx/TXID
+```
+
+Campos esperados — `/wallets`: `available_wallets`, `loaded_wallets`, `selected_wallet`
+
+Campos esperados — `/wallet/status`: `wallet`, `balance`, `utxos`
+
+Campos esperados — `/tx/{txid}`: `txid`, `wallet`, `status`, `confirmed`, `confirmations`, `block_hash`, `age_seconds`, `message`, `warning` (quando aplicável)
+
+---
+
+## Evidências de execução (regtest, 2026-05-02)
+
+---
+
 ## 1. Pré-requisitos no Bitcoin Core
 
 ### `bitcoin-cli -regtest getblockchaininfo`
@@ -395,3 +526,18 @@ Após `bitcoin-cli -regtest stop`, todas as rotas que dependem do nó devolvem 5
 Todos os 9 endpoints obrigatórios + ciclo PSBT + bug fix da Atividade 3 + path 503 foram exercitados em `regtest` real com Bitcoin Core v31.0. Evidências capturadas neste arquivo correspondem a uma sessão de validação única e linear.
 
 **Status final: pronto para entrega.**
+
+---
+
+## Resultado da validação
+
+| Item | Status | Evidência | Observação |
+|------|--------|-----------|------------|
+| Bitcoin Core RPC | OK | Seção 1 (`getblockchaininfo`) | v31.0.0, regtest, 109 blocos |
+| ZMQ | OK | Seção 1 (`getzmqnotifications`) | rawblock:28332, rawtx:28333 |
+| Atividade 1 | OK | Seção 2 | `/api/mempool/summary` + `/api/blockchain/lag` |
+| Atividade 2 | OK | Seção 3 | `/api/events/{summary,latest,state-comparison}` + divergence fix |
+| Atividade 3 | OK | Seção 4 | `/wallets`, PSBT completo, bug fix wallet tracking |
+| Caminho 503 | OK | Seção 5 | Todas as rotas retornam `node_unavailable` estruturado |
+| Frontend | Pendente | — | Verificável em `http://127.0.0.1:800{1,2,3}` com bitcoind ativo |
+| Acesso externo | Pendente | — | URL não configurada; ver `docs/deploy-cloudflare-tunnel.md` |
