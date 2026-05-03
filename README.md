@@ -234,6 +234,26 @@ Detalhes (instalação, deploy permanente em VPS, firewall): [`docs/deploy-cloud
 
 ---
 
+## Validação e demonstração
+
+O projeto foi validado ao vivo contra Bitcoin Core v31.0 em `regtest` em 2026-05-02. A validação completa — incluindo saídas reais dos endpoints, ciclo PSBT e caminho de erro 503 — está documentada em [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md).
+
+Para reproduzir localmente (requer `bitcoind -regtest` nas portas padrão):
+
+```bash
+./scripts/smoke-test.sh
+```
+
+URL pública: ainda não registrada. O projeto inclui roteiros para exposição via Cloudflare Tunnel ([`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md)) e VPS ([`docs/deploy-vps.md`](docs/deploy-vps.md)).
+
+---
+
+## Evidência operacional
+
+Além do código e da documentação, o projeto inclui um roteiro de validação ao vivo em [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md), com saídas reais do Bitcoin Core, smoke tests HTTP e checklist para comprovar o funcionamento das três atividades em ambiente `regtest`.
+
+---
+
 ## Licença
 
 [MIT](LICENSE) © 2026 Pedro Neves
