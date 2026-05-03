@@ -1,6 +1,6 @@
 # Atividade 2 — Eventos em Tempo Real via ZMQ
 
-> Backend FastAPI + frontend estático que assina notificações ZMQ do Bitcoin Core, mantém o estado em memória e expõe a divergência entre o **fluxo** (eventos ZMQ) e o **estado** (RPC).
+> Backend FastAPI + frontend React/Vite que assina notificações ZMQ do Bitcoin Core, mantém o estado em memória e expõe a divergência entre o **fluxo** (eventos ZMQ) e o **estado** (RPC).
 
 ---
 
@@ -9,7 +9,7 @@
 Sair do modelo "consultar quando precisar" (RPC puro da Atividade 1) e introduzir um pipeline orientado a eventos:
 
 ```
-evento ZMQ ──→ interpretação ──→ estado derivado em memória ──→ API REST
+evento ZMQ ──→ interpretação ──→ estado derivado em memória ──→ API REST + WebSocket
 ```
 
 A aplicação assina `rawblock` e `rawtx`, mantém buffers limitados e expõe um endpoint de **comparação** que detecta inconsistências entre o que foi observado via ZMQ e o `bestblockhash` retornado por RPC.

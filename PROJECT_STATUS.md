@@ -4,7 +4,7 @@
 
 ## Status geral
 
-Entrega concluída. As três atividades estão implementadas, validadas ao vivo (2026-05-02) e demonstradas publicamente via Cloudflare Tunnel (2026-05-03) contra Bitcoin Core v31.0 em regtest.
+Entrega concluída. As três atividades estão implementadas, validadas ao vivo (2026-05-02), demonstradas publicamente via Cloudflare Tunnel (2026-05-03) e validadas na stack Docker completa com Bitcoin Core regtest, Caddy e frontends React (2026-05-03).
 
 ## Status por atividade
 
@@ -13,6 +13,16 @@ Entrega concluída. As três atividades estão implementadas, validadas ao vivo 
 | 1 — Mempool RPC | Concluída | OK (2026-05-02) | OK (2026-05-03) |
 | 2 — ZMQ Events | Concluída | OK (2026-05-02) | OK (2026-05-03) |
 | 3 — Multi-wallet PSBT | Concluída | OK (2026-05-02) | OK (2026-05-03) |
+
+## Stack Docker local
+
+Validada em 2026-05-03 com:
+
+- `docker compose config`
+- builds React/Vite das três atividades
+- endpoints diretos `:8001`, `:8002`, `:8003`
+- Caddy em `/atividade-1/`, `/atividade-2/`, `/atividade-3/`
+- RPC, ZMQ e ciclo PSBT `broadcast → mempool → confirmed`
 
 ## URLs públicas (demo 2026-05-03)
 

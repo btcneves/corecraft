@@ -5,9 +5,10 @@
 | Layer | Technology |
 |-------|-----------|
 | Backend | Python 3.12 + FastAPI + Uvicorn |
-| Frontend | HTML/CSS/JavaScript (no frameworks) |
+| Frontend | React + Vite + TypeScript |
 | Bitcoin Core integration | Custom `rpc_client.py` per activity using `requests` + `HTTPBasicAuth` |
 | Event stream | `pyzmq` daemon thread (Activity 2 only) |
+| Local orchestration | Docker Compose + Caddy + Bitcoin Core regtest |
 
 ## Service overview
 
@@ -27,7 +28,7 @@ atividade-N/
 │   ├── main.py          FastAPI routes + static file serving
 │   ├── rpc_client.py    JSON-RPC 2.0 client
 │   └── <domain>.py      Business logic modules
-└── frontend/            Self-contained HTML/CSS/JS dashboard
+└── frontend/            React/Vite/TypeScript dashboard
 ```
 
 ## Design decisions
@@ -72,7 +73,10 @@ All routes that depend on Bitcoin Core return a structured 503 response when the
 ```
 
 ### Frontend design
-Each activity has a self-contained HTML/CSS/JS frontend served by FastAPI as static files. All API URLs are relative (`/api/mempool/summary`), so the frontend works identically whether accessed directly or through a tunnel (Cloudflare, ngrok) without modifying any JavaScript.
+Each activity has a self-contained React/Vite/TypeScript frontend. Docker builds the frontend and copies `dist/` into the FastAPI runtime image, where it is served by `app/main.py`. API URLs are prefix-aware, so each frontend works directly on `:8001`/`:8002`/`:8003` and through Caddy at `/atividade-1/`, `/atividade-2/`, and `/atividade-3/`.
+
+### Docker orchestration
+`docker compose up --build` starts Bitcoin Core in regtest, initializes `wallet1` and `wallet2`, mines spendable funds, starts the three activity services, and exposes them through Caddy. RPC credentials are supplied to `bitcoind` through command-line flags and to the backends through `BTC_RPC_USER`/`BTC_RPC_PASSWORD`; `bitcoin.conf` does not rely on environment-variable interpolation.
 
 ### JSON-RPC version
 All `rpc_client.py` modules send `"jsonrpc": "2.0"`. Bitcoin Core ≥ 31 rejects `"1.1"` with error `-32600: JSON-RPC version not supported`.

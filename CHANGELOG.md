@@ -2,6 +2,21 @@
 
 All notable changes to CoreCraft are documented here.
 
+## [1.1.0] — 2026-05-03
+
+### Added
+
+- Full Docker stack with `bitcoind`, wallet initialization, Caddy, and the three activity services.
+- React/Vite/TypeScript frontends for all activities.
+- Activity 2 WebSocket endpoint (`/ws/events`) with HTTP polling endpoints preserved.
+- Root tooling: `pyproject.toml`, per-activity Dockerfiles, setup scripts, Makefile, `.dockerignore`, and CI.
+- Structured JSON logging for the FastAPI backends.
+
+### Fixed
+
+- Docker RPC authentication now passes `-rpcuser` and `-rpcpassword` to `bitcoind` via Compose command flags instead of relying on unsupported environment-variable expansion inside `bitcoin.conf`.
+- FastAPI static serving now locates the Docker build output at `/app/frontend/dist`.
+
 ## [1.0.1] — 2026-05-03
 
 ### Fixed
