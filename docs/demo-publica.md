@@ -92,6 +92,8 @@ Quatro wallets detectadas via `listwalletdir`, todas carregadas. Wallet ativa: `
 
 109 UTXOs disponíveis na wallet1.
 
+> **Correção aplicada (commit `5b9a925`):** O campo `balance` retornou `null` nesta demo porque `getwalletinfo` no Bitcoin Core v31 não expõe mais esse campo diretamente. Após a correção, `/wallet/status` usa `getbalances()` e devolve o saldo numérico em `mine.trusted`. A resposta corrigida inclui os campos `balance` (numérico), `trusted_balance`, `untrusted_pending` e `immature_balance`.
+
 ---
 
 ## Conclusão

@@ -397,6 +397,8 @@ bitcoin-cli -regtest -rpcwallet=wallet1 sendtoaddress $ADDR 0.001
 }
 ```
 
+> **Correção aplicada (commit `5b9a925`):** O campo `balance` retornou `null` porque `getwalletinfo` no Bitcoin Core v31 não expõe mais esse campo diretamente. Após a correção, `/wallet/status` usa `getbalances()` e devolve o saldo numérico em `mine.trusted`. A resposta corrigida inclui os campos `balance` (numérico), `trusted_balance`, `untrusted_pending` e `immature_balance`.
+
 ### `POST /tx/send` (fluxo PSBT)
 
 Endereço destino na wallet2:
@@ -537,7 +539,7 @@ Todos os 9 endpoints obrigatórios + ciclo PSBT + bug fix da Atividade 3 + path 
 | ZMQ | OK | Seção 1 (`getzmqnotifications`) | rawblock:28332, rawtx:28333 |
 | Atividade 1 | OK | Seção 2 | `/api/mempool/summary` + `/api/blockchain/lag` |
 | Atividade 2 | OK | Seção 3 | `/api/events/{summary,latest,state-comparison}` + divergence fix |
-| Atividade 3 | OK | Seção 4 | `/wallets`, PSBT completo, bug fix wallet tracking |
+| Atividade 3 | OK | Seção 4 | `/wallets`, PSBT completo, bug fix wallet tracking, `balance` corrigido via `getbalances()` |
 | Caminho 503 | OK | Seção 5 | Todas as rotas retornam `node_unavailable` estruturado |
 | Frontend | OK | Local (2026-05-02) + público (2026-05-03) | Verificado via Cloudflare Tunnel nos três services |
 | Acesso externo | OK | `docs/demo-publica.md` | Tunnels ativos em 2026-05-03; respostas JSON reais capturadas |

@@ -185,6 +185,7 @@ Smoke tests completos com `curl`: [`docs/smoke-tests.md`](docs/smoke-tests.md).
 | [`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md) | Exposição pública via Cloudflare Tunnel ou ngrok |
 | [`docs/smoke-tests.md`](docs/smoke-tests.md) | Smoke tests `curl` por atividade |
 | [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md) | Saída completa de validação contra Bitcoin Core v31.0 |
+| [`docs/demo-publica.md`](docs/demo-publica.md) | Evidências de demo pública via Cloudflare Tunnel (2026-05-03) |
 
 Cada atividade tem seu próprio README detalhado:
 

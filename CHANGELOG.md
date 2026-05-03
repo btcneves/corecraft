@@ -2,6 +2,16 @@
 
 All notable changes to CoreCraft are documented here.
 
+## [1.0.1] — 2026-05-03
+
+### Fixed
+
+- **Activity 3 — `wallet_service.py`**: `wallet_status()` now falls back to
+  `getbalances()` when `getwalletinfo` does not expose a `balance` field
+  (behaviour observed with Bitcoin Core v31). `/wallet/status` now returns a
+  numeric balance via `mine.trusted` instead of `null`. The response also
+  includes `trusted_balance`, `untrusted_pending`, and `immature_balance`.
+
 ## [1.0.0] — 2026-05-02
 
 ### Added

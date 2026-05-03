@@ -34,7 +34,9 @@ Três micro-serviços independentes de integração com Bitcoin Core (regtest):
 | 1 | `GET /api/blockchain/lag` | `{"blocks":215,"headers":215,"lag":0}` |
 | 2 | `GET /api/events/summary` | `{"blocks_observed":1,"tx_observed":4,"last_event_time":1777837956.2590888,"tx_per_second":0.7}` |
 | 3 | `GET /wallets` | `{"available_wallets":["smoke_test_wallet","wallet1","wallet2","corecraft"],"loaded_wallets":["wallet1","wallet2","smoke_test_wallet","corecraft"],"selected_wallet":"wallet1"}` |
-| 3 | `GET /wallet/status` | `{"wallet":"wallet1","balance":null,"utxos":109}` |
+| 3 | `GET /wallet/status` | `{"wallet":"wallet1","balance":null,"utxos":109}` ¹ |
+
+¹ O campo `balance` exibiu `null` no momento da demo porque `getwalletinfo` no Bitcoin Core v31 não expõe mais esse campo diretamente. Corrigido em seguida (commit `5b9a925`): `/wallet/status` agora usa `getbalances()` e retorna o saldo numérico via `mine.trusted`.
 
 ## Ambiente no momento da demo
 
