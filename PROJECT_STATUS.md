@@ -4,33 +4,36 @@
 
 ## Status geral
 
-Pronto para entrega. As três atividades estão implementadas e validadas ao vivo contra Bitcoin Core v31.0 em regtest (2026-05-02). Nenhuma pendência bloqueia a entrega — apenas a URL pública opcional está em aberto.
+Entrega concluída. As três atividades estão implementadas, validadas ao vivo (2026-05-02) e demonstradas publicamente via Cloudflare Tunnel (2026-05-03) contra Bitcoin Core v31.0 em regtest.
 
 ## Status por atividade
 
-| Atividade | Implementação | Validação | Observação |
-|-----------|--------------|-----------|------------|
-| 1 — Mempool RPC | Concluída | OK (2026-05-02) | 2 endpoints validados com saída real |
-| 2 — ZMQ Events | Concluída | OK (2026-05-02) | 3 endpoints + bug fix divergence null |
-| 3 — Multi-wallet PSBT | Concluída | OK (2026-05-02) | 5 endpoints + ciclo PSBT completo + bug fix wallet tracking |
+| Atividade | Implementação | Validação local | Demo pública |
+|-----------|--------------|-----------------|--------------|
+| 1 — Mempool RPC | Concluída | OK (2026-05-02) | OK (2026-05-03) |
+| 2 — ZMQ Events | Concluída | OK (2026-05-02) | OK (2026-05-03) |
+| 3 — Multi-wallet PSBT | Concluída | OK (2026-05-02) | OK (2026-05-03) |
+
+## URLs públicas (demo 2026-05-03)
+
+| Atividade | URL |
+|-----------|-----|
+| Atividade 1 | https://administrators-humanitarian-define-author.trycloudflare.com |
+| Atividade 2 | https://dice-garcia-hub-particular.trycloudflare.com |
+| Atividade 3 | https://move-after-salaries-kde.trycloudflare.com |
+
+> Tunnels Cloudflare temporários gerados em 2026-05-03. Evidências completas em [`docs/demo-publica.md`](docs/demo-publica.md).
 
 ## Pendências
 
-- [ ] URL pública (VPS/tunnel) não configurada
-- [ ] Frontend não validado via acesso externo (apenas local)
-
-## Próximos passos
-
-1. Configurar Cloudflare Tunnel ou VPS seguindo `docs/deploy-cloudflare-tunnel.md`
-2. Registrar URLs em `docs/entrega.md`
-3. Re-executar `./scripts/smoke-test.sh` via URL pública
-4. Marcar `[ ] URL pública/tunnel testado` no checklist de `docs/validacao-ao-vivo.md`
+Nenhuma pendência em aberto.
 
 ## Arquivos de validação
 
 | Arquivo | Conteúdo |
 |---------|----------|
-| `docs/validacao-ao-vivo.md` | Evidências reais de execução (saídas JSON reais do regtest) |
+| `docs/validacao-ao-vivo.md` | Evidências reais de execução local (2026-05-02) |
+| `docs/demo-publica.md` | Evidências de acesso externo via Cloudflare Tunnel (2026-05-03) |
 | `docs/smoke-tests.md` | Smoke tests manuais com curl por atividade |
-| `scripts/smoke-test.sh` | Script automatizado de smoke tests (requer backends ativos) |
-| `docs/entrega.md` | Checklist de entrega + campo para URL pública |
+| `scripts/smoke-test.sh` | Script automatizado de smoke tests |
+| `docs/entrega.md` | Checklist de entrega + URLs públicas + respostas reais |

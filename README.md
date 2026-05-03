@@ -28,9 +28,9 @@ A evolução entre as atividades segue um arco claro:
 
 | Atividade | Status | Principais recursos |
 |-----------|--------|---------------------|
-| [Atividade 1](atividade-1/) | Concluída | RPC, mempool summary, blockchain lag |
-| [Atividade 2](atividade-2/) | Concluída, requer ZMQ ativo | rawtx/rawblock, eventos recentes, comparação RPC/ZMQ |
-| [Atividade 3](atividade-3/) | Concluída, requer wallets em regtest | múltiplas wallets, PSBT, tx interpretada, wallet status |
+| [Atividade 1](atividade-1/) | Concluída e validada | RPC, mempool summary, blockchain lag |
+| [Atividade 2](atividade-2/) | Concluída e validada, requer ZMQ ativo | rawtx/rawblock, eventos recentes, comparação RPC/ZMQ |
+| [Atividade 3](atividade-3/) | Concluída e validada, requer wallets em regtest | múltiplas wallets, PSBT, tx interpretada, wallet status |
 
 Portas locais (uvicorn): Atividade 1 → `8001` · Atividade 2 → `8002` · Atividade 3 → `8003`.
 
@@ -244,13 +244,43 @@ Para reproduzir localmente (requer `bitcoind -regtest` nas portas padrão):
 ./scripts/smoke-test.sh
 ```
 
-URL pública: ainda não registrada. O projeto inclui roteiros para exposição via Cloudflare Tunnel ([`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md)) e VPS ([`docs/deploy-vps.md`](docs/deploy-vps.md)).
+Demo pública executada em 2026-05-03 via Cloudflare Tunnel:
+
+| Atividade | URL | Endpoint validado | Resposta |
+|-----------|-----|-------------------|----------|
+| 1 | https://administrators-humanitarian-define-author.trycloudflare.com | `/api/blockchain/lag` | `{"blocks":215,"headers":215,"lag":0}` |
+| 2 | https://dice-garcia-hub-particular.trycloudflare.com | `/api/events/summary` | `{"blocks_observed":1,"tx_observed":4,...}` |
+| 3 | https://move-after-salaries-kde.trycloudflare.com | `/wallets` | `{"available_wallets":[...],"selected_wallet":"wallet1"}` |
+
+> URLs temporárias (trycloudflare.com) — ativas enquanto os processos `cloudflared` estavam rodando. Evidências completas: [`docs/demo-publica.md`](docs/demo-publica.md).
 
 ---
 
-## Evidência operacional
+## Formato de envio
 
-Além do código e da documentação, o projeto inclui um roteiro de validação ao vivo em [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md), com saídas reais do Bitcoin Core, smoke tests HTTP e checklist para comprovar o funcionamento das três atividades em ambiente `regtest`.
+```
+Nome: Pedro Neves
+GitHub: https://github.com/btcneves/corecraft
+
+Atividade 1:
+https://github.com/btcneves/corecraft/tree/main/atividade-1
+
+Atividade 2:
+https://github.com/btcneves/corecraft/tree/main/atividade-2
+
+Atividade 3:
+https://github.com/btcneves/corecraft/tree/main/atividade-3
+
+Observações:
+Repositório único organizado conforme exigido, com backend, frontend,
+documentação, integração Bitcoin Core via RPC/ZMQ quando aplicável e
+validação real em Bitcoin Core v31.0.0 no modo regtest.
+
+Demonstração pública:
+Atividade 1: https://administrators-humanitarian-define-author.trycloudflare.com
+Atividade 2: https://dice-garcia-hub-particular.trycloudflare.com
+Atividade 3: https://move-after-salaries-kde.trycloudflare.com
+```
 
 ---
 

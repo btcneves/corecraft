@@ -23,7 +23,7 @@ Execução real contra `bitcoind -regtest` no host (Bitcoin Core v31.0). Todos o
 | Backend Atividade 1 | http://127.0.0.1:8001 |
 | Backend Atividade 2 | http://127.0.0.1:8002 |
 | Backend Atividade 3 | http://127.0.0.1:8003 |
-| URL pública | Ainda não registrada. Ver `docs/deploy-cloudflare-tunnel.md` e `docs/deploy-vps.md`. |
+| URL pública (demo 2026-05-03) | Ativ. 1: https://administrators-humanitarian-define-author.trycloudflare.com · Ativ. 2: https://dice-garcia-hub-particular.trycloudflare.com · Ativ. 3: https://move-after-salaries-kde.trycloudflare.com |
 
 ---
 
@@ -37,7 +37,7 @@ Execução real contra `bitcoind -regtest` no host (Bitcoin Core v31.0). Todos o
 - [x] Atividade 2 validada
 - [x] Atividade 3 validada
 - [x] Frontend acessível (local)
-- [ ] URL pública/tunnel testado
+- [x] URL pública/tunnel testado (2026-05-03, Cloudflare Tunnel)
 
 ---
 
@@ -539,5 +539,22 @@ Todos os 9 endpoints obrigatórios + ciclo PSBT + bug fix da Atividade 3 + path 
 | Atividade 2 | OK | Seção 3 | `/api/events/{summary,latest,state-comparison}` + divergence fix |
 | Atividade 3 | OK | Seção 4 | `/wallets`, PSBT completo, bug fix wallet tracking |
 | Caminho 503 | OK | Seção 5 | Todas as rotas retornam `node_unavailable` estruturado |
-| Frontend | Pendente | — | Verificável em `http://127.0.0.1:800{1,2,3}` com bitcoind ativo |
-| Acesso externo | Pendente | — | URL não configurada; ver `docs/deploy-cloudflare-tunnel.md` |
+| Frontend | OK | Local (2026-05-02) + público (2026-05-03) | Verificado via Cloudflare Tunnel nos três services |
+| Acesso externo | OK | `docs/demo-publica.md` | Tunnels ativos em 2026-05-03; respostas JSON reais capturadas |
+
+---
+
+## 7. Demo pública — Cloudflare Tunnel (2026-05-03)
+
+Backends expostos via `cloudflared tunnel --url` em 2026-05-03. Bitcoin Core v31.0 em regtest, 215 blocos.
+
+| Atividade | URL | Endpoint testado | Resposta |
+|-----------|-----|------------------|----------|
+| 1 | https://administrators-humanitarian-define-author.trycloudflare.com | `GET /api/blockchain/lag` | `{"blocks":215,"headers":215,"lag":0}` |
+| 2 | https://dice-garcia-hub-particular.trycloudflare.com | `GET /api/events/summary` | `{"blocks_observed":1,"tx_observed":4,"last_event_time":1777837956.2590888,"tx_per_second":0.7}` |
+| 3 | https://move-after-salaries-kde.trycloudflare.com | `GET /wallets` | `{"available_wallets":["smoke_test_wallet","wallet1","wallet2","corecraft"],...,"selected_wallet":"wallet1"}` |
+| 3 | https://move-after-salaries-kde.trycloudflare.com | `GET /wallet/status` | `{"wallet":"wallet1","balance":null,"utxos":109}` |
+
+**Conclusão:** acesso externo verificado, frontend servido corretamente pelo FastAPI via HTTPS do Cloudflare Tunnel.
+
+Evidências completas: [`docs/demo-publica.md`](demo-publica.md).
