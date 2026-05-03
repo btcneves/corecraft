@@ -52,8 +52,25 @@ def wallet_status(name: str) -> dict:
     w_rpc = rpc_wallet(name)
     info = w_rpc.call("getwalletinfo")
     utxos = w_rpc.call("listunspent")
+
+    balance = info.get("balance")
+    trusted_balance = None
+    untrusted_pending = None
+    immature_balance = None
+
+    if balance is None:
+        balances = w_rpc.call("getbalances")
+        mine = balances.get("mine", {})
+        trusted_balance = mine.get("trusted", 0.0)
+        untrusted_pending = mine.get("untrusted_pending", 0.0)
+        immature_balance = mine.get("immature", 0.0)
+        balance = trusted_balance
+
     return {
         "wallet": info.get("walletname"),
-        "balance": info.get("balance"),
+        "balance": balance,
         "utxos": len(utxos),
+        "trusted_balance": trusted_balance if trusted_balance is not None else balance,
+        "untrusted_pending": untrusted_pending if untrusted_pending is not None else 0.0,
+        "immature_balance": immature_balance if immature_balance is not None else 0.0,
     }
