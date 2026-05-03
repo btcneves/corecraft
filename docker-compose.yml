@@ -1,60 +1,157 @@
+name: corecraft
+
 services:
-  atividade-1:
-    image: python:3.12-slim
-    working_dir: /app
+  bitcoind:
+    image: bitcoin/bitcoin:26
+    container_name: corecraft-bitcoind
+    command:
+      - -conf=/etc/bitcoin/bitcoin.conf
+      - -rpcuser=${BTC_RPC_USER:-user}
+      - -rpcpassword=${BTC_RPC_PASSWORD:-password}
+    environment:
+      BTC_RPC_USER: ${BTC_RPC_USER:-user}
+      BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
     volumes:
-      - ./atividade-1/backend:/app
-      - ./atividade-1/frontend:/frontend
-      - ./atividade-1/.env:/app/.env:ro
-    command: >
-      sh -c "pip install -r requirements.txt -q &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8001"
+      - bitcoin-data:/home/bitcoin/.bitcoin
+      - ./infra/bitcoin/bitcoin.conf:/etc/bitcoin/bitcoin.conf:ro
+    ports:
+      - "18443:18443"
+      - "28332:28332"
+      - "28333:28333"
+    healthcheck:
+      test: ["CMD-SHELL", "bitcoin-cli -regtest -rpcuser=$${BTC_RPC_USER:-user} -rpcpassword=$${BTC_RPC_PASSWORD:-password} getblockchaininfo >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    networks:
+      - corecraft
+
+  bitcoin-init:
+    image: bitcoin/bitcoin:26
+    container_name: corecraft-bitcoin-init
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+    environment:
+      BTC_RPC_HOST: bitcoind
+      BTC_RPC_PORT: 18443
+      BTC_RPC_USER: ${BTC_RPC_USER:-user}
+      BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
+    volumes:
+      - ./infra/bitcoin/init-wallets.sh:/init-wallets.sh:ro
+    entrypoint: ["/bin/sh", "/init-wallets.sh"]
+    networks:
+      - corecraft
+    restart: "no"
+
+  atividade-1:
+    container_name: corecraft-atividade-1
+    build:
+      context: .
+      dockerfile: atividade-1/Dockerfile
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+      bitcoin-init:
+        condition: service_completed_successfully
+    environment:
+      PYTHONUNBUFFERED: "1"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      BTC_RPC_HOST: bitcoind
+      BTC_RPC_PORT: 18443
+      BTC_RPC_USER: ${BTC_RPC_USER:-user}
+      BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
     ports:
       - "8001:8001"
-    extra_hosts:
-      # Permite que cada container resolva "host.docker.internal" para o host
-      # onde o bitcoind está rodando. Configure cada atividade-*/.env para
-      # BTC_RPC_HOST=host.docker.internal (e os endpoints ZMQ na Atividade 2).
-      - "host.docker.internal:host-gateway"
-    environment:
-      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/', timeout=3).read()\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks:
+      - corecraft
 
   atividade-2:
-    image: python:3.12-slim
-    working_dir: /app
-    volumes:
-      - ./atividade-2/backend:/app
-      - ./atividade-2/frontend:/frontend
-      - ./atividade-2/.env:/app/.env:ro
-    command: >
-      sh -c "pip install -r requirements.txt -q &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8002"
+    container_name: corecraft-atividade-2
+    build:
+      context: .
+      dockerfile: atividade-2/Dockerfile
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+      bitcoin-init:
+        condition: service_completed_successfully
+    environment:
+      PYTHONUNBUFFERED: "1"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      BTC_RPC_HOST: bitcoind
+      BTC_RPC_PORT: 18443
+      BTC_RPC_USER: ${BTC_RPC_USER:-user}
+      BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
+      ZMQ_RAWBLOCK_ENDPOINT: tcp://bitcoind:28332
+      ZMQ_RAWTX_ENDPOINT: tcp://bitcoind:28333
     ports:
       - "8002:8002"
-    extra_hosts:
-      # Permite que cada container resolva "host.docker.internal" para o host
-      # onde o bitcoind está rodando. Configure cada atividade-*/.env para
-      # BTC_RPC_HOST=host.docker.internal (e os endpoints ZMQ na Atividade 2).
-      - "host.docker.internal:host-gateway"
-    environment:
-      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/', timeout=3).read()\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks:
+      - corecraft
 
   atividade-3:
-    image: python:3.12-slim
-    working_dir: /app
-    volumes:
-      - ./atividade-3/backend:/app
-      - ./atividade-3/frontend:/frontend
-      - ./atividade-3/.env:/app/.env:ro
-    command: >
-      sh -c "pip install -r requirements.txt -q &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8003"
+    container_name: corecraft-atividade-3
+    build:
+      context: .
+      dockerfile: atividade-3/Dockerfile
+    depends_on:
+      bitcoind:
+        condition: service_healthy
+      bitcoin-init:
+        condition: service_completed_successfully
+    environment:
+      PYTHONUNBUFFERED: "1"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      BTC_RPC_HOST: bitcoind
+      BTC_RPC_PORT: 18443
+      BTC_RPC_USER: ${BTC_RPC_USER:-user}
+      BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
     ports:
       - "8003:8003"
-    extra_hosts:
-      # Permite que cada container resolva "host.docker.internal" para o host
-      # onde o bitcoind está rodando. Configure cada atividade-*/.env para
-      # BTC_RPC_HOST=host.docker.internal (e os endpoints ZMQ na Atividade 2).
-      - "host.docker.internal:host-gateway"
-    environment:
-      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/', timeout=3).read()\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks:
+      - corecraft
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: corecraft-caddy
+    depends_on:
+      atividade-1:
+        condition: service_healthy
+      atividade-2:
+        condition: service_healthy
+      atividade-3:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - corecraft
+
+networks:
+  corecraft:
+    driver: bridge
+
+volumes:
+  bitcoin-data:
+  caddy-data:
+  caddy-config:

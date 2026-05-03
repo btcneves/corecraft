@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Compile Python backends
+        run: python -m compileall -q atividade-1/backend/app atividade-2/backend/app atividade-3/backend/app
+
+      - name: Build Activity 1 frontend
+        working-directory: atividade-1/frontend
+        run: npm ci && npm run build
+
+      - name: Build Activity 2 frontend
+        working-directory: atividade-2/frontend
+        run: npm ci && npm run build
+
+      - name: Build Activity 3 frontend
+        working-directory: atividade-3/frontend
+        run: npm ci && npm run build
+
+      - name: Validate Compose file
+        run: docker compose config

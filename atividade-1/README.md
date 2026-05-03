@@ -1,6 +1,6 @@
 # Atividade 1 — Snapshot Inteligente da Mempool via RPC
 
-> Backend FastAPI + frontend estático que consulta o Bitcoin Core via JSON-RPC e expõe um snapshot enriquecido da mempool e do status de sincronização do nó.
+> Backend FastAPI + frontend React/Vite que consulta o Bitcoin Core via JSON-RPC e expõe um snapshot enriquecido da mempool e do status de sincronização do nó.
 
 ---
 
@@ -25,11 +25,11 @@ Construir uma camada de **interpretação** sobre o estado bruto do nó: em vez 
 atividade-1/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py        rotas FastAPI + serve frontend estático
+│   │   ├── main.py        rotas FastAPI + serve build React
 │   │   ├── mempool.py     summary() e lag() — toda a lógica de cálculo
 │   │   └── rpc_client.py  JSON-RPC (RPCError, RPCConnectionError, BitcoinRPC)
 │   └── requirements.txt
-├── frontend/              dashboard polling 5s (HTML + CSS + JS puro)
+├── frontend/              dashboard React/Vite com polling 5s
 ├── .env.example
 └── README.md
 ```

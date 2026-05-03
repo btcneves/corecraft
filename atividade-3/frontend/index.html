@@ -1,96 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CoreCraft — Atividade 3: Multi-Wallet</title>
-  <link rel="stylesheet" href="/static/styles.css" />
-</head>
-<body>
-  <header>
-    <h1>CoreCraft <span class="badge">Atividade 3</span></h1>
-    <p class="subtitle">Múltiplas Wallets — PSBT · Estado Interpretado</p>
-  </header>
-
-  <main>
-    <!-- Wallet Selector -->
-    <section class="card">
-      <h2>Seleção de Wallet</h2>
-      <div class="card-body">
-        <div class="form-row">
-          <label for="wallet-select">Wallet ativa</label>
-          <select id="wallet-select" disabled>
-            <option value="">— Carregando —</option>
-          </select>
-        </div>
-        <p id="wallet-hint" class="hint"></p>
-        <p class="card-error hidden" id="err-wallet"></p>
-      </div>
-    </section>
-
-    <!-- Wallet Status -->
-    <section class="card">
-      <h2>Status da Wallet</h2>
-      <div class="card-body">
-        <div class="stat-row">
-          <span class="label">Wallet</span>
-          <span class="value" id="ws-name">—</span>
-        </div>
-        <div class="stat-row">
-          <span class="label">Saldo</span>
-          <span class="value" id="ws-balance">—</span>
-        </div>
-        <div class="stat-row">
-          <span class="label">UTXOs disponíveis</span>
-          <span class="value" id="ws-utxos">—</span>
-        </div>
-      </div>
-      <p class="card-error hidden" id="err-status"></p>
-    </section>
-
-    <!-- Send Transaction -->
-    <section class="card">
-      <h2>Enviar Transação</h2>
-      <p class="note">Transação criada e assinada com a wallet selecionada via PSBT.</p>
-      <div class="card-body">
-        <div class="form-row">
-          <label for="to-address">Endereço destino</label>
-          <input type="text" id="to-address" placeholder="bcrt1q..." />
-        </div>
-        <div class="form-row">
-          <label for="amount">Valor (BTC)</label>
-          <input type="number" id="amount" step="0.00001" min="0.00001" placeholder="0.001" />
-        </div>
-        <button id="btn-send" disabled>Enviar</button>
-        <p id="send-result" class="send-result hidden"></p>
-        <p class="card-error hidden" id="err-send"></p>
-      </div>
-    </section>
-
-    <!-- Transaction List -->
-    <section class="card wide">
-      <h2>Transações Enviadas</h2>
-      <div id="tx-list-empty" class="empty-msg">Nenhuma transação enviada nesta sessão.</div>
-      <table id="tx-table" class="tx-table hidden">
-        <thead>
-          <tr>
-            <th>TXID</th>
-            <th>Wallet</th>
-            <th>Status</th>
-            <th>Confirmações</th>
-            <th>Idade</th>
-            <th>Mensagem</th>
-          </tr>
-        </thead>
-        <tbody id="tx-tbody"></tbody>
-      </table>
-    </section>
-  </main>
-
-  <footer>
-    <span id="last-update">Aguardando dados…</span>
-  </footer>
-
-  <script src="/static/app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CoreCraft - Atividade 3</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

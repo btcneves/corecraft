@@ -4,7 +4,7 @@
 
 **Integração com Bitcoin Core via JSON-RPC e ZMQ — três aplicações web evolutivas.**
 
-`Python 3.12` · `FastAPI` · `Uvicorn` · `pyzmq` · `HTML/CSS/JS puro`
+`Python 3.12` · `FastAPI` · `Uvicorn` · `pyzmq` · `React` · `Vite` · `TypeScript` · `Docker Compose`
 
 </div>
 
@@ -12,7 +12,7 @@
 
 ## Visão geral
 
-CoreCraft é o repositório das três atividades obrigatórias do programa CoreCraft. Cada atividade é um **micro-serviço independente** (backend FastAPI + frontend estático) que se comunica com um nó Bitcoin Core local em `regtest` e expõe uma camada interpretada do estado da rede.
+CoreCraft é o repositório das três atividades obrigatórias do programa CoreCraft. Cada atividade é um **micro-serviço independente** (backend FastAPI + frontend React) que se comunica com um nó Bitcoin Core em `regtest` e expõe uma camada interpretada do estado da rede.
 
 A evolução entre as atividades segue um arco claro:
 
@@ -34,7 +34,7 @@ A evolução entre as atividades segue um arco claro:
 
 Portas locais (uvicorn): Atividade 1 → `8001` · Atividade 2 → `8002` · Atividade 3 → `8003`.
 
-Os três backends seguem o mesmo padrão estrutural: `app/main.py` (rotas FastAPI) + `app/rpc_client.py` (cliente JSON-RPC dedicado) + módulos de domínio + frontend estático servido pelo próprio FastAPI.
+Os três backends seguem o mesmo padrão estrutural: `app/main.py` (rotas FastAPI) + `app/rpc_client.py` (cliente JSON-RPC dedicado) + módulos de domínio + build React servido pelo próprio FastAPI.
 
 ---
 
@@ -49,7 +49,7 @@ corecraft/
 │   │   │   ├── mempool.py        cálculo de fee rate e distribuição
 │   │   │   └── rpc_client.py     JSON-RPC com tratamento de erro
 │   │   └── requirements.txt
-│   ├── frontend/                 dashboard polling 5s (HTML/CSS/JS)
+│   ├── frontend/                 dashboard React/Vite polling 5s
 │   ├── .env.example
 │   └── README.md
 │
@@ -62,7 +62,7 @@ corecraft/
 │   │   │   ├── event_service.py  agregadores
 │   │   │   └── rpc_client.py
 │   │   └── requirements.txt
-│   ├── frontend/                 dashboard polling 2s + banner de divergência
+│   ├── frontend/                 dashboard React/Vite com WebSocket + fallback polling
 │   ├── .env.example
 │   └── README.md
 │
@@ -75,7 +75,7 @@ corecraft/
 │   │   │   ├── tx_interpreter.py broadcast → mempool → confirmed → unknown
 │   │   │   └── rpc_client.py     RPC global + RPC por wallet (/wallet/<nome>)
 │   │   └── requirements.txt
-│   ├── frontend/                 seletor de wallet, formulário de envio, tabela de tx
+│   ├── frontend/                 React/Vite: seletor de wallet, envio PSBT, tabela de tx
 │   ├── .env.example
 │   └── README.md
 │
@@ -140,18 +140,22 @@ uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 
 Frontend disponível em `http://localhost:8001` (servido pelo próprio FastAPI).
 
-### 3. Rodar as três simultaneamente (Docker Compose)
+### 3. Rodar a stack completa (Docker Compose)
 
 ```bash
+cp .env.example .env
 docker compose up --build
-# Atividade 1: http://localhost:8001
-# Atividade 2: http://localhost:8002
-# Atividade 3: http://localhost:8003
+# Caddy:
+#   http://localhost/atividade-1/
+#   http://localhost/atividade-2/
+#   http://localhost/atividade-3/
+# Portas diretas:
+#   http://localhost:8001
+#   http://localhost:8002
+#   http://localhost:8003
 ```
 
-> Requer `.env` preenchido em cada `atividade-*/`. O Bitcoin Core continua rodando no host.
->
-> **Importante (Docker)**: dentro de um container, `127.0.0.1` aponta para o **próprio container**, não para o host onde o `bitcoind` está rodando. Ao usar `docker compose`, edite cada `atividade-*/.env` para `BTC_RPC_HOST=host.docker.internal` (e `ZMQ_RAWBLOCK_ENDPOINT=tcp://host.docker.internal:28332` / `ZMQ_RAWTX_ENDPOINT=tcp://host.docker.internal:28333` na Atividade 2). O `docker-compose.yml` já mapeia `host.docker.internal` para o gateway do host via `extra_hosts`. Em execução local com uvicorn (sem Docker), mantenha `127.0.0.1`.
+O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial para `wallet1`, executa os tres backends e expõe as interfaces pelo Caddy. Detalhes em [`docs/docker-stack.md`](docs/docker-stack.md).
 
 ---
 
@@ -201,7 +205,7 @@ Cada atividade tem seu próprio README detalhado:
 - **Sem banco de dados.** Estado em memória (`deque` na Atividade 2, `dict` na Atividade 3). Estado zera ao reiniciar — comportamento esperado.
 - **PSBT na Atividade 3.** Fluxo `walletcreatefundedpsbt → walletprocesspsbt → finalizepsbt → sendrawtransaction` para o Core cuidar de seleção de UTXO e fee.
 - **Erro 503 estruturado.** Quando o nó está offline, todas as rotas que dependem dele retornam `{"detail": {"error": "node_unavailable", "detail": "..."}}` com HTTP 503.
-- **Frontend isolado.** Cada atividade tem HTML/CSS/JS próprios; nenhum framework. URLs relativas — funciona com tunnel sem alterar JS.
+- **Frontend isolado.** Cada atividade tem frontend React/Vite/TypeScript próprio. URLs relativas e Caddy com prefixos permitem acesso direto (`:8001`/`:8002`/`:8003`) ou por `/atividade-N/`.
 - **Decisões de arquitetura completas em [`docs/architecture.md`](docs/architecture.md).**
 
 ---
@@ -260,4 +264,3 @@ Demo pública executada em 2026-05-03 via Cloudflare Tunnel:
 ## Licença
 
 [MIT](LICENSE) © 2026 Pedro Neves
-

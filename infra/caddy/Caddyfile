@@ -1,0 +1,21 @@
+:80 {
+	redir /atividade-1 /atividade-1/
+	redir /atividade-2 /atividade-2/
+	redir /atividade-3 /atividade-3/
+
+	handle_path /atividade-1/* {
+		reverse_proxy atividade-1:8001
+	}
+
+	handle_path /atividade-2/* {
+		reverse_proxy atividade-2:8002
+	}
+
+	handle_path /atividade-3/* {
+		reverse_proxy atividade-3:8003
+	}
+
+	handle {
+		respond "CoreCraft: use /atividade-1/, /atividade-2/ or /atividade-3/" 200
+	}
+}

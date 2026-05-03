@@ -1,6 +1,6 @@
 # Atividade 3 — Múltiplas Wallets, PSBT e Estado Interpretado
 
-> Backend FastAPI + frontend estático que carrega e seleciona wallets do Bitcoin Core, monta transações via fluxo PSBT, transmite ao nó e expõe o ciclo de vida interpretado de cada transação (`broadcast → mempool → confirmed`).
+> Backend FastAPI + frontend React/Vite que carrega e seleciona wallets do Bitcoin Core, monta transações via fluxo PSBT, transmite ao nó e expõe o ciclo de vida interpretado de cada transação (`broadcast → mempool → confirmed`).
 
 ---
 
