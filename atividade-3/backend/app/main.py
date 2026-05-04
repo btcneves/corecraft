@@ -1,12 +1,21 @@
 import os
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import NoReturn
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from corecraft import (
+    AppState,
+    SelectWalletResponse,
+    SendTxResponse,
+    TxInterpretation,
+    WalletsResponse,
+    WalletStatus,
+)
 
 from .logging_config import configure_logging
 from .observability import correlation_middleware, health_payload, metrics_text
@@ -38,10 +47,7 @@ elif FRONTEND_SOURCE_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_SOURCE_DIR)), name="static")
 
 # ── In-memory state ──────────────────────────────────────────────────────────
-state: dict[str, Any] = {
-    "selected_wallet": None,
-    "tracked_txs": {},  # txid -> {wallet, broadcast_ts}
-}
+state: AppState = AppState(selected_wallet=None, tracked_txs={})
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -60,12 +66,12 @@ def _node() -> BitcoinRPC:
 
 
 def _require_wallet() -> str:
-    w = state.get("selected_wallet")
-    if not w:
+    w: str | None = state["selected_wallet"]
+    if w is None:
         raise HTTPException(
             status_code=409, detail="No wallet selected. POST /wallet/select first."
         )
-    return str(w)
+    return w
 
 
 def _handle_rpc(exc: Exception) -> NoReturn:
@@ -87,7 +93,7 @@ def index() -> FileResponse:
 
 
 @app.get("/health")
-def health() -> dict[str, object]:
+def health() -> dict[str, str]:
     return health_payload()
 
 
@@ -97,7 +103,7 @@ def metrics() -> str:
 
 
 @app.get("/wallets")
-def wallets() -> dict[str, object]:
+def wallets() -> WalletsResponse:
     try:
         return list_wallets(_node(), state)
     except (RPCConnectionError, RPCError) as exc:
@@ -105,7 +111,7 @@ def wallets() -> dict[str, object]:
 
 
 @app.post("/wallet/select")
-def wallet_select(body: SelectWalletRequest) -> dict[str, object]:
+def wallet_select(body: SelectWalletRequest) -> SelectWalletResponse:
     try:
         return select_wallet(body.wallet, _node(), state)
     except ValueError as exc:
@@ -115,7 +121,7 @@ def wallet_select(body: SelectWalletRequest) -> dict[str, object]:
 
 
 @app.get("/wallet/status")
-def wallet_status_route() -> dict[str, object]:
+def wallet_status_route() -> WalletStatus:
     name = _require_wallet()
     try:
         return wallet_status(name)
@@ -124,7 +130,7 @@ def wallet_status_route() -> dict[str, object]:
 
 
 @app.post("/tx/send")
-def tx_send(body: SendTxRequest) -> dict[str, object]:
+def tx_send(body: SendTxRequest) -> SendTxResponse:
     name = _require_wallet()
     try:
         return send_tx(body.to_address, body.amount, name, state["tracked_txs"])
@@ -135,8 +141,8 @@ def tx_send(body: SendTxRequest) -> dict[str, object]:
 
 
 @app.get("/tx/{txid}")
-def tx_status(txid: str) -> dict[str, object]:
-    wallet = state.get("selected_wallet")
+def tx_status(txid: str) -> TxInterpretation:
+    wallet = state["selected_wallet"]
     try:
         return get_tx(txid, wallet, state["tracked_txs"])
     except (RPCConnectionError, RPCError) as exc:

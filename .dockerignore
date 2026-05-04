@@ -76,7 +76,6 @@ tests
 # Development config
 *.ini
 mypy-*.ini
-pyproject.toml
 requirements-dev.txt
 
 # Docker (don't include docker files in build context)

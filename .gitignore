@@ -25,6 +25,18 @@ Thumbs.db
 # Logs
 *.log
 
+# Test / coverage artefacts
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# Type-checking cache
+.mypy_cache/
+
+# Linting cache
+.ruff_cache/
+
 # Tooling local
 .claude/
 .codex

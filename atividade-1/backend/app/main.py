@@ -6,6 +6,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
+from corecraft import BlockchainLag, MempoolSummary
+
 from .logging_config import configure_logging
 from .mempool import lag, summary
 from .observability import correlation_middleware, health_payload, metrics_text
@@ -41,7 +43,7 @@ def index() -> FileResponse:
 
 
 @app.get("/health")
-def health() -> dict[str, object]:
+def health() -> dict[str, str]:
     return health_payload()
 
 
@@ -51,10 +53,11 @@ def metrics() -> str:
 
 
 @app.get("/api/mempool/summary")
-def mempool_summary() -> dict[str, object]:
+def mempool_summary() -> MempoolSummary:
     rpc = rpc_from_env()
     try:
-        return summary(rpc)
+        result: MempoolSummary = summary(rpc)
+        return result
     except RPCConnectionError as exc:
         raise HTTPException(
             status_code=503, detail={"error": "node_unavailable", "detail": str(exc)}
@@ -66,10 +69,11 @@ def mempool_summary() -> dict[str, object]:
 
 
 @app.get("/api/blockchain/lag")
-def blockchain_lag() -> dict[str, object]:
+def blockchain_lag() -> BlockchainLag:
     rpc = rpc_from_env()
     try:
-        return lag(rpc)
+        result: BlockchainLag = lag(rpc)
+        return result
     except RPCConnectionError as exc:
         raise HTTPException(
             status_code=503, detail={"error": "node_unavailable", "detail": str(exc)}

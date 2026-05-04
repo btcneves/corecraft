@@ -4,15 +4,24 @@ from typing import Any
 import requests
 from requests.auth import HTTPBasicAuth
 
+from corecraft import RPCErrorData
+
 JsonValue = Any
 JsonDict = dict[str, Any]
 
 
 class RPCError(Exception):
+    """Exception raised for Bitcoin RPC errors."""
+
     def __init__(self, code: int, message: str) -> None:
-        self.code = code
-        self.message = message
+        self.code: int = code
+        self.message: str = message
         super().__init__(f"RPC error {code}: {message}")
+
+    @classmethod
+    def from_data(cls, data: RPCErrorData) -> "RPCError":
+        """Create an RPCError from RPC error data."""
+        return cls(code=data["code"], message=data["message"])
 
 
 class RPCConnectionError(Exception):
@@ -36,11 +45,17 @@ class BitcoinRPC:
         except requests.exceptions.Timeout as exc:
             raise RPCConnectionError(f"Bitcoin node timed out: {exc}") from exc
 
-        data = resp.json()
+        try:
+            data = resp.json()
+        except ValueError as exc:
+            raise RPCConnectionError(
+                f"Bitcoin node returned HTTP {resp.status_code} with non-JSON body"
+            ) from exc
+
         if data.get("error"):
             err = data["error"]
             raise RPCError(err.get("code", -1), err.get("message", "unknown"))
-        return data["result"]
+        return data.get("result")
 
 
 def _base_params() -> JsonDict:

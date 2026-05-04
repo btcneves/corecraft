@@ -42,3 +42,11 @@ class FakeRPC:
         if isinstance(result, Exception):
             raise result
         return result
+
+
+class FakeResponse:
+    def __init__(self, payload: dict[str, Any]) -> None:
+        self.payload = payload
+
+    def json(self) -> dict[str, Any]:
+        return self.payload

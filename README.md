@@ -81,6 +81,17 @@ corecraft/
 │   ├── .env.example
 │   └── README.md
 │
+├── src/
+│   └── corecraft/                pacote Python partilhado
+│       ├── __init__.py           re-exporta todos os tipos públicos
+│       └── types.py              38 TypedDicts — respostas RPC e tipos de domínio
+│
+├── tests/
+│   ├── conftest.py               FakeRPC, FakeResponse, import_activity_module
+│   ├── atividade_1/              testes unitários da Atividade 1
+│   ├── atividade_2/              testes unitários da Atividade 2
+│   └── atividade_3/              testes unitários da Atividade 3
+│
 ├── docs/
 │   ├── architecture.md           decisões de design e trade-offs
 │   ├── setup-bitcoin-core.md     bitcoin.conf, regtest, wallets, ZMQ
@@ -214,6 +225,35 @@ Cada atividade tem seu próprio README detalhado:
 - [`atividade-1/README.md`](atividade-1/README.md) — objetivo, restrições, endpoints, exemplos
 - [`atividade-2/README.md`](atividade-2/README.md) — fluxo `evento → estado`, ZMQ, divergência
 - [`atividade-3/README.md`](atividade-3/README.md) — multi-wallet, PSBT, interpretação de tx
+
+---
+
+## Testes
+
+O projeto usa **pytest** com cobertura mínima de 70% (actualmente 85%).
+
+```bash
+# instalar dependências de desenvolvimento
+pip install -e ".[dev]"
+
+# executar suite completa com cobertura
+pytest tests/ --cov
+
+# type-checking estrito nas 3 atividades
+python -m mypy --config-file mypy-atividade-1.ini atividade-1/backend/app/
+python -m mypy --config-file mypy-atividade-2.ini atividade-2/backend/app/
+python -m mypy --config-file mypy-atividade-3.ini atividade-3/backend/app/
+```
+
+| Módulo coberto | Cobertura |
+|---|---|
+| `rpc_client.py` (3 atividades) | 95–96% |
+| `zmq_listener.py` | 84% |
+| `tx_service.py` / `tx_interpreter.py` | 96–98% |
+| `event_service.py` | 100% |
+| **Total** | **85%** |
+
+Os testes usam `monkeypatch` para isolar cada módulo de domínio. `FakeRPC` simula o cliente Bitcoin RPC sem rede real. `import_activity_module` garante que cada atividade é importada num namespace limpo.
 
 ---
 

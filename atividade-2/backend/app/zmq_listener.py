@@ -1,6 +1,7 @@
 import logging
 import os
 import threading
+from typing import Any
 
 import zmq
 
@@ -16,9 +17,9 @@ _thread: threading.Thread | None = None
 def _decode_txid(raw: bytes, rpc: BitcoinRPC) -> str | None:
     """Resolve txid via RPC decoderawtransaction (handles witness serialization correctly)."""
     try:
-        result = rpc.call("decoderawtransaction", raw.hex())
+        result: dict[str, Any] = rpc.call("decoderawtransaction", raw.hex())
         if isinstance(result, dict):
-            txid = result.get("txid")
+            txid: str | None = result.get("txid")
             return str(txid) if txid is not None else None
         return None
     except (RPCError, RPCConnectionError) as exc:

@@ -81,6 +81,43 @@ Each activity has a self-contained React/Vite/TypeScript frontend. Docker builds
 ### JSON-RPC version
 All `rpc_client.py` modules send `"jsonrpc": "2.0"`. Bitcoin Core ≥ 31 rejects `"1.1"` with error `-32600: JSON-RPC version not supported`.
 
+### Shared types package (`src/corecraft`)
+
+A standalone Python package (`pip install -e .`) holds all TypedDicts shared across the three activities:
+
+- **RPC response types** — `GetBlockchainInfoResponse`, `MempoolEntry`, `GetWalletInfoResponse`, `FinalizePSBTResponse`, etc.
+- **Application types** — `AppState`, `TxInterpretation`, `StateComparison`, `WalletsResponse`, `SelectWalletResponse`
+
+TypedDicts with a mix of required and optional fields use the two-class inheritance pattern:
+
+```python
+class _TxInterpretationBase(TypedDict):        # total=True — all required
+    txid: str
+    status: str
+    confirmed: bool
+    ...
+
+class TxInterpretation(_TxInterpretationBase, total=False):  # optional extras
+    warning: str
+```
+
+This keeps mypy happy without making all fields optional via `total=False`.
+
+### RPC error resilience
+
+Every `rpc_client.py` wraps `resp.json()` in a `try/except ValueError` so that HTTP 401 or HTTP 500 responses with non-JSON bodies raise `RPCConnectionError` rather than an unhandled `JSONDecodeError`:
+
+```python
+try:
+    data = resp.json()
+except ValueError as exc:
+    raise RPCConnectionError(
+        f"Bitcoin node returned HTTP {resp.status_code} with non-JSON body"
+    ) from exc
+```
+
+`data.get("result")` is used instead of `data["result"]` to handle the rare case where both `result` and `error` are absent.
+
 ## Known limitations
 
 See [Known Limitations](../README.md#limitações-conhecidas) in the root README.

@@ -1,24 +1,29 @@
 from typing import Any
 
+from corecraft import (
+    BlockchainLag,
+    GetMempoolInfoResponse,
+    MempoolSummary,
+)
+
 from .rpc_client import BitcoinRPC
 
-JsonDict = dict[str, Any]
 
-
-def summary(rpc: BitcoinRPC) -> JsonDict:
-    info = rpc.call("getmempoolinfo")
+def summary(rpc: BitcoinRPC) -> MempoolSummary:
+    info: GetMempoolInfoResponse = rpc.call("getmempoolinfo")
     tx_count = info["size"]
     total_vsize = info.get("bytes", 0)
 
-    raw = rpc.call("getrawmempool", True)
+    raw: dict[str, Any] = rpc.call("getrawmempool", True)
 
-    fee_rates = []
-    dist = {"low": 0, "medium": 0, "high": 0}
+    fee_rates: list[float] = []
+    dist: dict[str, int] = {"low": 0, "medium": 0, "high": 0}
 
-    for entry in raw.values():
-        fees = entry.get("fees", {})
-        fee_btc = fees.get("base", entry.get("fee", 0))
-        vsize = entry.get("vsize", entry.get("size", 1))
+    for entry_raw in raw.values():
+        entry: dict[str, Any] = entry_raw
+        fees: dict[str, Any] = entry.get("fees", {})
+        fee_btc: float = fees.get("base", entry.get("fee", 0))
+        vsize: int = entry.get("vsize", entry.get("size", 1))
         if vsize == 0:
             continue
         rate = (fee_btc * 100_000_000) / vsize
@@ -47,8 +52,8 @@ def summary(rpc: BitcoinRPC) -> JsonDict:
     }
 
 
-def lag(rpc: BitcoinRPC) -> JsonDict:
-    info = rpc.call("getblockchaininfo")
+def lag(rpc: BitcoinRPC) -> BlockchainLag:
+    info: dict[str, Any] = rpc.call("getblockchaininfo")
     blocks = info["blocks"]
     headers = info["headers"]
     return {
