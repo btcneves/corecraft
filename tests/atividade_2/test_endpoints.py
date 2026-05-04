@@ -35,3 +35,51 @@ def test_activity_2_state_comparison_rpc_error(monkeypatch: pytest.MonkeyPatch) 
 
     assert exc_info.value.status_code == 503
     assert exc_info.value.detail["error"] == "node_unavailable"
+
+
+def test_activity_2_state_comparison_divergence(monkeypatch: pytest.MonkeyPatch) -> None:
+    main = import_activity_module("atividade-2", "app.main", monkeypatch)
+    main.store.add_block(bytes(80))
+    zmq_hash = main.store.last_block_hash()
+
+    monkeypatch.setattr(
+        main,
+        "rpc_from_env",
+        lambda: FakeRPC({"getbestblockhash": "different_hash_from_rpc"}),
+    )
+
+    comparison = main.events_state_comparison()
+    assert comparison["status"] == "compared"
+    assert comparison["divergence"] is True
+    assert comparison["last_seen_block"] == zmq_hash
+
+
+def test_activity_2_state_comparison_in_sync(monkeypatch: pytest.MonkeyPatch) -> None:
+    main = import_activity_module("atividade-2", "app.main", monkeypatch)
+    main.store.add_block(bytes(80))
+    zmq_hash = main.store.last_block_hash()
+
+    monkeypatch.setattr(
+        main,
+        "rpc_from_env",
+        lambda: FakeRPC({"getbestblockhash": zmq_hash}),
+    )
+
+    comparison = main.events_state_comparison()
+    assert comparison["status"] == "compared"
+    assert comparison["divergence"] is False
+
+
+def test_activity_2_rpc_error_returns_503(monkeypatch: pytest.MonkeyPatch) -> None:
+    main = import_activity_module("atividade-2", "app.main", monkeypatch)
+    monkeypatch.setattr(
+        main,
+        "rpc_from_env",
+        lambda: FakeRPC({"getbestblockhash": main.RPCError(-1, "boom")}),
+    )
+
+    with pytest.raises(HTTPException) as exc_info:
+        main.events_state_comparison()
+
+    assert exc_info.value.status_code == 503
+    assert exc_info.value.detail["error"] == "rpc_error"

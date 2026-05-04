@@ -250,8 +250,8 @@ class TrackedTx(TypedDict):
     broadcast_ts: float
 
 
-class TxInterpretation(TypedDict, total=False):
-    """Interpreted transaction state."""
+class _TxInterpretationBase(TypedDict):
+    """Required fields present in every TxInterpretation."""
 
     txid: str
     wallet: str | None
@@ -261,7 +261,12 @@ class TxInterpretation(TypedDict, total=False):
     block_hash: str | None
     age_seconds: int | None
     message: str | None
-    warning: str | None
+
+
+class TxInterpretation(_TxInterpretationBase, total=False):
+    """Interpreted transaction state. `warning` is present only for stale-mempool cases."""
+
+    warning: str
 
 
 class WalletInfo(TypedDict):
@@ -318,14 +323,19 @@ class EventsLatest(TypedDict):
     txs: list[TxEvent]
 
 
-class StateComparison(TypedDict, total=False):
-    """State comparison API response."""
+class _StateComparisonBase(TypedDict):
+    """Fields always present in a StateComparison."""
 
     best_block: str
     last_seen_block: str | None
     divergence: bool | None
     status: str
-    message: str | None
+
+
+class StateComparison(_StateComparisonBase, total=False):
+    """State comparison API response. `message` is present only while waiting for first ZMQ block."""
+
+    message: str
 
 
 class SendTxResponse(TypedDict):
@@ -334,6 +344,33 @@ class SendTxResponse(TypedDict):
     txid: str
     wallet: str
     status: str
+
+
+# =============================================================================
+# Activity 3 application types
+# =============================================================================
+
+
+class WalletsResponse(TypedDict):
+    """Response for GET /wallets."""
+
+    available_wallets: list[str]
+    loaded_wallets: list[str]
+    selected_wallet: str | None
+
+
+class SelectWalletResponse(TypedDict):
+    """Response for POST /wallet/select."""
+
+    selected_wallet: str
+    wallet_info: WalletInfo
+
+
+class AppState(TypedDict):
+    """In-memory application state for activity 3."""
+
+    selected_wallet: str | None
+    tracked_txs: dict[str, TrackedTx]
 
 
 # =============================================================================

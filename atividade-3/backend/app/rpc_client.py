@@ -45,11 +45,17 @@ class BitcoinRPC:
         except requests.exceptions.Timeout as exc:
             raise RPCConnectionError(f"Bitcoin node timed out: {exc}") from exc
 
-        data = resp.json()
+        try:
+            data = resp.json()
+        except ValueError as exc:
+            raise RPCConnectionError(
+                f"Bitcoin node returned HTTP {resp.status_code} with non-JSON body"
+            ) from exc
+
         if data.get("error"):
             err = data["error"]
             raise RPCError(err.get("code", -1), err.get("message", "unknown"))
-        return data["result"]
+        return data.get("result")
 
 
 def _base_params() -> JsonDict:

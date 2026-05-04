@@ -1,6 +1,7 @@
 """CoreCraft shared types package."""
 
 from .types import (
+    AppState,
     BlockEvent,
     BlockchainLag,
     EventsLatest,
@@ -23,6 +24,7 @@ from .types import (
     MempoolSummary,
     MineBalances,
     RPCErrorData,
+    SelectWalletResponse,
     SendTxResponse,
     StateComparison,
     TrackedTx,
@@ -32,9 +34,11 @@ from .types import (
     WalletInfo,
     WalletProcessPSBTResponse,
     WalletStatus,
+    WalletsResponse,
 )
 
 __all__ = [
+    "AppState",
     "BlockEvent",
     "BlockchainLag",
     "EventsLatest",
@@ -57,6 +61,7 @@ __all__ = [
     "MempoolSummary",
     "MineBalances",
     "RPCErrorData",
+    "SelectWalletResponse",
     "SendTxResponse",
     "StateComparison",
     "TrackedTx",
@@ -66,4 +71,5 @@ __all__ = [
     "WalletInfo",
     "WalletProcessPSBTResponse",
     "WalletStatus",
+    "WalletsResponse",
 ]

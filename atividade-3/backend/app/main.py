@@ -1,8 +1,15 @@
 import os
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import NoReturn
 
-from corecraft import SendTxResponse, TxInterpretation, WalletStatus
+from corecraft import (
+    AppState,
+    SelectWalletResponse,
+    SendTxResponse,
+    TxInterpretation,
+    WalletStatus,
+    WalletsResponse,
+)
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -40,10 +47,7 @@ elif FRONTEND_SOURCE_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_SOURCE_DIR)), name="static")
 
 # ── In-memory state ──────────────────────────────────────────────────────────
-state: dict[str, Any] = {
-    "selected_wallet": None,
-    "tracked_txs": {},  # txid -> {wallet, broadcast_ts}
-}
+state: AppState = AppState(selected_wallet=None, tracked_txs={})
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -62,12 +66,12 @@ def _node() -> BitcoinRPC:
 
 
 def _require_wallet() -> str:
-    w = state.get("selected_wallet")
-    if not w:
+    w: str | None = state["selected_wallet"]
+    if w is None:
         raise HTTPException(
             status_code=409, detail="No wallet selected. POST /wallet/select first."
         )
-    return str(w)
+    return w
 
 
 def _handle_rpc(exc: Exception) -> NoReturn:
@@ -99,7 +103,7 @@ def metrics() -> str:
 
 
 @app.get("/wallets")
-def wallets() -> dict[str, object]:
+def wallets() -> WalletsResponse:
     try:
         return list_wallets(_node(), state)
     except (RPCConnectionError, RPCError) as exc:
@@ -107,7 +111,7 @@ def wallets() -> dict[str, object]:
 
 
 @app.post("/wallet/select")
-def wallet_select(body: SelectWalletRequest) -> dict[str, object]:
+def wallet_select(body: SelectWalletRequest) -> SelectWalletResponse:
     try:
         return select_wallet(body.wallet, _node(), state)
     except ValueError as exc:
@@ -138,7 +142,7 @@ def tx_send(body: SendTxRequest) -> SendTxResponse:
 
 @app.get("/tx/{txid}")
 def tx_status(txid: str) -> TxInterpretation:
-    wallet = state.get("selected_wallet")
+    wallet = state["selected_wallet"]
     try:
         return get_tx(txid, wallet, state["tracked_txs"])
     except (RPCConnectionError, RPCError) as exc:
