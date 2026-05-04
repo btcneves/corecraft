@@ -65,7 +65,8 @@ def health() -> dict[str, str]:
 
 @app.get("/metrics", response_class=PlainTextResponse)
 def metrics() -> str:
-    return metrics_text()
+    snap = store.snapshot()
+    return metrics_text(zmq_blocks=snap["blocks_observed"], zmq_txs=snap["tx_observed"])
 
 
 @app.get("/api/events/summary")

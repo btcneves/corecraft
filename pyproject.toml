@@ -30,7 +30,7 @@ line-ending = "lf"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=atividade-1/backend/app --cov=atividade-2/backend/app --cov=atividade-3/backend/app --cov-report=term-missing --cov-fail-under=70"
+addopts = "--cov=atividade-1/backend/app --cov=atividade-2/backend/app --cov=atividade-3/backend/app --cov-report=term-missing --cov-fail-under=80"
 
 [tool.coverage.run]
 branch = true

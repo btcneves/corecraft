@@ -12,18 +12,30 @@ SERVICE_NAME = "atividade-3"
 _started_at = time.time()
 _correlation_id: ContextVar[str | None] = ContextVar("correlation_id", default=None)
 _metrics: dict[str, int] = {"requests_total": 0, "errors_total": 0}
+_path_counters: dict[str, int] = {}
+_last_latency_ms: float = 0.0
+_domain_counters: dict[str, int] = {"psbt_sent_total": 0}
 
 
 def get_correlation_id() -> str | None:
     return _correlation_id.get()
 
 
+def increment_domain(name: str) -> None:
+    """Increment a domain-specific counter (e.g. psbt_sent_total)."""
+    _domain_counters[name] = _domain_counters.get(name, 0) + 1
+
+
 async def correlation_middleware(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
+    global _last_latency_ms
     correlation_id = request.headers.get("X-Correlation-ID") or str(uuid.uuid4())
     token = _correlation_id.set(correlation_id)
     _metrics["requests_total"] += 1
+    path = request.scope.get("path", "")
+    _path_counters[path] = _path_counters.get(path, 0) + 1
+    t0 = time.perf_counter()
     try:
         response = await call_next(request)
         if response.status_code >= 500:
@@ -34,6 +46,7 @@ async def correlation_middleware(
         _metrics["errors_total"] += 1
         raise
     finally:
+        _last_latency_ms = (time.perf_counter() - t0) * 1000
         _correlation_id.reset(token)
 
 
@@ -56,5 +69,17 @@ def metrics_text() -> str:
         "# HELP corecraft_errors_total Total HTTP 5xx responses or unhandled errors.",
         "# TYPE corecraft_errors_total counter",
         f'corecraft_errors_total{{service="{SERVICE_NAME}"}} {_metrics["errors_total"]}',
+        "# HELP corecraft_last_request_latency_ms Last HTTP request duration in milliseconds.",
+        "# TYPE corecraft_last_request_latency_ms gauge",
+        f'corecraft_last_request_latency_ms{{service="{SERVICE_NAME}"}} {_last_latency_ms:.3f}',
+        "# HELP corecraft_psbt_sent_total Total PSBT transactions broadcast.",
+        "# TYPE corecraft_psbt_sent_total counter",
+        f'corecraft_psbt_sent_total{{service="{SERVICE_NAME}"}} {_domain_counters["psbt_sent_total"]}',
+        "# HELP corecraft_requests_by_path_total HTTP requests broken down by path.",
+        "# TYPE corecraft_requests_by_path_total counter",
     ]
+    for path, count in sorted(_path_counters.items()):
+        lines.append(
+            f'corecraft_requests_by_path_total{{service="{SERVICE_NAME}",path="{path}"}} {count}'
+        )
     return "\n".join(lines) + "\n"
