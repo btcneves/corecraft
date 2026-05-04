@@ -113,6 +113,23 @@ Every backend exposes `/health`, `/metrics`, and JSON logs with `correlation_id`
 
 ---
 
+## Key Concepts
+
+| Concept | Where it appears | Summary |
+|---------|------------------|---------|
+| `regtest` | All activities | Local, controlled Bitcoin Core network. It allows on-demand mining, test wallets, and full validation without touching testnet or mainnet. |
+| JSON-RPC | Activities 1, 2, and 3 | Synchronous interface used to query node state, mempool, blockchain, wallets, UTXOs, and to broadcast transactions. |
+| ZMQ | Activity 2 | Bitcoin Core asynchronous PUB/SUB channel. It publishes `rawblock` and `rawtx` events in near real time for block and transaction detection. |
+| Mempool | Activities 1 and 2 | Set of valid transactions not yet confirmed in a block. Activity 1 interprets RPC snapshots; Activity 2 observes related ZMQ events. |
+| UTXO | Activity 3 | Unspent transaction output that can fund a new transaction. The selected wallet needs mature UTXOs before it can send funds. |
+| PSBT | Activity 3 | Partially Signed Bitcoin Transaction. The backend uses `walletcreatefundedpsbt → walletprocesspsbt → finalizepsbt → sendrawtransaction` to create, sign, and broadcast transactions with Bitcoin Core. |
+| Wallet-scoped RPC | Activity 3 | Calls made under `/wallet/<name>` so balance, UTXO, signing, and history operations stay isolated per wallet. |
+| Interpreted state | Activity 3 | Domain layer that translates node responses into states such as `broadcast`, `mempool`, `confirmed`, and `unknown`. |
+
+Deeper references: [`docs/rpc-zmq.md`](docs/rpc-zmq.md), [`docs/architecture.md`](docs/architecture.md), and [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md).
+
+---
+
 ## Repository Structure
 
 ```text

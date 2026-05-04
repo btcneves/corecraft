@@ -20,6 +20,20 @@ Each activity is an independent microservice with its own backend and frontend.
 | 2 — ZMQ event stream | 8002 | `zmq_listener.py`, `event_store.py`, `event_service.py`, `rpc_client.py` |
 | 3 — Multi-wallet + PSBT | 8003 | `wallet_service.py`, `tx_service.py`, `tx_interpreter.py`, `rpc_client.py` |
 
+## Key Concepts
+
+| Concept | Role in CoreCraft | Implementation detail |
+|---------|-------------------|-----------------------|
+| `regtest` | Provides a deterministic Bitcoin network for development, validation, and demos. | Docker and manual setup both start `bitcoind -regtest`, create `wallet1`/`wallet2`, and mine spendable funds locally. |
+| JSON-RPC | Main request/response integration path with Bitcoin Core. | Each activity has an explicit `rpc_client.py` using JSON-RPC 2.0 over HTTP Basic Auth. |
+| ZMQ | Event-driven transport for new blocks and transactions. | Activity 2 subscribes to `rawblock` and `rawtx`, stores bounded in-memory buffers, and compares observed flow with RPC state. |
+| Mempool | Source of unconfirmed transaction state and fee-rate distribution. | Activity 1 reads `getmempoolinfo` and `getrawmempool true`; Activity 3 checks `getmempoolentry` while interpreting sent txs. |
+| UTXO | Spendable wallet state used to fund transactions. | Activity 3 relies on Bitcoin Core wallet RPC for UTXO selection instead of selecting inputs manually. |
+| PSBT | Safe transaction construction and signing workflow. | Activity 3 delegates funding, signing, finalization, and broadcast to Bitcoin Core through the PSBT RPC sequence. |
+| Wallet-scoped RPC | Separation between node-level and wallet-level operations. | Global calls use `/`; wallet calls use `/wallet/<name>` so selected-wallet state does not leak across RPC contexts. |
+| In-memory state | Keeps the project lightweight and transparent. | Activity 2 stores recent events in `deque`; Activity 3 tracks sent txids in a process-local `dict`. |
+| Interpreted state | Converts low-level node responses into UI-friendly domain status. | Transaction state is normalized to `broadcast`, `mempool`, `confirmed`, or `unknown`. |
+
 All three share the same structural pattern:
 
 ```
