@@ -1,9 +1,51 @@
 name: corecraft
 
+# Docker Compose configuration for CoreCraft
+# Supports running all services or individual activities using profiles
+# 
+# Usage:
+#   docker compose up --build              # Start all services
+#   docker compose --profile atividade-1 up # Start only atividade-1 + dependencies
+#   docker compose --profile atividade-2 up # Start only atividade-2 + dependencies
+#   docker compose --profile atividade-3 up # Start only atividade-3 + dependencies
+#   docker compose up --build --profile ""  # Start without optional services
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-healthcheck-backend: &default-healthcheck-backend
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 30s
+
+x-backend-common: &backend-common
+  restart: unless-stopped
+  networks:
+    - corecraft
+  logging:
+    <<: *default-logging
+  depends_on:
+    bitcoind:
+      condition: service_healthy
+    bitcoin-init:
+      condition: service_completed_successfully
+  environment:
+    PYTHONUNBUFFERED: "1"
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    BTC_RPC_HOST: bitcoind
+    BTC_RPC_PORT: 18443
+    BTC_RPC_USER: ${BTC_RPC_USER:-user}
+    BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
+
 services:
   bitcoind:
     image: bitcoin/bitcoin:26
     container_name: corecraft-bitcoind
+    restart: unless-stopped
     command:
       - -conf=/etc/bitcoin/bitcoin.conf
     environment:
@@ -24,6 +66,8 @@ services:
       start_period: 20s
     networks:
       - corecraft
+    logging:
+      <<: *default-logging
 
   bitcoin-init:
     image: bitcoin/bitcoin:26
@@ -42,44 +86,34 @@ services:
     networks:
       - corecraft
     restart: "no"
+    logging:
+      <<: *default-logging
 
   atividade-1:
     container_name: corecraft-atividade-1
     build:
       context: .
       dockerfile: atividade-1/Dockerfile
-    depends_on:
-      bitcoind:
-        condition: service_healthy
-      bitcoin-init:
-        condition: service_completed_successfully
-    environment:
-      PYTHONUNBUFFERED: "1"
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      BTC_RPC_HOST: bitcoind
-      BTC_RPC_PORT: 18443
-      BTC_RPC_USER: ${BTC_RPC_USER:-user}
-      BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
+      args:
+        APP_PORT: 8001
+    <<: *backend-common
     ports:
       - "8001:8001"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=3).read()\""]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-    networks:
-      - corecraft
+      <<: *default-healthcheck-backend
+    profiles:
+      - atividade-1
+      - all
 
   atividade-2:
     container_name: corecraft-atividade-2
     build:
       context: .
       dockerfile: atividade-2/Dockerfile
-    depends_on:
-      bitcoind:
-        condition: service_healthy
-      bitcoin-init:
-        condition: service_completed_successfully
+      args:
+        APP_PORT: 8002
+    <<: *backend-common
     environment:
       PYTHONUNBUFFERED: "1"
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -93,42 +127,32 @@ services:
       - "8002:8002"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health', timeout=3).read()\""]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-    networks:
-      - corecraft
+      <<: *default-healthcheck-backend
+    profiles:
+      - atividade-2
+      - all
 
   atividade-3:
     container_name: corecraft-atividade-3
     build:
       context: .
       dockerfile: atividade-3/Dockerfile
-    depends_on:
-      bitcoind:
-        condition: service_healthy
-      bitcoin-init:
-        condition: service_completed_successfully
-    environment:
-      PYTHONUNBUFFERED: "1"
-      LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      BTC_RPC_HOST: bitcoind
-      BTC_RPC_PORT: 18443
-      BTC_RPC_USER: ${BTC_RPC_USER:-user}
-      BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
+      args:
+        APP_PORT: 8003
+    <<: *backend-common
     ports:
       - "8003:8003"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/health', timeout=3).read()\""]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-    networks:
-      - corecraft
+      <<: *default-healthcheck-backend
+    profiles:
+      - atividade-3
+      - all
 
   caddy:
     image: caddy:2-alpine
     container_name: corecraft-caddy
+    restart: unless-stopped
     depends_on:
       atividade-1:
         condition: service_healthy
@@ -144,12 +168,21 @@ services:
       - caddy-config:/config
     networks:
       - corecraft
+    logging:
+      <<: *default-logging
+    profiles:
+      - caddy
+      - all
 
 networks:
   corecraft:
     driver: bridge
+    name: corecraft-network
 
 volumes:
   bitcoin-data:
+    name: corecraft-bitcoin-data
   caddy-data:
+    name: corecraft-caddy-data
   caddy-config:
+    name: corecraft-caddy-config
