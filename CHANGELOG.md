@@ -21,7 +21,7 @@ All notable changes to CoreCraft are documented here.
 ### Added
 
 - Release workflow (`.github/workflows/release.yml`): builds and pushes Docker images to `ghcr.io` and creates a GitHub Release with CHANGELOG excerpt on every `v*.*.*` tag.
-- Docker images now tagged at `ghcr.io/btcneves/corecraft-atividade-{1,2,3}`.
+- Docker images now tagged at `ghcr.io/btcneves/corecraft-suite-atividade-{1,2,3}`.
 - `scripts/quickstart.sh`: single OS-detecting entry-point for Linux and macOS.
 - `VERSION` file as single source of truth for the project version.
 - Makefile `tag` and `release` targets to automate versioning.

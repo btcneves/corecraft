@@ -11,7 +11,7 @@
 
 [![GitHub Release](https://img.shields.io/github/v/release/btcneves/CoreCraft?style=flat-square&label=release)](https://github.com/btcneves/CoreCraft/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/btcneves/CoreCraft/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/btcneves/CoreCraft/actions/workflows/ci.yml)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fbtcneves%2Fcorecraft-blue?style=flat-square&logo=docker)](https://github.com/btcneves/CoreCraft/pkgs/container/corecraft-atividade-1)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fbtcneves%2Fcorecraft--suite-blue?style=flat-square&logo=docker)](https://github.com/btcneves/CoreCraft/pkgs/container/corecraft-suite-atividade-1)
 
 </div>
 
@@ -33,9 +33,9 @@
 ```
 ✔ Container corecraft-bitcoind       Healthy
 ✔ Container corecraft-bitcoin-init   Exited (0)
-✔ Container corecraft-atividade-1    Healthy
-✔ Container corecraft-atividade-2    Healthy
-✔ Container corecraft-atividade-3    Healthy
+✔ Container corecraft-suite-atividade-1    Healthy
+✔ Container corecraft-suite-atividade-2    Healthy
+✔ Container corecraft-suite-atividade-3    Healthy
 ✔ Container corecraft-caddy          Started
 ```
 

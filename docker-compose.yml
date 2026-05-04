@@ -90,8 +90,8 @@ services:
       <<: *default-logging
 
   atividade-1:
-    container_name: corecraft-atividade-1
-    image: ghcr.io/btcneves/corecraft-atividade-1:latest
+    container_name: corecraft-suite-atividade-1
+    image: ghcr.io/btcneves/corecraft-suite-atividade-1:latest
     build:
       context: .
       dockerfile: atividade-1/Dockerfile
@@ -108,8 +108,8 @@ services:
       - all
 
   atividade-2:
-    container_name: corecraft-atividade-2
-    image: ghcr.io/btcneves/corecraft-atividade-2:latest
+    container_name: corecraft-suite-atividade-2
+    image: ghcr.io/btcneves/corecraft-suite-atividade-2:latest
     build:
       context: .
       dockerfile: atividade-2/Dockerfile
@@ -135,8 +135,8 @@ services:
       - all
 
   atividade-3:
-    container_name: corecraft-atividade-3
-    image: ghcr.io/btcneves/corecraft-atividade-3:latest
+    container_name: corecraft-suite-atividade-3
+    image: ghcr.io/btcneves/corecraft-suite-atividade-3:latest
     build:
       context: .
       dockerfile: atividade-3/Dockerfile
