@@ -1,11 +1,92 @@
+# Git
 .git
+.gitignore
+.gitattributes
+
+# Python
 .venv
+.venv.*
 **/.venv
 **/__pycache__
 **/*.pyc
-**/node_modules
-**/dist
-.env
-*.log
+**/*.pyo
+**/*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# IDE and Editors
+.idea
+.vscode
+*.swp
+*.swo
+*~
 .claude
 .codex
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs
+*.log.*
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+.tox
+.nox
+
+# Node
+**/node_modules
+**/npm-debug.log
+**/yarn-error.log
+
+# Build artifacts
+**/dist
+**/build
+**/*.tsbuildinfo
+
+# Documentation (not needed in build)
+docs
+*.md
+!README.md
+LICENSE
+CONTRIBUTING.md
+SECURITY.md
+CHANGELOG.md
+PROJECT_STATUS.md
+
+# Scripts (not needed in build context)
+scripts
+Makefile
+
+# Tests (not needed in production build)
+tests
+**/test_*.py
+**/conftest.py
+
+# Development config
+*.ini
+mypy-*.ini
+pyproject.toml
+requirements-dev.txt
+
+# Docker (don't include docker files in build context)
+docker-compose*.yml
+Dockerfile
+Dockerfile.*
+.dockerignore
+
+# Misc
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
