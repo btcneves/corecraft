@@ -2,8 +2,8 @@
 
 from .types import (
     AppState,
-    BlockEvent,
     BlockchainLag,
+    BlockEvent,
     EventsLatest,
     EventsSummary,
     EventStoreSnapshot,
@@ -33,8 +33,8 @@ from .types import (
     WalletCreateFundedPSBTResponse,
     WalletInfo,
     WalletProcessPSBTResponse,
-    WalletStatus,
     WalletsResponse,
+    WalletStatus,
 )
 
 __all__ = [

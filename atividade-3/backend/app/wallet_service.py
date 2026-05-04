@@ -7,8 +7,8 @@ from corecraft import (
     MineBalances,
     SelectWalletResponse,
     WalletInfo,
-    WalletStatus,
     WalletsResponse,
+    WalletStatus,
 )
 
 from .rpc_client import BitcoinRPC, RPCError, rpc_wallet
@@ -17,9 +17,7 @@ from .rpc_client import BitcoinRPC, RPCError, rpc_wallet
 def list_wallets(node_rpc: BitcoinRPC, state: AppState) -> WalletsResponse:
     raw_dir: ListWalletDirResponse = node_rpc.call("listwalletdir")
     wallets_raw = raw_dir.get("wallets", [])
-    available: list[str] = [
-        w["name"] if isinstance(w, dict) else str(w) for w in wallets_raw
-    ]
+    available: list[str] = [w["name"] if isinstance(w, dict) else str(w) for w in wallets_raw]
     loaded: list[str] = node_rpc.call("listwallets")
     return WalletsResponse(
         available_wallets=available,
@@ -31,8 +29,7 @@ def list_wallets(node_rpc: BitcoinRPC, state: AppState) -> WalletsResponse:
 def select_wallet(name: str, node_rpc: BitcoinRPC, state: AppState) -> SelectWalletResponse:
     raw_dir: ListWalletDirResponse = node_rpc.call("listwalletdir")
     available: list[str] = [
-        w["name"] if isinstance(w, dict) else str(w)
-        for w in raw_dir.get("wallets", [])
+        w["name"] if isinstance(w, dict) else str(w) for w in raw_dir.get("wallets", [])
     ]
     if name not in available:
         raise ValueError(f"Wallet '{name}' not found in listwalletdir")

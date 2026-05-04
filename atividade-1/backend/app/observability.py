@@ -2,7 +2,6 @@ import time
 import uuid
 from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
-from typing import Any
 
 from fastapi import Request, Response
 

@@ -7,7 +7,6 @@ when working with Bitcoin RPC responses and internal data structures.
 
 from typing import Any, TypedDict
 
-
 # =============================================================================
 # Bitcoin RPC Response Types
 # =============================================================================
@@ -333,7 +332,7 @@ class _StateComparisonBase(TypedDict):
 
 
 class StateComparison(_StateComparisonBase, total=False):
-    """State comparison API response. `message` is present only while waiting for first ZMQ block."""
+    """State comparison API response. `message` only present while waiting for first ZMQ block."""
 
     message: str
 
