@@ -1,47 +1,47 @@
-# Validação ao vivo — CoreCraft
+# Live Validation — CoreCraft
 
-Execução real contra `bitcoind -regtest` no host (Bitcoin Core v31.0). Todos os endpoints obrigatórios das três atividades foram exercitados, incluindo o ciclo PSBT completo (`broadcast → mempool → confirmed`) e o caminho de erro 503 quando o nó está offline.
+Actual execution against `bitcoind -regtest` on host (Bitcoin Core v31.0). All mandatory endpoints of the three activities have been exercised, including the full PSBT cycle (`broadcast → mempool → confirmed`) and the 503 error path when the node is offline.
 
-- Data: 2026-05-02T17:48:09Z (UTC)
-- Nó: /Satoshi:31.0.0/
-- Backends locais (uvicorn): 8001 / 8002 / 8003
+- Date: 2026-05-02T17:48:09Z (UTC)
+- Node: /Satoshi:31.0.0/
+- Local backends (uvicorn): 8001 / 8002 / 8003
 
 ---
 
-## Ambiente de validação
+## Validation environment
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Sistema operacional | Linux (Ubuntu) |
+| Operating system | Linux (Ubuntu) |
 | Python | 3.12 |
 | Bitcoin Core | v31.0.0 (`/Satoshi:31.0.0/`) |
-| Rede | `regtest` |
+| Network | `regtest` |
 | RPC host | `127.0.0.1` |
 | RPC port | `18443` |
 | ZMQ rawblock | `tcp://127.0.0.1:28332` (`pubrawblock`) |
 | ZMQ rawtx | `tcp://127.0.0.1:28333` (`pubrawtx`) |
-| Backend Atividade 1 | http://127.0.0.1:8001 |
-| Backend Atividade 2 | http://127.0.0.1:8002 |
-| Backend Atividade 3 | http://127.0.0.1:8003 |
-| URL pública (demo 2026-05-03) | Ativ. 1: https://administrators-humanitarian-define-author.trycloudflare.com · Ativ. 2: https://dice-garcia-hub-particular.trycloudflare.com · Ativ. 3: https://move-after-salaries-kde.trycloudflare.com |
+| Backend Activity 1 | http://127.0.0.1:8001 |
+| Backend Activity 2 | http://127.0.0.1:8002 |
+| Backend Activity 3 | http://127.0.0.1:8003 |
+| Public URL (demo 2026-05-03) | Activity 1: https://administrators-humanitarian-define-author.trycloudflare.com · Activity 2: https://dice-garcia-hub-particular.trycloudflare.com · Activity 3: https://move-after-salaries-kde.trycloudflare.com |
 
 ---
 
-## Checklist de validação
+## Validation checklist
 
-- [x] Bitcoin Core rodando
-- [x] RPC respondendo
-- [x] ZMQ configurado
+- [x] Bitcoin Core running
+- [x] RPC responding
+- [x] ZMQ configured
 - [x] Wallets criadas/carregadas
-- [x] Atividade 1 validada
-- [x] Atividade 2 validada
-- [x] Atividade 3 validada
-- [x] Frontend acessível (local)
-- [x] URL pública/tunnel testado (2026-05-03, Cloudflare Tunnel)
+- [x] Activity 1 validated
+- [x] Activity 2 validated
+- [x] Activity 3 validated
+- [x] Accessible frontend (on-premises)
+- [x] Tested public URL/tunnel (2026-05-03, Cloudflare Tunnel)
 
 ---
 
-## Comandos Bitcoin Core
+## Bitcoin Core Commands
 
 ```bash
 bitcoin-cli -regtest getblockchaininfo
@@ -55,7 +55,7 @@ bitcoin-cli -regtest listwallets
 
 ---
 
-## Preparação de wallets em regtest
+## Preparing wallets in regtest
 
 ```bash
 bitcoin-cli -regtest createwallet wallet1
@@ -70,20 +70,20 @@ bitcoin-cli -regtest -rpcwallet=wallet1 listunspent
 
 ---
 
-## Smoke tests — Atividade 1
+## Smoke tests — Activity 1
 
 ```bash
 curl http://127.0.0.1:8001/api/mempool/summary
 curl http://127.0.0.1:8001/api/blockchain/lag
 ```
 
-Campos esperados — `/api/mempool/summary`: `tx_count`, `total_vsize`, `avg_fee_rate`, `min_fee_rate`, `max_fee_rate`, `fee_distribution.low`, `fee_distribution.medium`, `fee_distribution.high`
+Expected fields — `/api/mempool/summary`: `tx_count`, `total_vsize`, `avg_fee_rate`, `min_fee_rate`, `max_fee_rate`, `fee_distribution.low`, `fee_distribution.medium`, `fee_distribution.high`
 
-Campos esperados — `/api/blockchain/lag`: `blocks`, `headers`, `lag`
+Expected fields — `/api/blockchain/lag`: `blocks`, `headers`, `lag`
 
 ---
 
-## Smoke tests — Atividade 2
+## Smoke tests — Activity 2
 
 ```bash
 curl http://127.0.0.1:8002/api/events/summary
@@ -91,13 +91,13 @@ curl http://127.0.0.1:8002/api/events/latest
 curl http://127.0.0.1:8002/api/events/state-comparison
 ```
 
-Campos esperados — `/api/events/summary`: `blocks_observed`, `tx_observed`, `last_event_time`, `tx_per_second`
+Expected fields — `/api/events/summary`: `blocks_observed`, `tx_observed`, `last_event_time`, `tx_per_second`
 
-Campos esperados — `/api/events/latest`: `blocks[]`, `txs[]`
+Expected fields — `/api/events/latest`: `blocks[]`, `txs[]`
 
-Campos esperados — `/api/events/state-comparison`: `best_block`, `last_seen_block`, `divergence`, `status`
+Expected fields — `/api/events/state-comparison`: `best_block`, `last_seen_block`, `divergence`, `status`
 
-Para gerar eventos:
+To generate events:
 
 ```bash
 ADDR=$(bitcoin-cli -regtest -rpcwallet=wallet1 getnewaddress)
@@ -109,7 +109,7 @@ bitcoin-cli -regtest -rpcwallet=wallet1 sendtoaddress $ADDR2 0.001
 
 ---
 
-## Smoke tests — Atividade 3
+## Smoke tests — Activity 3
 
 ```bash
 curl http://127.0.0.1:8003/wallets
@@ -127,19 +127,19 @@ curl -X POST http://127.0.0.1:8003/tx/send \
 curl http://127.0.0.1:8003/tx/TXID
 ```
 
-Campos esperados — `/wallets`: `available_wallets`, `loaded_wallets`, `selected_wallet`
+Expected fields — `/wallets`: `available_wallets`, `loaded_wallets`, `selected_wallet`
 
-Campos esperados — `/wallet/status`: `wallet`, `balance`, `utxos`
+Expected fields — `/wallet/status`: `wallet`, `balance`, `utxos`
 
-Campos esperados — `/tx/{txid}`: `txid`, `wallet`, `status`, `confirmed`, `confirmations`, `block_hash`, `age_seconds`, `message`, `warning` (quando aplicável)
-
----
-
-## Evidências de execução (regtest, 2026-05-02)
+Expected fields — `/tx/{txid}`: `txid`, `wallet`, `status`, `confirmed`, `confirmations`, `block_hash`, `age_seconds`, `message`, `warning` (when applicable)
 
 ---
 
-## 1. Pré-requisitos no Bitcoin Core
+## Execution evidence (regtest, 2026-05-02)
+
+---
+
+## 1. Prerequisites in Bitcoin Core
 
 ### `bitcoin-cli -regtest getblockchaininfo`
 
@@ -221,9 +221,9 @@ Campos esperados — `/tx/{txid}`: `txid`, `wallet`, `status`, `confirmed`, `con
 
 ---
 
-## 2. Atividade 1 — Snapshot da mempool via RPC
+## 2. Activity 1 — Mempool snapshot via RPC
 
-### `GET /api/mempool/summary` (mempool vazia)
+### `GET /api/mempool/summary` (empty mempool)
 
 ```json
 {
@@ -252,11 +252,11 @@ Campos esperados — `/tx/{txid}`: `txid`, `wallet`, `status`, `confirmed`, `con
 
 ---
 
-## 3. Atividade 2 — Eventos via ZMQ
+## 3. Activity 2 — Events via ZMQ
 
-### Estado inicial — ZMQ ainda sem blocos (evidência da Correção 2)
+### Initial state — ZMQ still without blocks (evidence from Fix 2)
 
-Imediatamente após subir o backend, antes que qualquer evento ZMQ chegue:
+Immediately after starting the backend, before any ZMQ events arrive:
 
 #### `GET /api/events/state-comparison`
 
@@ -270,9 +270,9 @@ Imediatamente após subir o backend, antes que qualquer evento ZMQ chegue:
 }
 ```
 
-→ `divergence: null`, `status: "waiting_for_zmq_block"`, `message` explícita. Antes desta correção a API retornava `divergence: true` (falso-positivo), porque `null != hash` em Python. O frontend não exibe o banner vermelho neste estado.
+→ `divergence: null`, `status: "waiting_for_zmq_block"`, `message` explicit. Before this fix, the API returned `divergence: true` (false positive), because `null != hash` in Python. The frontend does not display the red banner in this state.
 
-#### `GET /api/events/summary` (vazio)
+#### `GET /api/events/summary` (empty)
 
 ```json
 {
@@ -283,7 +283,7 @@ Imediatamente após subir o backend, antes que qualquer evento ZMQ chegue:
 }
 ```
 
-#### `GET /api/events/latest` (vazio)
+#### `GET /api/events/latest` (empty)
 
 ```json
 {
@@ -292,9 +292,9 @@ Imediatamente após subir o backend, antes que qualquer evento ZMQ chegue:
 }
 ```
 
-### Após gerar 1 bloco + 1 tx
+### After generating 1 block + 1 tx
 
-Comandos no Bitcoin Core:
+Commands in Bitcoin Core:
 
 ```bash
 bitcoin-cli -regtest generatetoaddress 1 $ADDR
@@ -350,13 +350,13 @@ bitcoin-cli -regtest -rpcwallet=wallet1 sendtoaddress $ADDR 0.001
 }
 ```
 
-→ `status: "compared"`, `divergence: false` — `best_block` (RPC) e `last_seen_block` (ZMQ) coincidem.
+→ `status: "compared"`, `divergence: false` — `best_block` (RPC) and `last_seen_block` (ZMQ) match.
 
 ---
 
-## 4. Atividade 3 — Multi-wallet, PSBT, estado interpretado
+## 4. Activity 3 — Multi-wallet, PSBT, interpreted state
 
-### `GET /wallets` (descoberta)
+### `GET /wallets` (discovery)
 
 ```json
 {
@@ -387,7 +387,7 @@ bitcoin-cli -regtest -rpcwallet=wallet1 sendtoaddress $ADDR 0.001
 }
 ```
 
-### `GET /wallet/status` (com wallet1 selecionada)
+### `GET /wallet/status` (with wallet1 selected)
 
 ```json
 {
@@ -397,11 +397,11 @@ bitcoin-cli -regtest -rpcwallet=wallet1 sendtoaddress $ADDR 0.001
 }
 ```
 
-> **Correção aplicada (commit `5b9a925`):** O campo `balance` retornou `null` porque `getwalletinfo` no Bitcoin Core v31 não expõe mais esse campo diretamente. Após a correção, `/wallet/status` usa `getbalances()` e devolve o saldo numérico em `mine.trusted`. A resposta corrigida inclui os campos `balance` (numérico), `trusted_balance`, `untrusted_pending` e `immature_balance`.
+> **Fix applied (commit `5b9a925`):** The field `balance` returned `null` because `getwalletinfo` in Bitcoin Core v31 no longer exposes this field directly. After correction, `/wallet/status` uses `getbalances()` and returns the numeric balance in `mine.trusted`. The corrected response includes the fields `balance` (numeric), `trusted_balance`, `untrusted_pending`, and `immature_balance`.
 
-### `POST /tx/send` (fluxo PSBT)
+### `POST /tx/send` (PSBT stream)
 
-Endereço destino na wallet2:
+Destination address in wallet2:
 
 ```bash
 DEST=bcrt1q5eue8fczuaw46d5zr6y47sergm69lnzslzr5mg
@@ -410,13 +410,13 @@ curl -X POST http://127.0.0.1:8003/tx/send \
   -d "{\"to_address\":\"$DEST\",\"amount\":0.001}"
 ```
 
-Resposta (tx broadcast):
+Response (tx broadcast):
 
 ```json
 {"txid":"abefee2af319bb2cd3d313838f325e3362a012741c0fcd158ce2fcd6dfb7a422","wallet":"wallet1","status":"broadcast"}
 ```
 
-### `GET /tx/{txid}` — recém-enviada (mempool)
+### `GET /tx/{txid}` — newly sent (mempool)
 
 ```json
 {
@@ -431,9 +431,9 @@ Resposta (tx broadcast):
 }
 ```
 
-### Evidência do bug fix da Correção 1 — wallet rastreada
+### Patch 1 bug fix evidence — wallet tracked
 
-Trocando a wallet ativa para `wallet2` (que **não enviou** esta tx) e consultando o mesmo txid:
+Changing the active wallet to `wallet2` (which **did not send** this tx) and consulting the same txid:
 
 #### `POST /wallet/select` → wallet2
 
@@ -448,7 +448,7 @@ Trocando a wallet ativa para `wallet2` (que **não enviou** esta tx) e consultan
 }
 ```
 
-#### `GET /tx/{txid}` (com wallet2 ativa)
+#### `GET /tx/{txid}` (with active wallet2)
 
 ```json
 {
@@ -463,16 +463,16 @@ Trocando a wallet ativa para `wallet2` (que **não enviou** esta tx) e consultan
 }
 ```
 
-→ Resposta ainda traz `"wallet": "wallet1"` (a wallet original do envio), e `gettransaction` continua resolvendo no contexto certo. **Antes da Correção 1**, a chamada teria caído na wallet2 e `gettransaction` falharia silenciosamente, levando o status a `unknown`.
+→ Response still brings `"wallet": "wallet1"` (the original sending wallet), and `gettransaction` continues resolving in the right context. **Before Fix 1**, the call would have dropped to wallet2 and `gettransaction` would silently fail, taking the status to `unknown`.
 
-Voltando a seleção para wallet1 antes do próximo passo:
+Returning the selection to wallet1 before the next step:
 
 ```bash
 curl -X POST http://127.0.0.1:8003/wallet/select \
   -H "Content-Type: application/json" -d '{"wallet":"wallet1"}'
 ```
 
-### Após minerar 1 bloco — `status: confirmed`
+### After mining 1 block — `status: confirmed`
 
 ```bash
 bitcoin-cli -regtest generatetoaddress 1 $ADDR
@@ -493,70 +493,70 @@ bitcoin-cli -regtest generatetoaddress 1 $ADDR
 }
 ```
 
-→ `status: "confirmed"`, `confirmed: true`, `confirmations >= 1`, `block_hash` não-nulo, `message: "Transação confirmada em bloco."`.
+→ `status: "confirmed"`, `confirmed: true`, `confirmations >= 1`, non-null `block_hash`, `message: "Transaction confirmed in block."`.
 
 ---
 
-## 5. Caminho de erro — Bitcoin Core offline (HTTP 503 estruturado)
+## 5. Error Path — Bitcoin Core Offline (Structured HTTP 503)
 
-Após `bitcoin-cli -regtest stop`, todas as rotas que dependem do nó devolvem 503 estruturado:
+After `bitcoin-cli -regtest stop`, all routes that depend on the node return structured 503:
 
-### `GET /api/mempool/summary` (Atividade 1)
+### `GET /api/mempool/summary` (Activity 1)
 
 ```
 {"detail":{"error":"node_unavailable","detail":"Cannot connect to Bitcoin node: HTTPConnectionPool(host='127.0.0.1', port=18443): Max retries exceeded with url: / (Caused by NewConnectionError(\"HTTPConnection(host='127.0.0.1', port=18443): Failed to establish a new connection: [Errno 111] Connection refused\"))"}}HTTP 503
 ```
 
-### `GET /api/events/state-comparison` (Atividade 2)
+### `GET /api/events/state-comparison` (Activity 2)
 
 ```
 {"detail":{"error":"node_unavailable","detail":"Cannot connect to Bitcoin node: HTTPConnectionPool(host='127.0.0.1', port=18443): Max retries exceeded with url: / (Caused by NewConnectionError(\"HTTPConnection(host='127.0.0.1', port=18443): Failed to establish a new connection: [Errno 111] Connection refused\"))"}}HTTP 503
 ```
 
-### `GET /wallets` (Atividade 3)
+### `GET /wallets` (Activity 3)
 
 ```
 {"detail":{"error":"node_unavailable","detail":"Cannot connect to Bitcoin node: HTTPConnectionPool(host='127.0.0.1', port=18443): Max retries exceeded with url: / (Caused by NewConnectionError(\"HTTPConnection(host='127.0.0.1', port=18443): Failed to establish a new connection: [Errno 111] Connection refused\"))"}}HTTP 503
 ```
 
-→ Em todas as três, o backend devolve `HTTP 503` com payload `{"detail": {"error": "node_unavailable", "detail": "Cannot connect to Bitcoin node: ..."}}` — comportamento por design (nenhuma rota retorna 500).
+→ In all three, the backend returns `HTTP 503` with payload `{"detail": {"error": "node_unavailable", "detail": "Cannot connect to Bitcoin node: ..."}}` — behavior by design (no route returns 500).
 
 ---
 
-## 6. Conclusão
+## 6. Conclusion
 
-Todos os 9 endpoints obrigatórios + ciclo PSBT + bug fix da Atividade 3 + path 503 foram exercitados em `regtest` real com Bitcoin Core v31.0. Evidências capturadas neste arquivo correspondem a uma sessão de validação única e linear.
+All 9 mandatory endpoints + PSBT cycle + Activity 3 bug fix + path 503 were exercised in real `regtest` with Bitcoin Core v31.0. Evidence captured in this file corresponds to a single, linear validation session.
 
-**Status final: pronto para entrega.**
+**Final status: ready for delivery.**
 
 ---
 
-## Resultado da validação
+## Validation result
 
-| Item | Status | Evidência | Observação |
+| Item | Status | Evidence | Note |
 |------|--------|-----------|------------|
-| Bitcoin Core RPC | OK | Seção 1 (`getblockchaininfo`) | v31.0.0, regtest, 109 blocos |
-| ZMQ | OK | Seção 1 (`getzmqnotifications`) | rawblock:28332, rawtx:28333 |
-| Atividade 1 | OK | Seção 2 | `/api/mempool/summary` + `/api/blockchain/lag` |
-| Atividade 2 | OK | Seção 3 | `/api/events/{summary,latest,state-comparison}` + divergence fix |
-| Atividade 3 | OK | Seção 4 | `/wallets`, PSBT completo, bug fix wallet tracking, `balance` corrigido via `getbalances()` |
-| Caminho 503 | OK | Seção 5 | Todas as rotas retornam `node_unavailable` estruturado |
-| Frontend | OK | Local (2026-05-02) + público (2026-05-03) | Verificado via Cloudflare Tunnel nos três services |
-| Acesso externo | OK | `docs/demo-publica.md` | Tunnels ativos em 2026-05-03; respostas JSON reais capturadas |
+| Bitcoin Core RPC | OK | Section 1 (`getblockchaininfo`) | v31.0.0, regtest, 109 blocks |
+| ZMQ | OK | Section 1 (`getzmqnotifications`) | rawblock:28332, rawtx:28333 |
+| Activity 1 | OK | Section 2 | `/api/mempool/summary` + `/api/blockchain/lag` |
+| Activity 2 | OK | Section 3 | `/api/events/{summary,latest,state-comparison}` + divergence fix |
+| Activity 3 | OK | Section 4 | `/wallets`, full PSBT, bug fix wallet tracking, `balance` fixed via `getbalances()` |
+| Path 503 | OK | Section 5 | All routes return structured `node_unavailable` |
+| Frontend | OK | Local (2026-05-02) + public (2026-05-03) | Verified via Cloudflare Tunnel on all three services |
+| External access | OK | `docs/demo-publica.md` | Tunnels active on 2026-05-03; Real JSON responses captured |
 
 ---
 
-## 7. Demo pública — Cloudflare Tunnel (2026-05-03)
+## 7. Public Demo — Cloudflare Tunnel (2026-05-03)
 
-Backends expostos via `cloudflared tunnel --url` em 2026-05-03. Bitcoin Core v31.0 em regtest, 215 blocos.
+Backends exposed via `cloudflared tunnel --url` on 2026-05-03. Bitcoin Core v31.0 on regtest, 215 blocks.
 
-| Atividade | URL | Endpoint testado | Resposta |
+| Activity | URL | Endpoint tested | Answer |
 |-----------|-----|------------------|----------|
 | 1 | https://administrators-humanitarian-define-author.trycloudflare.com | `GET /api/blockchain/lag` | `{"blocks":215,"headers":215,"lag":0}` |
 | 2 | https://dice-garcia-hub-particular.trycloudflare.com | `GET /api/events/summary` | `{"blocks_observed":1,"tx_observed":4,"last_event_time":1777837956.2590888,"tx_per_second":0.7}` |
 | 3 | https://move-after-salaries-kde.trycloudflare.com | `GET /wallets` | `{"available_wallets":["smoke_test_wallet","wallet1","wallet2","corecraft"],...,"selected_wallet":"wallet1"}` |
 | 3 | https://move-after-salaries-kde.trycloudflare.com | `GET /wallet/status` | `{"wallet":"wallet1","balance":null,"utxos":109}` |
 
-**Conclusão:** acesso externo verificado, frontend servido corretamente pelo FastAPI via HTTPS do Cloudflare Tunnel.
+**Conclusion:** external access verified, frontend served correctly by FastAPI via HTTPS from Cloudflare Tunnel.
 
-Evidências completas: [`docs/demo-publica.md`](demo-publica.md).
+Complete evidence: [`docs/demo-publica.md`](demo-publica.md).

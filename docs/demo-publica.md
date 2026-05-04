@@ -1,17 +1,17 @@
-# Demo Pública — CoreCraft (2026-05-03)
+# Public Demo — CoreCraft (2026-05-03)
 
-Demonstração via Cloudflare Tunnel dos três backends em execução local expostos pela internet. Bitcoin Core v31.0.0 em regtest, 215 blocos no momento do registro.
+Demonstration via Cloudflare Tunnel of the three backends running locally exposed over the internet. Bitcoin Core v31.0.0 in regtest, 215 blocks at time of registration.
 
 ---
 
-## Ambiente
+## Environment
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| Data | 2026-05-03 |
+| Date | 2026-05-03 |
 | Bitcoin Core | v31.0.0 |
-| Rede | regtest |
-| Blocos / Headers | 215 / 215 (lag = 0) |
+| Network | regtest |
+| Blocks / Headers | 215 / 215 (lag = 0) |
 | ZMQ rawblock | tcp://127.0.0.1:28332 |
 | ZMQ rawtx | tcp://127.0.0.1:28333 |
 | Wallets | wallet1, wallet2, smoke_test_wallet, corecraft |
@@ -19,21 +19,21 @@ Demonstração via Cloudflare Tunnel dos três backends em execução local expo
 
 ---
 
-## URLs públicas
+## Public URLs
 
-| Atividade | URL |
+| Activity | URL |
 |-----------|-----|
-| Atividade 1 | https://administrators-humanitarian-define-author.trycloudflare.com |
-| Atividade 2 | https://dice-garcia-hub-particular.trycloudflare.com |
-| Atividade 3 | https://move-after-salaries-kde.trycloudflare.com |
+| Activity 1 | https://administrators-humanitarian-define-author.trycloudflare.com |
+| Activity 2 | https://dice-garcia-hub-particular.trycloudflare.com |
+| Activity 3 | https://move-after-salaries-kde.trycloudflare.com |
 
-> Tunnels temporários (trycloudflare.com) — gerados sem conta e válidos enquanto o processo `cloudflared` estava ativo.
+> Temporary Tunnels (trycloudflare.com) — generated without account and valid while process `cloudflared` was active.
 
 ---
 
-## Atividade 1 — Snapshot da Mempool via RPC
+## Activity 1 — Mempool Snapshot via RPC
 
-**URL base:** https://administrators-humanitarian-define-author.trycloudflare.com
+**Base URL:** https://administrators-humanitarian-define-author.trycloudflare.com
 
 ### `GET /api/blockchain/lag`
 
@@ -41,13 +41,13 @@ Demonstração via Cloudflare Tunnel dos três backends em execução local expo
 {"blocks":215,"headers":215,"lag":0}
 ```
 
-Nó sincronizado: `blocks == headers`, `lag == 0`. Bitcoin Core v31.0 em regtest com 215 blocos minerados.
+Synchronized node: `blocks == headers`, `lag == 0`. Bitcoin Core v31.0 in regtest with 215 blocks mined.
 
 ---
 
-## Atividade 2 — Eventos em Tempo Real via ZMQ
+## Activity 2 — Real-Time Events via ZMQ
 
-**URL base:** https://dice-garcia-hub-particular.trycloudflare.com
+**Base URL:** https://dice-garcia-hub-particular.trycloudflare.com
 
 ### `GET /api/events/summary`
 
@@ -60,13 +60,13 @@ Nó sincronizado: `blocks == headers`, `lag == 0`. Bitcoin Core v31.0 em regtest
 }
 ```
 
-ZMQ ativo: 1 bloco e 4 transações observados via `rawblock`/`rawtx` no momento da captura.
+Active ZMQ: 1 block and 4 transactions observed via `rawblock`/`rawtx` at the time of capture.
 
 ---
 
-## Atividade 3 — Multi-wallet, PSBT e Estado Interpretado
+## Activity 3 — Multi-wallet, PSBT and Interpreted State
 
-**URL base:** https://move-after-salaries-kde.trycloudflare.com
+**Base URL:** https://move-after-salaries-kde.trycloudflare.com
 
 ### `GET /wallets`
 
@@ -78,7 +78,7 @@ ZMQ ativo: 1 bloco e 4 transações observados via `rawblock`/`rawtx` no momento
 }
 ```
 
-Quatro wallets detectadas via `listwalletdir`, todas carregadas. Wallet ativa: `wallet1`.
+Four wallets detected via `listwalletdir`, all loaded. Active wallet: `wallet1`.
 
 ### `GET /wallet/status`
 
@@ -90,21 +90,21 @@ Quatro wallets detectadas via `listwalletdir`, todas carregadas. Wallet ativa: `
 }
 ```
 
-109 UTXOs disponíveis na wallet1.
+109 UTXOs available on wallet1.
 
-> **Correção aplicada (commit `5b9a925`):** O campo `balance` retornou `null` nesta demo porque `getwalletinfo` no Bitcoin Core v31 não expõe mais esse campo diretamente. Após a correção, `/wallet/status` usa `getbalances()` e devolve o saldo numérico em `mine.trusted`. A resposta corrigida inclui os campos `balance` (numérico), `trusted_balance`, `untrusted_pending` e `immature_balance`.
+> **Fix applied (commit `5b9a925`):** The field `balance` returned `null` in this demo because `getwalletinfo` in Bitcoin Core v31 no longer exposes this field directly. After correction, `/wallet/status` uses `getbalances()` and returns the numeric balance in `mine.trusted`. The corrected response includes the fields `balance` (numeric), `trusted_balance`, `untrusted_pending`, and `immature_balance`.
 
 ---
 
-## Conclusão
+## Conclusion
 
 | Item | Status |
 |------|--------|
-| Atividade 1 — acesso externo | OK |
-| Atividade 2 — acesso externo | OK |
-| Atividade 3 — acesso externo | OK |
-| Frontend servido via HTTPS | OK |
-| ZMQ ativo e recebendo eventos | OK |
-| Múltiplas wallets funcionais | OK |
+| Activity 1 — external access | OK |
+| Activity 2 — external access | OK |
+| Activity 3 — external access | OK |
+| Frontend served via HTTPS | OK |
+| ZMQ active and receiving events | OK |
+| Multiple functional wallets | OK |
 
-Todos os três backends foram acessíveis publicamente via HTTPS (Cloudflare Tunnel) com Bitcoin Core v31.0 em regtest, retornando dados reais do nó.
+All three backends were publicly accessible via HTTPS (Cloudflare Tunnel) with Bitcoin Core v31.0 under regtest, returning real node data.

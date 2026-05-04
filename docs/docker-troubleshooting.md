@@ -43,16 +43,16 @@ error: incorrect rpcuser or rpcpassword
 ```
 
 **Causes:**
-- `BTC_RPC_USER`/`BTC_RPC_PASSWORD` in `.env` don't match the `rpcauth` in `infra/bitcoin/bitcoin.conf`
+- `BTC_RPC_USER`/`BTC_RPC_PASSWORD` in `.env` do not match the `rpcauth` in `infra/bitcoin/bitcoin.conf`
 - `.env` file was modified after `bitcoin-init` ran
 
 **Solution:**
 
-1. Verify your `.env` matches the default:
+1. Check your `.env` matches the default:
    ```bash
    cat .env
    ```
-   Should show:
+Should show:
    ```bash
    BTC_RPC_USER=user
    BTC_RPC_PASSWORD=password
@@ -80,7 +80,7 @@ error: incorrect rpcuser or rpcpassword
 
 **Symptoms:**
 - `docker compose ps` shows `bitcoind` as `unhealthy`
-- Other services can't connect to Bitcoin
+- Other services cannot connect to Bitcoin
 
 **Causes:**
 - First-time blockchain sync takes time
@@ -120,7 +120,7 @@ error: incorrect rpcuser or rpcpassword
    - Settings → Resources → Memory: 4GB+
    - Settings → Resources → CPUs: 2+
 
-### 3. Backend Services Unhealthy
+### 3. Unhealthy Backend Services
 
 **Symptoms:**
 - `docker compose ps` shows `atividade-*` as `unhealthy`
@@ -170,7 +170,7 @@ error: incorrect rpcuser or rpcpassword
 ### 4. ZMQ Not Receiving Events
 
 **Symptoms:**
-- Atividade 2 shows `{"status":"waiting_for_zmq_block"}`
+- Activity 2 shows `{"status":"waiting_for_zmq_block"}`
 - No events received after mining blocks
 
 **Causes:**
@@ -184,7 +184,7 @@ error: incorrect rpcuser or rpcpassword
    ```bash
    docker compose exec bitcoind bitcoin-cli -regtest getzmqnotifications
    ```
-   Should show:
+Should show:
    ```json
    [
      {"type": "pubrawblock", "address": "tcp://0.0.0.0:28332"},
@@ -192,7 +192,7 @@ error: incorrect rpcuser or rpcpassword
    ]
    ```
 
-2. Test ZMQ connectivity from atividade-2:
+2. Test ZMQ connectivity from activity-2:
    ```bash
    docker compose exec atividade-2 python -c "
    import zmq
@@ -227,7 +227,7 @@ error: incorrect rpcuser or rpcpassword
 - Direct ports (8001, 8002, 8003) work fine
 
 **Causes:**
-- Caddy can't reach backend services
+- Caddy cannot reach backend services
 - Port 80 already in use
 - Caddy configuration error
 
@@ -393,7 +393,7 @@ ERROR: failed to solve: failed to compute cache key
 ### 10. Network Connectivity Issues
 
 **Symptoms:**
-- Services can't communicate
+- Services cannot communicate
 - Timeouts connecting to bitcoind
 
 **Solution:**
@@ -408,7 +408,7 @@ ERROR: failed to solve: failed to compute cache key
    docker compose exec atividade-1 ping -c 3 bitcoind
    ```
 
-3. Recreate network:
+3. Recreate networks:
    ```bash
    docker compose down
    docker network rm corecraft-network
@@ -465,37 +465,37 @@ If you're still stuck:
 
 ## macOS — Apple Silicon (M1/M2/M3)
 
-### Sintoma: arranque muito lento (>5 min) ou timeout nos health checks
+### Symptom: very slow start-up (>5 min) or timeout in health checks
 
-**Causa:** As imagens Docker do Bitcoin Core são x86_64. No Apple Silicon, o Docker Desktop executa-as via Rosetta 2, o que adiciona latência de arranque (~30–60 s extra na primeira execução) e maior consumo de RAM.
+**Cause:** Bitcoin Core Docker images are x86_64. On Apple Silicon, Docker Desktop runs them via Rosetta 2, which adds start-up latency (~30–60 s extra on first run) and higher RAM consumption.
 
-**Solução:**
+**Solution:**
 
-1. Abrir Docker Desktop → **Settings** → **Resources** → **Memory**: definir para pelo menos **4 GB** (recomendado 6 GB).
-2. Verificar se o Rosetta está ativado: Docker Desktop → **Features in development** → ativar **"Use Rosetta for x86/amd64 emulation on Apple Silicon"**.
-3. Aumentar o timeout dos health checks se necessário:
+1. Open Docker Desktop → **Settings** → **Resources** → **Memory**: set to at least **4 GB** (6 GB recommended).
+2. Check if Rosetta is enabled: Docker Desktop → **Features in development** → activate **"Use Rosetta for x86/amd64 emulation on Apple Silicon"**.
+3. Increase health check timeouts if necessary:
    ```bash
-   # No docker-compose.yml, ajuste start_period para os serviços Bitcoin:
-   # start_period: 120s   (em vez de 60s)
+   # In docker-compose.yml, adjust start_period for Bitcoin services:
+   # start_period: 120s   (instead of 60s)
    ```
 
-### Sintoma: `exec format error` ou `no matching manifest`
+### Symptom: `exec format error` or `no matching manifest`
 
-**Causa:** A imagem não tem variante arm64.
+**Cause:** The image does not have an arm64 variant.
 
-**Solução:** Forçar a plataforma no Compose:
+**Solution:** Force the platform in Compose:
 ```bash
 DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up
 ```
 
-Ou adicionar ao `.env`:
+Or add to `.env`:
 ```bash
 DOCKER_DEFAULT_PLATFORM=linux/amd64
 ```
 
-### Sintoma: `brew` não encontrado após instalar Homebrew
+### Symptom: `brew` not found after installing Homebrew
 
-No Apple Silicon, o Homebrew instala em `/opt/homebrew/bin`, não em `/usr/local/bin`. Adicionar ao PATH:
+On Apple Silicon, Homebrew installs to `/opt/homebrew/bin`, not `/usr/local/bin`. Add to PATH:
 ```bash
 echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
@@ -505,26 +505,26 @@ source ~/.zshrc
 
 ## Windows — WSL 2
 
-### Sintoma: `docker: command not found` no terminal WSL
+### Symptom: `docker: command not found` on WSL terminal
 
-**Causa:** Docker Desktop não está a expor o socket dentro do WSL 2.
+**Cause:** Docker Desktop is not exposing the socket within WSL 2.
 
-**Solução:**
-1. Abrir Docker Desktop → **Settings** → **Resources** → **WSL Integration**.
-2. Ativar a integração para a sua distribuição Ubuntu (ou outra).
-3. Reiniciar o terminal WSL.
+**Solution:**
+1. Open Docker Desktop → **Settings** → **Resources** → **WSL Integration**.
+2. Enable integration for your Ubuntu (or other) distribution.
+3. Restart the WSL terminal.
 
-Verificar:
+To check:
 ```bash
-docker --version    # deve mostrar a versão do Docker Desktop
+docker --version    # should show the Docker Desktop version
 docker compose version
 ```
 
-### Sintoma: `./scripts/quickstart.sh: Permission denied`
+### Symptom: `./scripts/quickstart.sh: Permission denied`
 
-**Causa:** O ficheiro foi clonado num sistema de ficheiros Windows (ex: `/mnt/c/...`) e as permissões POSIX não se aplicam.
+**Cause:** The file was cloned into a Windows file system (ex: `/mnt/c/...`) and POSIX permissions do not apply.
 
-**Solução:** Clonar o repositório dentro do sistema de ficheiros do WSL (não em `/mnt/c/`):
+**Workaround:** Clone the repository within the WSL file system (not in `/mnt/c/`):
 ```bash
 cd ~
 git clone https://github.com/btcneves/corecraft.git
@@ -532,32 +532,32 @@ cd corecraft
 ./scripts/quickstart.sh
 ```
 
-### Sintoma: portas já em uso — conflito com Windows nativo
+### Symptom: Ports already in use — conflict with native Windows
 
-O Windows pode ter serviços a ouvir nas mesmas portas. Verificar:
+Windows can have services listening on the same ports. To check:
 ```powershell
-# PowerShell (fora do WSL)
+# PowerShell (outside WSL)
 netstat -ano | findstr ":8001 "
 netstat -ano | findstr ":18443 "
 ```
 
-Se alguma porta estiver ocupada, terminar o processo ou mudar a porta no `docker-compose.yml`.
+If any port is occupied, end the process or change the port on `docker-compose.yml`.
 
-### Sintoma: `Activate.ps1 cannot be loaded` ao ativar venv no PowerShell
+### Symptom: `Activate.ps1 cannot be loaded` when enabling venv in PowerShell
 
-**Causa:** Política de execução do PowerShell bloqueia scripts.
+**Cause:** PowerShell execution policy blocks scripts.
 
-**Solução** (execute uma vez, afeta apenas o utilizador atual):
+**Solution** (run once, only affects current user):
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-### bitcoin-cli não reconhecido no Prompt de Comando
+### bitcoin-cli not recognized in Command Prompt
 
-Após instalar o Bitcoin Core no Windows nativo, adicionar ao PATH:
-1. Painel de Controlo → Sistema → Variáveis de Ambiente → PATH → Editar.
-2. Adicionar: `C:\Program Files\Bitcoin\daemon\`
-3. Abrir novo terminal e verificar: `bitcoin-cli --version`
+After installing Bitcoin Core on native Windows, add to PATH:
+1. Control Panel → System → Environment Variables → PATH → Edit.
+2. Add: `C:\Program Files\Bitcoin\daemon\`
+3. Open new terminal and check: `bitcoin-cli --version`
 
 ---
 
@@ -568,7 +568,7 @@ To avoid issues:
 1. **Keep Docker updated** - Use latest Docker Desktop
 2. **Allocate sufficient resources** - 4GB+ RAM (6GB+ on Apple Silicon), 2+ CPUs
 3. **Regular cleanup** - `docker system prune` weekly
-4. **Don't modify .env** unless you understand the implications
+4. **Do not modify .env** unless you understand the implications
 5. **Use profiles** - Only run what you need
 6. **Monitor disk space** - Bitcoin data grows over time
 7. **Apple Silicon** - Always allocate ≥4GB RAM and use Rosetta emulation

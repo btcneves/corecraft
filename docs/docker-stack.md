@@ -52,13 +52,13 @@ docker compose up
 Use Docker Compose profiles to run specific activities:
 
 ```bash
-# Only Atividade 1 (Mempool)
+# Activity 1 only (Mempool)
 docker compose --profile atividade-1 up
 
-# Only Atividade 2 (ZMQ Events)
+# Activity 2 only (ZMQ Events)
 docker compose --profile atividade-2 up
 
-# Only Atividade 3 (Transaction Interpreter)
+# Activity 3 only (Transaction Interpreter)
 docker compose --profile atividade-3 up
 ```
 
@@ -78,7 +78,7 @@ scripts\setup-windows.bat --single-activity atividade-3
 ./scripts/setup-linux.sh --no-build
 ```
 
-## Accessing Services
+## Access Services
 
 ### Via Caddy Proxy (Recommended)
 
@@ -91,9 +91,9 @@ http://localhost/atividade-3/
 ### Direct Access
 
 ```
-http://localhost:8001  # Atividade 1
-http://localhost:8002  # Atividade 2
-http://localhost:8003  # Atividade 3
+http://localhost:8001  # Activity 1
+http://localhost:8002  # Activity 2
+http://localhost:8003  # Activity 3
 ```
 
 ### Bitcoin RPC
@@ -172,7 +172,7 @@ BTC_RPC_PORT=18443
 BTC_RPC_USER=${BTC_RPC_USER}
 BTC_RPC_PASSWORD=${BTC_RPC_PASSWORD}
 
-# Atividade 2 only (ZMQ)
+# Activity 2 only (ZMQ)
 ZMQ_RAWBLOCK_ENDPOINT=tcp://bitcoind:28332
 ZMQ_RAWTX_ENDPOINT=tcp://bitcoind:28333
 ```
@@ -343,7 +343,7 @@ uvicorn atividade-1.backend.app.main:app --reload
 - Ports exposed to host are minimal (80, 8001-8003, 18443, 28332-28333)
 - No sensitive data is baked into images
 
-## Updating
+## Update
 
 To update to the latest version:
 

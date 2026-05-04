@@ -1,9 +1,9 @@
 # Dashboard Assets
 
-Este diretório reserva nomes estáveis para screenshots/GIFs dos dashboards React:
+This directory reserves stable names for screenshots/GIFs of React dashboards:
 
 - `atividade-1-dashboard.png`
 - `atividade-2-dashboard.gif`
 - `atividade-3-dashboard.png`
 
-Os arquivos visuais devem ser atualizados a partir de uma execução real de `docker compose up --build`, preferencialmente depois de validar RPC, ZMQ e PSBT com os smoke tests.
+Visual files must be updated from a real run of `docker compose up --build`, preferably after validating RPC, ZMQ and PSBT with smoke tests.

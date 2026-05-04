@@ -1,8 +1,8 @@
 # Deploy — Cloudflare Tunnel
 
-Cloudflare Tunnel permite expor um servidor local na internet sem abrir portas no roteador.
+Cloudflare Tunnel allows you to expose a local server to the internet without opening ports on the router.
 
-## Instalação
+## Installation
 
 ```bash
 # Linux (x64)
@@ -13,32 +13,32 @@ sudo dpkg -i cloudflared-linux-amd64.deb
 brew install cloudflare/cloudflare/cloudflared
 ```
 
-## Expor cada atividade
+## Expose each activity
 
 ```bash
-# Atividade 1 (backend deve estar rodando em 8001)
+# Activity 1 (backend must be running on 8001)
 cloudflared tunnel --url http://localhost:8001
 
-# Atividade 2 (backend deve estar rodando em 8002)
+# Activity 2 (backend must be running on 8002)
 cloudflared tunnel --url http://localhost:8002
 
-# Atividade 3 (backend deve estar rodando em 8003)
+# Activity 3 (backend must be running on 8003)
 cloudflared tunnel --url http://localhost:8003
 ```
 
-O cloudflared exibirá uma URL pública no formato `https://xxxx-xxxx.trycloudflare.com`.
+cloudflared will display a public URL in the format `https://xxxx-xxxx.trycloudflare.com`.
 
-## Configurar o frontend para URL pública (se necessário)
+## Configure the frontend for public URL (if necessary)
 
-Se o frontend precisar chamar a API por URL absoluta (ex.: mobile ou externo), configure a variável `API_BASE` em cada `app.js`:
+If the frontend needs to call the API via absolute URL (e.g. mobile or external), configure the variable `API_BASE` in each `app.js`:
 
 ```js
 const API_BASE = 'https://xxxx-xxxx.trycloudflare.com';
 ```
 
-Por padrão, os frontends usam URLs relativas (`/api/...`), portanto funcionam sem alteração quando o backend serve o frontend.
+By default, frontends use relative URLs (`/api/...`), so they work unchanged when the backend serves the frontend.
 
-## Dica: rodar múltiplos túneis
+## Tip: run multiple tunnels
 
 ```bash
 cloudflared tunnel --url http://localhost:8001 &
@@ -46,7 +46,7 @@ cloudflared tunnel --url http://localhost:8002 &
 cloudflared tunnel --url http://localhost:8003 &
 ```
 
-## Alternativa: ngrok
+## Alternative: ngrok
 
 ```bash
 ngrok http 8001

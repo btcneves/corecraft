@@ -33,7 +33,7 @@ atividade-N/
 
 ## Design decisions
 
-### No Bitcoin libraries
+### No high-level Bitcoin libraries
 Each activity has its own `rpc_client.py` that calls `requests.post` with `HTTPBasicAuth` and JSON-RPC 2.0 payloads. This keeps the dependency surface minimal and makes the Bitcoin Core protocol explicit. Block hashes, when needed, are computed locally in Python (double SHA-256 + byte reversal).
 
 ### No database
@@ -63,7 +63,7 @@ Global and wallet-scoped calls never mix. When querying a transaction, the servi
 When the ZMQ listener has not yet received a block (e.g., immediately after startup), `last_seen_block` is `null`. The API returns `divergence: null` and `status: "waiting_for_zmq_block"` rather than comparing null against the RPC best block hash. The frontend only shows the divergence banner when `status === "compared" && divergence === true`.
 
 ### txid resolution in Activity 2
-Transaction IDs are resolved via `decoderawtransaction` RPC, which avoids writing a local witness-serialisation parser. If the node is offline when a ZMQ transaction arrives, the txid is not registered and a warning is logged.
+Transaction IDs are resolved via `decoderawtransaction` RPC, which avoids writing a local witness-serialization parser. If the node is offline when a ZMQ transaction arrives, the txid is not registered and a warning is logged.
 
 ### HTTP 503 for node unavailability
 All routes that depend on Bitcoin Core return a structured 503 response when the node is unreachable. No route returns HTTP 500 for a connectivity failure:

@@ -1,32 +1,32 @@
-# Setup Bitcoin Core (regtest)
+# Bitcoin Core Setup (regtest)
 
-Este documento cobre a instalação e configuração do Bitcoin Core para uso com o CoreCraft em todos os sistemas operativos suportados.
+This document covers installing and configuring Bitcoin Core for use with CoreCraft on all supported operating systems.
 
 ---
 
-## Sumário
+## Summary
 
-- [Instalação](#instalação)
+- [Installation](#installation)
   - [Linux (Ubuntu/Debian)](#linux-ubuntudebian)
   - [Linux (Fedora/RHEL)](#linux-fedorarhel)
-  - [Linux — a partir do tarball oficial](#linux--a-partir-do-tarball-oficial)
+  - [Linux — from the official tarball](#linux--from-the-official-tarball)
   - [macOS — Homebrew](#macos--homebrew)
-  - [macOS — Instalador DMG](#macos--instalador-dmg)
-  - [Windows — Instalador oficial](#windows--instalador-oficial)
+  - [macOS — DMG Installer](#macos--dmg-installer)
+  - [Windows — Official Installer](#windows--official-installer)
   - [Windows via WSL 2](#windows-via-wsl-2)
-- [Configuração (bitcoin.conf)](#configuração-bitcoinconf)
-- [Iniciar e parar o daemon](#iniciar-e-parar-o-daemon)
-- [Verificar estado e ZMQ](#verificar-estado-e-zmq)
-- [Criar wallets e gerar saldo](#criar-wallets-e-gerar-saldo)
-- [Operações frequentes](#operações-frequentes)
+- [Configuration (bitcoin.conf)](#configuration-bitcoinconf)
+- [Start and stop the daemon](#start-and-stop-the-daemon)
+- [Check status and ZMQ](#check-status-and-zmq)
+- [Create wallets and generate balance](#create-wallets-and-generate-balance)
+- [Frequent operations](#frequent-operations)
 
 ---
 
-## Instalação
+## Installation
 
 ### Linux (Ubuntu/Debian)
 
-**Opção 1 — PPA oficial (recomendado, mais simples):**
+**Option 1 — Official PPA (recommended, simpler):**
 
 ```bash
 sudo add-apt-repository ppa:bitcoin/bitcoin
@@ -34,14 +34,14 @@ sudo apt-get update
 sudo apt-get install -y bitcoind bitcoin-qt
 ```
 
-**Opção 2 — apt direto (versão do repositório oficial Ubuntu, pode ser mais antiga):**
+**Option 2 — direct apt (official Ubuntu repository version, may be older):**
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y bitcoind
 ```
 
-Verificar a versão instalada:
+Check the installed version:
 
 ```bash
 bitcoind --version
@@ -55,36 +55,36 @@ bitcoind --version
 sudo dnf install -y bitcoin-core
 ```
 
-Se o pacote não estiver disponível no repositório padrão, usar o tarball oficial (ver abaixo).
+If the package is not available in the default repository, use the official tarball (see below).
 
 ---
 
-### Linux — a partir do tarball oficial
+### Linux — from the official tarball
 
-Use este método para instalar qualquer versão específica ou em distribuições sem PPA.
+Use this method to install any specific version or on PPA-free distributions.
 
 ```bash
-# Substituir pela versão desejada (ver https://bitcoincore.org/en/download/)
+# Replace with the desired version (see https://bitcoincore.org/en/download/)
 VERSION=27.0
 
-# Descarregar e verificar integridade
+# Download and verify integrity
 wget https://bitcoincore.org/bin/bitcoin-core-${VERSION}/bitcoin-${VERSION}-x86_64-linux-gnu.tar.gz
 wget https://bitcoincore.org/bin/bitcoin-core-${VERSION}/SHA256SUMS
 
 sha256sum --check --ignore-missing SHA256SUMS
 
-# Extrair e instalar
+# Extract and install
 tar xzf bitcoin-${VERSION}-x86_64-linux-gnu.tar.gz
 sudo install -m 0755 -t /usr/local/bin \
   bitcoin-${VERSION}/bin/bitcoind \
   bitcoin-${VERSION}/bin/bitcoin-cli
 
-# Verificar
+# Check
 bitcoind --version
 bitcoin-cli --version
 ```
 
-> Para ARM (Raspberry Pi, etc.), substituir `x86_64-linux-gnu` por `aarch64-linux-gnu`.
+> For ARM (Raspberry Pi, etc.), replace `x86_64-linux-gnu` with `aarch64-linux-gnu`.
 
 ---
 
@@ -94,7 +94,7 @@ bitcoin-cli --version
 brew install bitcoin
 ```
 
-O Homebrew instala `bitcoind` e `bitcoin-cli` em `/usr/local/bin/` (Intel) ou `/opt/homebrew/bin/` (Apple Silicon).
+Homebrew installs `bitcoind` and `bitcoin-cli` on `/usr/local/bin/` (Intel) or `/opt/homebrew/bin/` (Apple Silicon).
 
 ```bash
 bitcoind --version
@@ -102,14 +102,14 @@ bitcoind --version
 
 ---
 
-### macOS — Instalador DMG
+### macOS — DMG Installer
 
-1. Descarregar o `.dmg` em [bitcoincore.org/en/download](https://bitcoincore.org/en/download/).
-2. Abrir o `.dmg` e arrastar `Bitcoin-Qt.app` para `Applications`.
-3. O `bitcoind` e o `bitcoin-cli` ficam em `/Applications/Bitcoin-Qt.app/Contents/MacOS/`:
+1. Download `.dmg` to [bitcoincore.org/en/download](https://bitcoincore.org/en/download/).
+2. Open `.dmg` and drag `Bitcoin-Qt.app` to `Applications`.
+3. `bitcoind` and `bitcoin-cli` are in `/Applications/Bitcoin-Qt.app/Contents/MacOS/`:
 
 ```bash
-# Adicionar ao PATH (colocar no ~/.zshrc ou ~/.bash_profile)
+# Add to PATH (place in ~/.zshrc or ~/.bash_profile)
 export PATH="/Applications/Bitcoin-Qt.app/Contents/MacOS:$PATH"
 
 source ~/.zshrc   # ou source ~/.bash_profile
@@ -118,56 +118,56 @@ bitcoind --version
 
 ---
 
-### Windows — Instalador oficial
+### Windows — Official Installer
 
-1. Descarregar o instalador `.exe` (64-bit) em [bitcoincore.org/en/download](https://bitcoincore.org/en/download/).
-2. Executar o instalador como administrador; seguir os passos do assistente.
-3. O instalador cria por padrão `C:\Program Files\Bitcoin\`.
-4. Adicionar o diretório `daemon` ao PATH do sistema:
-   - Painel de Controlo → Sistema → Definições avançadas do sistema → Variáveis de Ambiente
-   - Em "Variáveis de sistema", selecionar `Path` → Editar → Novo
-   - Adicionar: `C:\Program Files\Bitcoin\daemon`
-5. Abrir um **novo** Prompt de Comando ou PowerShell e verificar:
+1. Download the `.exe` (64-bit) installer on [bitcoincore.org/en/download](https://bitcoincore.org/en/download/).
+2. Run the installer as administrator; Follow the wizard's steps.
+3. The installer creates by default `C:\Program Files\Bitcoin\`.
+4. Add the `daemon` directory to the system PATH:
+   - Control Panel → System → Advanced system settings → Environment Variables
+   - Under "System variables", select `Path` → Edit → New
+   - Add: `C:\Program Files\Bitcoin\daemon`
+5. Open a **new** Command Prompt or PowerShell and check:
 
 ```cmd
 bitcoind --version
 bitcoin-cli --version
 ```
 
-> O diretório de dados padrão no Windows é `%APPDATA%\Bitcoin\` (tipicamente `C:\Users\<utilizador>\AppData\Roaming\Bitcoin\`).
+> The default data directory in Windows is `%APPDATA%\Bitcoin\` (typically `C:\Users\<user>\AppData\Roaming\Bitcoin\`).
 
 ---
 
 ### Windows via WSL 2
 
-WSL 2 é a opção **recomendada para desenvolvimento** no Windows: permite usar Bitcoin Core e todas as ferramentas do projeto num ambiente Linux nativo.
+WSL 2 is the **recommended option for development** on Windows: it allows you to use Bitcoin Core and all project tools in a native Linux environment.
 
-**Instalar WSL 2:**
+**Install WSL 2:**
 
 ```powershell
-# PowerShell como Administrador
+# PowerShell as Administrator
 wsl --install -d Ubuntu
-# Reiniciar quando solicitado
+# Restart when prompted
 ```
 
-Após o reinício, configurar o utilizador Ubuntu e, no terminal Ubuntu, seguir as instruções [Linux (Ubuntu/Debian)](#linux-ubuntudebian) acima.
+After restart, configure the Ubuntu user and, in the Ubuntu terminal, follow the [Linux (Ubuntu/Debian)](#linux-ubuntudebian) instructions above.
 
-> O Docker Desktop detecta automaticamente o WSL 2. O `bitcoind` a correr no WSL 2 é acessível pelo host Windows em `127.0.0.1:18443`.
+> Docker Desktop automatically detects WSL 2. `bitcoind` running on WSL 2 is accessible from the Windows host at `127.0.0.1:18443`.
 
 ---
 
-## Configuração (bitcoin.conf)
+## Configuration (bitcoin.conf)
 
-### Caminhos por sistema operativo
+### Paths by operating system
 
-| OS | Caminho do bitcoin.conf |
+| OS | bitcoin.conf Path |
 |----|------------------------|
 | Linux | `~/.bitcoin/bitcoin.conf` |
 | macOS | `~/Library/Application Support/Bitcoin/bitcoin.conf` |
-| Windows (nativo) | `%APPDATA%\Bitcoin\bitcoin.conf` |
-| Windows (WSL 2) | `~/.bitcoin/bitcoin.conf` (dentro do WSL) |
+| Windows (native) | `%APPDATA%\Bitcoin\bitcoin.conf` |
+| Windows (WSL 2) | `~/.bitcoin/bitcoin.conf` (within WSL) |
 
-### Criar/editar o ficheiro
+### Create/edit the file
 
 **Linux / macOS / WSL 2:**
 
@@ -183,7 +183,7 @@ New-Item -ItemType Directory -Force -Path "$env:APPDATA\Bitcoin" | Out-Null
 notepad "$env:APPDATA\Bitcoin\bitcoin.conf"
 ```
 
-### Conteúdo do bitcoin.conf
+### bitcoin.conf content
 
 ```ini
 regtest=1
@@ -200,47 +200,47 @@ zmqpubrawblock=tcp://127.0.0.1:28332
 zmqpubrawtx=tcp://127.0.0.1:28333
 ```
 
-> **Nota:** As linhas `zmqpub*` são **obrigatórias para a Atividade 2**. Se não pretende usar a Atividade 2, pode omiti-las — o daemon inicia igualmente.
+> **Note:** Lines `zmqpub*` are **required for Activity 2**. If you do not intend to use Activity 2, you can omit them — the daemon starts anyway.
 
-> **Nota:** `txindex=1` constrói um índice completo de transações. Na primeira iniciação com este flag, o nó indexa a chain (em regtest com poucos blocos, é instantâneo).
+> **Note:** `txindex=1` builds a complete index of transactions. On the first start with this flag, the node indexes the chain (in regtest with few blocks, it is instantaneous).
 
 ---
 
-## Iniciar e parar o daemon
+## Start and stop the daemon
 
-### Linux / macOS
+### Linux/macOS
 
 ```bash
-# Iniciar em background
+# Start in the background
 bitcoind -regtest -daemon
 
-# Parar
+# Stop
 bitcoin-cli -regtest stop
 ```
 
-### Windows (Prompt de Comando)
+### Windows (Command Prompt)
 
 ```cmd
-REM Iniciar em background
+REM Start in the background
 start /B bitcoind -regtest -daemon
 
-REM Parar
+REM Stop
 bitcoin-cli -regtest stop
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-# Iniciar em background
+# Start in the background
 Start-Process bitcoind -ArgumentList "-regtest", "-daemon" -WindowStyle Hidden
 
-# Parar
+# Stop
 bitcoin-cli -regtest stop
 ```
 
-### Iniciar como serviço no Linux (systemd)
+### Start as service in Linux (systemd)
 
-Para manter o daemon ativo entre reinícios:
+To keep the daemon alive between restarts:
 
 ```bash
 sudo tee /etc/systemd/system/bitcoind-regtest.service > /dev/null << 'EOF'
@@ -266,23 +266,23 @@ sudo systemctl enable --now bitcoind-regtest
 
 ---
 
-## Verificar estado e ZMQ
+## Check status and ZMQ
 
 ```bash
-# Estado da chain
+# Chain state
 bitcoin-cli -regtest getblockchaininfo
 
-# Verificar ZMQ (deve listar rawblock e rawtx se configurado)
+# Check ZMQ (should list rawblock and rawtx if configured)
 bitcoin-cli -regtest getzmqnotifications
 
-# Listar wallets carregadas
+# List loaded wallets
 bitcoin-cli -regtest listwallets
 
-# Listar wallets em disco
+# List wallets on disk
 bitcoin-cli -regtest listwalletdir
 ```
 
-Saída esperada de `getzmqnotifications` com ZMQ configurado:
+Expected output of `getzmqnotifications` with ZMQ configured:
 
 ```json
 [
@@ -293,87 +293,87 @@ Saída esperada de `getzmqnotifications` com ZMQ configurado:
 
 ---
 
-## Criar wallets e gerar saldo
+## Create wallets and generate balance
 
-### Criar wallets (necessário para Atividades 2 e 3)
+### Create wallets (required for Activities 2 and 3)
 
 ```bash
 bitcoin-cli -regtest createwallet wallet1
 bitcoin-cli -regtest createwallet wallet2
 ```
 
-### Gerar endereço e minerar saldo
+### Generate address and mine balance
 
 ```bash
-# Obter endereço da wallet1
+# Get wallet1 address
 ADDR=$(bitcoin-cli -regtest -rpcwallet=wallet1 getnewaddress)
-echo "Endereço: $ADDR"
+echo "Address: $ADDR"
 
-# Minerar 101 blocos (os primeiros 100 coinbases ficam imaturos;
-# o 101.º bloco torna o saldo do bloco 1 gastável)
+# Mine 101 blocks (the first 100 coinbases remain immature;
+# the 101st block makes the balance from block 1 spendable)
 bitcoin-cli -regtest generatetoaddress 101 $ADDR
 ```
 
-**Windows (Prompt de Comando):**
+**Windows (Command Prompt):**
 
 ```cmd
 for /f %a in ('bitcoin-cli -regtest -rpcwallet=wallet1 getnewaddress') do set ADDR=%a
 bitcoin-cli -regtest generatetoaddress 101 %ADDR%
 ```
 
-### Verificar saldo
+### Check balance
 
 ```bash
-# Saldo detalhado (trusted / pending / immature)
+# Detailed balance (trusted / pending / immature)
 bitcoin-cli -regtest -rpcwallet=wallet1 getbalances
 
-# Informação geral da wallet
+# General wallet information
 bitcoin-cli -regtest -rpcwallet=wallet1 getwalletinfo
 
-# Lista de UTXOs disponíveis
+# List available UTXOs
 bitcoin-cli -regtest -rpcwallet=wallet1 listunspent
 ```
 
 ---
 
-## Operações frequentes
+## Frequent operations
 
-### Minerar blocos adicionais
+### Mine additional blocks
 
 ```bash
-# Minerar 1 bloco
+# Mine 1 block
 bitcoin-cli -regtest generatetoaddress 1 $ADDR
 
-# Minerar 10 blocos
+# Mine 10 blocks
 bitcoin-cli -regtest generatetoaddress 10 $ADDR
 ```
 
-### Enviar transação entre wallets (para teste)
+### Send transaction between wallets (for testing)
 
 ```bash
 DEST=$(bitcoin-cli -regtest -rpcwallet=wallet2 getnewaddress)
 bitcoin-cli -regtest -rpcwallet=wallet1 sendtoaddress $DEST 0.001
 ```
 
-### Ver transações recentes
+### View recent transactions
 
 ```bash
 bitcoin-cli -regtest -rpcwallet=wallet1 listtransactions
 ```
 
-### Carregar wallet que não está em memória
+### Load wallet that is not in memory
 
 ```bash
 bitcoin-cli -regtest loadwallet wallet2
 ```
 
-### Descarregar wallet
+### Download wallet
 
 ```bash
 bitcoin-cli -regtest unloadwallet wallet2
 ```
 
-### Reiniciar o daemon (após editar bitcoin.conf)
+### Restart the daemon (after editing bitcoin.conf)
 
 ```bash
 bitcoin-cli -regtest stop
@@ -383,7 +383,7 @@ bitcoind -regtest -daemon
 
 ---
 
-## Referências
+## References
 
 - [Bitcoin Core Downloads](https://bitcoincore.org/en/download/)
 - [bitcoin.conf reference (bitcoin/bitcoin GitHub)](https://github.com/bitcoin/bitcoin/blob/master/doc/bitcoin-conf.md)

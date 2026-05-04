@@ -1,70 +1,70 @@
-# RPC vs ZMQ — Conceitos e Uso no CoreCraft
+# RPC vs ZMQ — Concepts and Usage in CoreCraft
 
 ## JSON-RPC (HTTP)
 
-**Modelo:** Pull — a aplicação faz o pedido, o node responde.
+**Model:** Pull — the application makes the request, the node responds.
 
 ```
-Aplicação ──── POST /  ──→  Bitcoin Core
-Aplicação ←── resposta ───  Bitcoin Core
+Application ──── POST /  ──→  Bitcoin Core
+Application ←── response ───  Bitcoin Core
 ```
 
-**Características:**
-- Síncrono: você pergunta, ele responde imediatamente.
-- Stateless: cada chamada é independente.
-- Ideal para: consultar estado, enviar transações, listar UTXOs.
+**Features:**
+- Synchronous: the application requests data, and the node responds immediately.
+- Stateless: each call is independent.
+- Ideal for: querying status, sending transactions, listing UTXOs.
 
-**Exemplo:**
+**Example:**
 ```python
-rpc.call("getmempoolinfo")          # snapshot da mempool
-rpc.call("sendrawtransaction", hex) # broadcast de tx
+rpc.call("getmempoolinfo")          # mempool snapshot
+rpc.call("sendrawtransaction", hex) # tx broadcast
 ```
 
 ## ZMQ (PUB/SUB)
 
-**Modelo:** Push — o node publica eventos, a aplicação assina.
+**Model:** Push — the node publishes events, the application subscribes.
 
 ```
-Bitcoin Core ──── publica ──→  ZMQ endpoint
-Aplicação    ←── recebe  ────  ZMQ endpoint
+Bitcoin Core ──── publishes ──→  ZMQ endpoint
+Application     ←── receives  ───  ZMQ endpoint
 ```
 
-**Características:**
-- Assíncrono: o node envia quando algo acontece.
-- Baixa latência: praticamente em tempo real.
-- Ideal para: detectar novos blocos, novas transações na mempool.
+**Features:**
+- Asynchronous: the node sends when something happens.
+- Low latency: practically in real time.
+- Ideal for: detecting new blocks, new transactions in the mempool.
 
-**Tópicos disponíveis:**
-| Tópico | Conteúdo | Porta (default) |
+**Available topics:**
+| Topic | Content | Port (default) |
 |--------|----------|----------------|
-| `rawblock` | Bloco completo serializado | 28332 |
-| `rawtx` | Transação serializada | 28333 |
-| `hashblock` | Hash do novo bloco | 28332 |
-| `hashtx` | Hash de nova tx | 28333 |
+| `rawblock` | Complete serialized block | 28332 |
+| `rawtx` | Serialized transaction | 28333 |
+| `hashblock` | Hash of new block | 28332 |
+| `hashtx` | New tx hash | 28333 |
 
-**Exemplo:**
+**Example:**
 ```python
 sock.setsockopt(zmq.SUBSCRIBE, b"rawblock")
 sock.setsockopt(zmq.SUBSCRIBE, b"rawtx")
 topic, body, seq = sock.recv_multipart()
 ```
 
-## Quando usar cada um — decisões no CoreCraft
+## When to use each — decisions in CoreCraft
 
-| Atividade | Tecnologia | Justificativa |
+| Activity | Technology | Justification |
 |-----------|-----------|---------------|
-| 1 | RPC only | Snapshot pontual não precisa de tempo real |
-| 2 | RPC + ZMQ | ZMQ para detectar eventos; RPC para `bestblockhash` e `decoderawtransaction` |
-| 3 | RPC only | Operações de wallet (PSBT, UTXOs) são stateful e síncronas por natureza |
+| 1 | RPC only | Point-in-time snapshot doesn’t need real time |
+| 2 | RPC + ZMQ | ZMQ to detect events; RPC for `bestblockhash` and `decoderawtransaction` |
+| 3 | RPC only | Wallet operations (PSBT, UTXOs) are stateful and synchronous in nature |
 
-## Configuração necessária no bitcoin.conf
+## Configuration required in bitcoin.conf
 
 ```ini
 zmqpubrawblock=tcp://127.0.0.1:28332
 zmqpubrawtx=tcp://127.0.0.1:28333
 ```
 
-Verificar:
+To check:
 ```bash
 bitcoin-cli -regtest getzmqnotifications
 ```

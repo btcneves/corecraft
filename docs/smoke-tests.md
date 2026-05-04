@@ -21,7 +21,7 @@ bitcoin-cli -regtest generatetoaddress 101 $ADDR
 bitcoin-cli -regtest -rpcwallet=wallet1 getwalletinfo
 ```
 
-## Prerequisites — backends running
+## Prerequisites — running backends
 
 ```bash
 # Terminal 1
