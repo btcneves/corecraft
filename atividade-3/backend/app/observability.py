@@ -74,7 +74,8 @@ def metrics_text() -> str:
         f'corecraft_last_request_latency_ms{{service="{SERVICE_NAME}"}} {_last_latency_ms:.3f}',
         "# HELP corecraft_psbt_sent_total Total PSBT transactions broadcast.",
         "# TYPE corecraft_psbt_sent_total counter",
-        f'corecraft_psbt_sent_total{{service="{SERVICE_NAME}"}} {_domain_counters["psbt_sent_total"]}',
+        f'corecraft_psbt_sent_total{{service="{SERVICE_NAME}"}} '
+        f'{_domain_counters["psbt_sent_total"]}',
         "# HELP corecraft_requests_by_path_total HTTP requests broken down by path.",
         "# TYPE corecraft_requests_by_path_total counter",
     ]
