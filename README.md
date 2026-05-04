@@ -36,6 +36,8 @@ Portas locais (uvicorn): Atividade 1 → `8001` · Atividade 2 → `8002` · Ati
 
 Os três backends seguem o mesmo padrão estrutural: `app/main.py` (rotas FastAPI) + `app/rpc_client.py` (cliente JSON-RPC dedicado) + módulos de domínio + build React servido pelo próprio FastAPI.
 
+Todos os backends expõem `/health`, `/metrics` e logs JSON com `correlation_id`. O CI executa `ruff`, `mypy --strict`, `pytest --cov`, `npm audit`, `pip-audit`, Trivy e validação do Compose.
+
 ---
 
 ## Estrutura do repositório
@@ -107,6 +109,7 @@ corecraft/
 | Bitcoin Core | 26.0+ | Modo `regtest`, com RPC habilitado |
 | ZMQ | — | Apenas Atividade 2 (`zmqpubrawblock` e `zmqpubrawtx` no `bitcoin.conf`) |
 | `pip` | atualizado | Instala `fastapi`, `uvicorn`, `requests`, `python-dotenv`, `pyzmq` |
+| Node.js | 18+ local, 22.12 no CI/Docker | Frontends React/Vite |
 
 > Setup completo do Bitcoin Core: [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md)
 
@@ -157,6 +160,17 @@ docker compose up --build
 
 O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial para `wallet1`, executa os tres backends e expõe as interfaces pelo Caddy. Detalhes em [`docs/docker-stack.md`](docs/docker-stack.md).
 
+Variáveis principais:
+
+```bash
+BTC_RPC_USER=user
+BTC_RPC_PASSWORD=password
+BTC_RPC_AUTH=user:corecraft$55eef9f3661634839386ead63a2e72d60d0ef27470547ec7b4b12d0e9dce8db2
+LOG_LEVEL=INFO
+```
+
+`BTC_RPC_AUTH` é o valor `rpcauth` usado pelo Bitcoin Core. `BTC_RPC_USER` e `BTC_RPC_PASSWORD` continuam sendo usados por `bitcoin-cli`, `bitcoin-init` e pelos backends para autenticar via HTTP Basic Auth.
+
 ---
 
 ## Endpoints (resumo)
@@ -165,6 +179,8 @@ O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial p
 |:------:|------|:---------:|-----------|
 | GET | `/api/mempool/summary` | 1 | Snapshot da mempool com distribuição de fee rate |
 | GET | `/api/blockchain/lag` | 1 | Lag de sincronização (`headers - blocks`) |
+| GET | `/health` | 1-3 | Healthcheck simples do backend |
+| GET | `/metrics` | 1-3 | Métricas Prometheus text básicas |
 | GET | `/api/events/summary` | 2 | Contadores e taxa de eventos do buffer ZMQ |
 | GET | `/api/events/latest` | 2 | Últimos blocos e txs recebidos via ZMQ |
 | GET | `/api/events/state-comparison` | 2 | Compara `getbestblockhash` (RPC) × último bloco (ZMQ) |
@@ -188,6 +204,8 @@ Smoke tests completos com `curl`: [`docs/smoke-tests.md`](docs/smoke-tests.md).
 | [`docs/deploy-vps.md`](docs/deploy-vps.md) | Deploy em VPS Ubuntu 22.04 com `tmux` e `ufw` |
 | [`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md) | Exposição pública via Cloudflare Tunnel ou ngrok |
 | [`docs/smoke-tests.md`](docs/smoke-tests.md) | Smoke tests `curl` por atividade |
+| [`docs/docker-stack.md`](docs/docker-stack.md) | Stack Docker completa, variáveis e comandos Make |
+| [`docs/docker-troubleshooting.md`](docs/docker-troubleshooting.md) | Diagnóstico de RPC auth, healthchecks, ZMQ e Caddy |
 | [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md) | Saída completa de validação contra Bitcoin Core v31.0 |
 | [`docs/demo-publica.md`](docs/demo-publica.md) | Evidências de demo pública via Cloudflare Tunnel (2026-05-03) |
 
@@ -205,6 +223,7 @@ Cada atividade tem seu próprio README detalhado:
 - **Sem banco de dados.** Estado em memória (`deque` na Atividade 2, `dict` na Atividade 3). Estado zera ao reiniciar — comportamento esperado.
 - **PSBT na Atividade 3.** Fluxo `walletcreatefundedpsbt → walletprocesspsbt → finalizepsbt → sendrawtransaction` para o Core cuidar de seleção de UTXO e fee.
 - **Erro 503 estruturado.** Quando o nó está offline, todas as rotas que dependem dele retornam `{"detail": {"error": "node_unavailable", "detail": "..."}}` com HTTP 503.
+- **Observabilidade mínima.** Logs são emitidos em JSON com `service` e `correlation_id`; cada backend expõe `/health` e `/metrics`.
 - **Frontend isolado.** Cada atividade tem frontend React/Vite/TypeScript próprio. URLs relativas e Caddy com prefixos permitem acesso direto (`:8001`/`:8002`/`:8003`) ou por `/atividade-N/`.
 - **Decisões de arquitetura completas em [`docs/architecture.md`](docs/architecture.md).**
 
@@ -250,6 +269,14 @@ Para reproduzir localmente (requer `bitcoind -regtest` nas portas padrão):
 ```
 
 Demo pública executada em 2026-05-03 via Cloudflare Tunnel:
+
+### Screenshots dos dashboards
+
+Placeholders versionados para evidências visuais estão em [`docs/assets/README.md`](docs/assets/README.md). Ao gerar novos screenshots/GIFs dos dashboards React, salve-os como:
+
+- `docs/assets/atividade-1-dashboard.png`
+- `docs/assets/atividade-2-dashboard.gif`
+- `docs/assets/atividade-3-dashboard.png`
 
 | Atividade | URL | Endpoint validado | Resposta |
 |-----------|-----|-------------------|----------|

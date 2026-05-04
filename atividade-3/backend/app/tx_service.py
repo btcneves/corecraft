@@ -1,10 +1,13 @@
 import time
+from typing import Any
 
-from .rpc_client import BitcoinRPC, RPCError, rpc_node, rpc_wallet
+from .rpc_client import RPCError, rpc_node, rpc_wallet
 from .tx_interpreter import interpret
 
+JsonDict = dict[str, Any]
 
-def send_tx(to_address: str, amount: float, wallet_name: str, tracked_txs: dict) -> dict:
+
+def send_tx(to_address: str, amount: float, wallet_name: str, tracked_txs: JsonDict) -> JsonDict:
     """
     Build, sign and broadcast a transaction using PSBT flow:
     walletcreatefundedpsbt → walletprocesspsbt → finalizepsbt → sendrawtransaction
@@ -32,7 +35,7 @@ def send_tx(to_address: str, amount: float, wallet_name: str, tracked_txs: dict)
     return {"txid": txid, "wallet": wallet_name, "status": "broadcast"}
 
 
-def get_tx(txid: str, wallet_name: str | None, tracked_txs: dict) -> dict:
+def get_tx(txid: str, wallet_name: str | None, tracked_txs: JsonDict) -> JsonDict:
     n_rpc = rpc_node()
     tracked = tracked_txs.get(txid)
 

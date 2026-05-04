@@ -4,14 +4,18 @@ import os
 import sys
 from datetime import UTC, datetime
 
+from .observability import SERVICE_NAME, get_correlation_id
+
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         payload = {
-            "ts": datetime.fromtimestamp(record.created, UTC).isoformat(),
+            "timestamp": datetime.fromtimestamp(record.created, UTC).isoformat(),
             "level": record.levelname,
+            "service": SERVICE_NAME,
             "logger": record.name,
             "message": record.getMessage(),
+            "correlation_id": get_correlation_id(),
         }
         if record.exc_info:
             payload["exc_info"] = self.formatException(record.exc_info)

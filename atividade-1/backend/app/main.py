@@ -3,17 +3,19 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from .logging_config import configure_logging
 from .mempool import lag, summary
+from .observability import correlation_middleware, health_payload, metrics_text
 from .rpc_client import RPCConnectionError, RPCError, rpc_from_env
 
 load_dotenv()
 configure_logging()
 
 app = FastAPI(title="CoreCraft Atividade 1 — Mempool Snapshot")
+app.middleware("http")(correlation_middleware)
 
 FRONTEND_CANDIDATES = [
     Path(os.getenv("FRONTEND_DIR", "")) if os.getenv("FRONTEND_DIR") else None,
@@ -34,32 +36,50 @@ elif FRONTEND_SOURCE_DIR.exists():
 
 
 @app.get("/")
-def index():
+def index() -> FileResponse:
     return FileResponse(str(FRONTEND_DIR / "index.html"))
 
 
+@app.get("/health")
+def health() -> dict[str, object]:
+    return health_payload()
+
+
+@app.get("/metrics", response_class=PlainTextResponse)
+def metrics() -> str:
+    return metrics_text()
+
+
 @app.get("/api/mempool/summary")
-def mempool_summary():
+def mempool_summary() -> dict[str, object]:
     rpc = rpc_from_env()
     try:
         return summary(rpc)
     except RPCConnectionError as exc:
-        raise HTTPException(status_code=503, detail={"error": "node_unavailable", "detail": str(exc)})
+        raise HTTPException(
+            status_code=503, detail={"error": "node_unavailable", "detail": str(exc)}
+        ) from exc
     except RPCError as exc:
-        raise HTTPException(status_code=503, detail={"error": "rpc_error", "detail": str(exc)})
+        raise HTTPException(
+            status_code=503, detail={"error": "rpc_error", "detail": str(exc)}
+        ) from exc
 
 
 @app.get("/api/blockchain/lag")
-def blockchain_lag():
+def blockchain_lag() -> dict[str, object]:
     rpc = rpc_from_env()
     try:
         return lag(rpc)
     except RPCConnectionError as exc:
-        raise HTTPException(status_code=503, detail={"error": "node_unavailable", "detail": str(exc)})
+        raise HTTPException(
+            status_code=503, detail={"error": "node_unavailable", "detail": str(exc)}
+        ) from exc
     except RPCError as exc:
-        raise HTTPException(status_code=503, detail={"error": "rpc_error", "detail": str(exc)})
+        raise HTTPException(
+            status_code=503, detail={"error": "rpc_error", "detail": str(exc)}
+        ) from exc
 
 
 @app.get("/{path:path}")
-def spa_fallback(path: str):
+def spa_fallback(path: str) -> FileResponse:
     return FileResponse(str(FRONTEND_DIR / "index.html"))

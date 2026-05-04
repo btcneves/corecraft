@@ -13,5 +13,9 @@ COPY atividade-1/backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY atividade-1/backend/app ./app
 COPY --from=frontend /src/dist ./frontend/dist
+RUN addgroup --system corecraft \
+    && adduser --system --ingroup corecraft --home /app corecraft \
+    && chown -R corecraft:corecraft /app
+USER corecraft
 EXPOSE 8001
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]

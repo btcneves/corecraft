@@ -1,17 +1,19 @@
-import os
 import asyncio
+import os
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import zmq_listener
 from .event_service import get_latest, get_state_comparison, get_summary
 from .event_store import EventStore
 from .logging_config import configure_logging
+from .observability import correlation_middleware, health_payload, metrics_text
 from .rpc_client import RPCConnectionError, RPCError, rpc_from_env
 
 load_dotenv()
@@ -31,7 +33,7 @@ FRONTEND_SOURCE_DIR = FRONTEND_DIR.parent if FRONTEND_DIR.name == "dist" else FR
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     rpc = rpc_from_env()
     zmq_listener.start(store, rpc)
     yield
@@ -39,6 +41,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="CoreCraft Atividade 2 — Eventos em Tempo Real", lifespan=lifespan)
+app.middleware("http")(correlation_middleware)
 
 if (FRONTEND_DIR / "assets").exists():
     app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets")
@@ -49,33 +52,47 @@ elif FRONTEND_SOURCE_DIR.exists():
 
 
 @app.get("/")
-def index():
+def index() -> FileResponse:
     return FileResponse(str(FRONTEND_DIR / "index.html"))
 
 
+@app.get("/health")
+def health() -> dict[str, object]:
+    return health_payload()
+
+
+@app.get("/metrics", response_class=PlainTextResponse)
+def metrics() -> str:
+    return metrics_text()
+
+
 @app.get("/api/events/summary")
-def events_summary():
+def events_summary() -> dict[str, object]:
     return get_summary(store)
 
 
 @app.get("/api/events/latest")
-def events_latest():
+def events_latest() -> dict[str, object]:
     return get_latest(store)
 
 
 @app.get("/api/events/state-comparison")
-def events_state_comparison():
+def events_state_comparison() -> dict[str, object]:
     rpc = rpc_from_env()
     try:
         return get_state_comparison(store, rpc)
     except RPCConnectionError as exc:
-        raise HTTPException(status_code=503, detail={"error": "node_unavailable", "detail": str(exc)})
+        raise HTTPException(
+            status_code=503, detail={"error": "node_unavailable", "detail": str(exc)}
+        ) from exc
     except RPCError as exc:
-        raise HTTPException(status_code=503, detail={"error": "rpc_error", "detail": str(exc)})
+        raise HTTPException(
+            status_code=503, detail={"error": "rpc_error", "detail": str(exc)}
+        ) from exc
 
 
 @app.websocket("/ws/events")
-async def events_ws(websocket: WebSocket):
+async def events_ws(websocket: WebSocket) -> None:
     await websocket.accept()
     rpc = rpc_from_env()
     try:
@@ -88,7 +105,9 @@ async def events_ws(websocket: WebSocket):
                 payload["state_comparison"] = get_state_comparison(store, rpc)
             except (RPCConnectionError, RPCError) as exc:
                 payload["state_comparison"] = {
-                    "error": "node_unavailable" if isinstance(exc, RPCConnectionError) else "rpc_error",
+                    "error": "node_unavailable"
+                    if isinstance(exc, RPCConnectionError)
+                    else "rpc_error",
                     "detail": str(exc),
                 }
             await websocket.send_json(payload)
@@ -98,5 +117,5 @@ async def events_ws(websocket: WebSocket):
 
 
 @app.get("/{path:path}")
-def spa_fallback(path: str):
+def spa_fallback(path: str) -> FileResponse:
     return FileResponse(str(FRONTEND_DIR / "index.html"))
