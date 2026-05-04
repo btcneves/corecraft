@@ -2,6 +2,25 @@
 
 All notable changes to CoreCraft are documented here.
 
+## [1.2.0] — 2026-05-04
+
+### Added
+
+- Release workflow (`.github/workflows/release.yml`): builds and pushes Docker images to `ghcr.io` and creates a GitHub Release with CHANGELOG excerpt on every `v*.*.*` tag.
+- Docker images now tagged at `ghcr.io/btcneves/corecraft-atividade-{1,2,3}`.
+- `scripts/quickstart.sh`: single OS-detecting entry-point for Linux and macOS.
+- `VERSION` file as single source of truth for the project version.
+- Makefile `tag` and `release` targets to automate versioning.
+
+### Changed
+
+- `scripts/setup-mac.sh`: detects Apple Silicon vs Intel, checks Homebrew path, warns about Rosetta 2 overhead and recommends 4 GB RAM on arm64.
+- `scripts/setup-windows.bat`: detects WSL 2, shows PowerShell execution policy note, adds bitcoin-cli PATH guidance.
+- `scripts/smoke-test.sh`: rewritten with wait-for-services loop, per-endpoint PASS/FAIL, `--timeout` flag, and correct exit code.
+- `README.md`: prominent 3-command quickstart block at the top; docs section now shows beginner-first ordering.
+- `.env.example`: comments explaining each variable.
+- `docs/getting-started.md`: TL;DR 3-step block at the top.
+
 ## [1.1.0] — 2026-05-03
 
 ### Added

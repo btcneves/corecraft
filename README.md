@@ -10,6 +10,19 @@
 
 ---
 
+> **Início rápido — tem Docker? São três comandos:**
+>
+> ```bash
+> git clone https://github.com/btcneves/corecraft.git && cd corecraft
+> ./scripts/quickstart.sh        # Linux / macOS  |  scripts\setup-windows.bat no Windows
+> docker compose up
+> ```
+>
+> Acede às atividades em `http://localhost:8001`, `8002` e `8003`.  
+> Guia completo (incluindo sem Docker): [**docs/getting-started.md**](docs/getting-started.md)
+
+---
+
 ## Visão geral
 
 CoreCraft é o repositório das três atividades obrigatórias do programa CoreCraft. Cada atividade é um **micro-serviço independente** (backend FastAPI + frontend React) que se comunica com um nó Bitcoin Core em `regtest` e expõe uma camada interpretada do estado da rede.
@@ -93,13 +106,14 @@ corecraft/
 │   └── atividade_3/              testes unitários da Atividade 3
 │
 ├── docs/
+│   ├── getting-started.md        ← começa aqui (Docker + manual, todos os OS)
+│   ├── setup-bitcoin-core.md     instalação e configuração do Bitcoin Core
+│   ├── docker-stack.md           referência completa da stack Docker
 │   ├── architecture.md           decisões de design e trade-offs
-│   ├── setup-bitcoin-core.md     bitcoin.conf, regtest, wallets, ZMQ
 │   ├── rpc-zmq.md                conceitos RPC vs ZMQ
-│   ├── deploy-vps.md             Ubuntu 22.04 + tmux + ufw
-│   ├── deploy-cloudflare-tunnel.md  exposição pública
-│   ├── smoke-tests.md            smoke tests curl por atividade
-│   └── validacao-ao-vivo.md      evidências de validação em regtest real
+│   ├── smoke-tests.md            como verificar os endpoints manualmente
+│   ├── deploy-vps.md             deploy em Ubuntu 22.04
+│   └── deploy-cloudflare-tunnel.md  exposição pública via Cloudflare
 │
 ├── CHANGELOG.md                  histórico de versões e correções
 ├── CONTRIBUTING.md               guia de contribuição

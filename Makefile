@@ -10,7 +10,7 @@ ACTIVITY ?= atividade-1
          up-atividade-1 up-atividade-2 up-atividade-3 \
          logs-atividade-1 logs-atividade-2 logs-atividade-3 \
          shell-atividade-1 shell-atividade-2 shell-atividade-3 \
-         shell-bitcoind test-local
+         shell-bitcoind test-local tag release
 
 help:
 	@echo "CoreCraft Makefile - Available Targets"
@@ -191,3 +191,21 @@ audit:
 	cd atividade-3/frontend && npm audit --audit-level=moderate
 
 ci: format-check lint type test frontend security audit config
+
+# ── Release ──────────────────────────────────────────────────────────────────
+# Uso: make tag VERSION=1.2.0
+tag:
+	@if [ -z "$(VERSION)" ]; then \
+	  echo "Erro: especifique a versão — ex: make tag VERSION=1.2.0"; exit 1; fi
+	@echo "$(VERSION)" > VERSION
+	git add VERSION
+	git commit -m "chore: bump version to $(VERSION)"
+	git tag -a "v$(VERSION)" -m "Release v$(VERSION)"
+	@echo ""
+	@echo "Tag v$(VERSION) criada. Para publicar: git push && git push --tags"
+
+release:
+	@VERSION=$$(cat VERSION); \
+	git push origin main && \
+	git push origin "v$$VERSION" && \
+	echo "Release v$$VERSION publicado — o workflow de CI criará a GitHub Release automaticamente."
