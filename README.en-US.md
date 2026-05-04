@@ -76,6 +76,25 @@ The activities follow a clear progression:
 | 2 | Real-time events and state-vs-flow divergence | RPC + ZMQ |
 | 3 | Multiple wallets, PSBT, and interpreted transaction state | Global RPC + per-wallet RPC |
 
+### High-Level Architecture
+
+```mermaid
+flowchart LR
+    user[Browser] --> caddy[Caddy reverse proxy]
+    caddy --> a1["Activity 1<br/>FastAPI + React<br/>Mempool Snapshot"]
+    caddy --> a2["Activity 2<br/>FastAPI + React<br/>ZMQ Events"]
+    caddy --> a3["Activity 3<br/>FastAPI + React<br/>Wallets + PSBT"]
+
+    a1 -->|JSON-RPC| bitcoind["Bitcoin Core<br/>regtest"]
+    a2 -->|JSON-RPC| bitcoind
+    bitcoind -->|ZMQ rawblock/rawtx| a2
+    a3 -->|Global RPC| bitcoind
+    a3 -->|Wallet RPC| wallets[("wallet1 / wallet2")]
+    bitcoind --- wallets
+```
+
+Full technical diagrams: [`docs/architecture.md`](docs/architecture.md).
+
 ---
 
 ## Delivery Status

@@ -31,6 +31,76 @@ atividade-N/
 └── frontend/            React/Vite/TypeScript dashboard
 ```
 
+## Architecture diagrams
+
+### Runtime topology
+
+```mermaid
+flowchart TB
+    browser[Browser]
+    caddy["Caddy<br/>reverse proxy"]
+
+    subgraph services["CoreCraft services"]
+        a1["Activity 1<br/>FastAPI + React<br/>Port 8001"]
+        a2["Activity 2<br/>FastAPI + React<br/>Port 8002"]
+        a3["Activity 3<br/>FastAPI + React<br/>Port 8003"]
+    end
+
+    subgraph bitcoin["Bitcoin Core regtest node"]
+        node["bitcoind<br/>JSON-RPC"]
+        zmq["ZMQ publishers<br/>rawblock / rawtx"]
+        wallets[("wallet1 / wallet2")]
+    end
+
+    browser --> caddy
+    caddy -->|/atividade-1/| a1
+    caddy -->|/atividade-2/| a2
+    caddy -->|/atividade-3/| a3
+
+    browser -->|direct local access| a1
+    browser -->|direct local access| a2
+    browser -->|direct local access| a3
+
+    a1 -->|getmempoolinfo<br/>getrawmempool<br/>getblockchaininfo| node
+    a2 -->|getbestblockhash<br/>decoderawtransaction| node
+    zmq -->|push events| a2
+    a3 -->|global RPC| node
+    a3 -->|wallet-scoped RPC| wallets
+    node --- wallets
+    node --> zmq
+```
+
+### Data flow by activity
+
+```mermaid
+flowchart LR
+    subgraph activity1["Activity 1: RPC snapshot"]
+        a1ui[React dashboard] --> a1api[FastAPI API]
+        a1api -->|polls JSON-RPC| core1[Bitcoin Core]
+        core1 -->|mempool + chain state| a1api
+        a1api -->|interpreted snapshot| a1ui
+    end
+
+    subgraph activity2["Activity 2: RPC + ZMQ stream"]
+        core2[Bitcoin Core] -->|rawblock / rawtx| listener[ZMQ listener]
+        listener --> store[In-memory event store]
+        a2api[FastAPI API] -->|reads summaries| store
+        a2api -->|checks best block + decodes tx| core2
+        a2api --> a2ui[React dashboard]
+    end
+
+    subgraph activity3["Activity 3: Wallet + PSBT"]
+        a3ui[React dashboard] --> a3api[FastAPI API]
+        a3api --> wallet[Wallet service]
+        a3api --> tx[Transaction service]
+        wallet -->|wallet RPC| core3[Bitcoin Core]
+        tx -->|PSBT + broadcast RPC| core3
+        tx --> tracker[In-memory tx tracker]
+        a3api --> interpreter[Tx interpreter]
+        interpreter -->|gettransaction / getrawtransaction| core3
+    end
+```
+
 ## Design decisions
 
 ### No high-level Bitcoin libraries
@@ -49,6 +119,49 @@ Transaction signing uses Partially Signed Bitcoin Transactions (PSBT) so Bitcoin
 
 ```
 walletcreatefundedpsbt → walletprocesspsbt → finalizepsbt → sendrawtransaction
+```
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as React UI
+    participant API as FastAPI /tx/send
+    participant Wallet as Wallet RPC
+    participant Node as Bitcoin Core
+    participant Tracker as In-memory tx tracker
+
+    UI->>API: POST /tx/send (destination, amount)
+    API->>Wallet: walletcreatefundedpsbt
+    Wallet-->>API: funded PSBT + fee
+    API->>Wallet: walletprocesspsbt
+    Wallet-->>API: signed PSBT
+    API->>Wallet: finalizepsbt
+    Wallet-->>API: raw transaction hex
+    API->>Node: sendrawtransaction
+    Node-->>API: txid
+    API->>Tracker: store txid, wallet, timestamp
+    API-->>UI: txid + interpreted broadcast state
+```
+
+### Transaction interpretation flow
+
+```mermaid
+flowchart TD
+    start["GET /tx/{txid}"] --> tracked{"Known in<br/>tx tracker?"}
+    tracked -->|yes| wallet_rpc["Query original wallet<br/>gettransaction"]
+    tracked -->|no| global_rpc["Query node<br/>getrawtransaction / mempool"]
+
+    wallet_rpc --> confirmed{"Confirmations > 0?"}
+    confirmed -->|yes| status_confirmed[confirmed]
+    confirmed -->|no| mempool_check{"Present in mempool?"}
+
+    global_rpc --> mempool_check
+    mempool_check -->|yes| status_mempool[mempool]
+    mempool_check -->|no| unknown[unknown]
+
+    status_confirmed --> response[Return interpreted state]
+    status_mempool --> response
+    unknown --> response
 ```
 
 ### Global vs wallet-scoped RPC (Activity 3)
