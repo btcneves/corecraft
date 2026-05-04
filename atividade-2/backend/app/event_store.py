@@ -20,6 +20,7 @@ class EventStore:
         self.blocks: deque[BlockEvent] = deque(maxlen=max_blocks)
         self.txs: deque[TxEvent] = deque(maxlen=max_txs)
         self.last_event_time: float | None = None
+        self._total_block_count: int = 0
         self._total_tx_count: int = 0
 
     def add_block(self, raw: bytes) -> None:
@@ -29,6 +30,7 @@ class EventStore:
         with self._lock:
             self.blocks.append(BlockEvent(hash=block_hash, ts=ts))
             self.last_event_time = ts
+            self._total_block_count += 1
 
     def add_tx(self, txid: str) -> None:
         """Add a transaction event to the store."""
@@ -43,6 +45,8 @@ class EventStore:
             blocks: list[BlockEvent] = list(self.blocks)
             txs: list[TxEvent] = list(self.txs)
             last_event_time: float | None = self.last_event_time
+            total_blocks: int = self._total_block_count
+            total_txs: int = self._total_tx_count
 
         tx_per_second: float = 0.0
         if len(txs) >= 2:
@@ -53,8 +57,8 @@ class EventStore:
         return EventStoreSnapshot(
             blocks=blocks,
             txs=txs,
-            blocks_observed=len(blocks),
-            tx_observed=len(txs),
+            blocks_observed=total_blocks,
+            tx_observed=total_txs,
             last_event_time=last_event_time,
             tx_per_second=tx_per_second,
         )

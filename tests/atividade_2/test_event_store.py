@@ -19,8 +19,10 @@ def test_event_store_tracks_blocks_txs_and_limits(monkeypatch: pytest.MonkeyPatc
     snapshot = store.snapshot()
 
     assert store.last_block_hash() == expected_hash
+    # Cumulative totals — not capped by buffer size
     assert snapshot["blocks_observed"] == 1
-    assert snapshot["tx_observed"] == 2
+    assert snapshot["tx_observed"] == 3
+    # Buffer still caps what's kept in memory for /events/latest
     assert [tx["txid"] for tx in snapshot["txs"]] == ["tx2", "tx3"]
     assert snapshot["last_event_time"] is not None
 
