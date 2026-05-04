@@ -325,7 +325,7 @@ swap=1GB
 
 ## Development Mode
 
-For development with hot-reload, see [docker-dev.md](docker-dev.md) (if available) or use:
+For development with hot-reload, use:
 
 ```bash
 # Run without Docker (local development)
