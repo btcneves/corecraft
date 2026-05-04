@@ -9,6 +9,8 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
+from corecraft import EventsLatest, EventsSummary, StateComparison
+
 from . import zmq_listener
 from .event_service import get_latest, get_state_comparison, get_summary
 from .event_store import EventStore
@@ -57,7 +59,7 @@ def index() -> FileResponse:
 
 
 @app.get("/health")
-def health() -> dict[str, object]:
+def health() -> dict[str, str]:
     return health_payload()
 
 
@@ -67,17 +69,17 @@ def metrics() -> str:
 
 
 @app.get("/api/events/summary")
-def events_summary() -> dict[str, object]:
+def events_summary() -> EventsSummary:
     return get_summary(store)
 
 
 @app.get("/api/events/latest")
-def events_latest() -> dict[str, object]:
+def events_latest() -> EventsLatest:
     return get_latest(store)
 
 
 @app.get("/api/events/state-comparison")
-def events_state_comparison() -> dict[str, object]:
+def events_state_comparison() -> StateComparison:
     rpc = rpc_from_env()
     try:
         return get_state_comparison(store, rpc)

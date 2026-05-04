@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Any, NoReturn
 
+from corecraft import SendTxResponse, TxInterpretation, WalletStatus
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, PlainTextResponse
@@ -87,7 +89,7 @@ def index() -> FileResponse:
 
 
 @app.get("/health")
-def health() -> dict[str, object]:
+def health() -> dict[str, str]:
     return health_payload()
 
 
@@ -115,7 +117,7 @@ def wallet_select(body: SelectWalletRequest) -> dict[str, object]:
 
 
 @app.get("/wallet/status")
-def wallet_status_route() -> dict[str, object]:
+def wallet_status_route() -> WalletStatus:
     name = _require_wallet()
     try:
         return wallet_status(name)
@@ -124,7 +126,7 @@ def wallet_status_route() -> dict[str, object]:
 
 
 @app.post("/tx/send")
-def tx_send(body: SendTxRequest) -> dict[str, object]:
+def tx_send(body: SendTxRequest) -> SendTxResponse:
     name = _require_wallet()
     try:
         return send_tx(body.to_address, body.amount, name, state["tracked_txs"])
@@ -135,7 +137,7 @@ def tx_send(body: SendTxRequest) -> dict[str, object]:
 
 
 @app.get("/tx/{txid}")
-def tx_status(txid: str) -> dict[str, object]:
+def tx_status(txid: str) -> TxInterpretation:
     wallet = state.get("selected_wallet")
     try:
         return get_tx(txid, wallet, state["tracked_txs"])

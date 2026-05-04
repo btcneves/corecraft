@@ -6,8 +6,6 @@ from typing import Any
 
 from fastapi import Request, Response
 
-JsonDict = dict[str, Any]
-
 SERVICE_NAME = "atividade-1"
 _started_at = time.time()
 _correlation_id: ContextVar[str | None] = ContextVar("correlation_id", default=None)
@@ -37,7 +35,8 @@ async def correlation_middleware(
         _correlation_id.reset(token)
 
 
-def health_payload() -> JsonDict:
+def health_payload() -> dict[str, str]:
+    """Generate health check payload."""
     return {"status": "ok", "service": SERVICE_NAME}
 
 

@@ -4,14 +4,23 @@ from typing import Any
 import requests
 from requests.auth import HTTPBasicAuth
 
+from corecraft import RPCErrorData
+
 JsonValue = Any
 
 
 class RPCError(Exception):
+    """Exception raised for Bitcoin RPC errors."""
+
     def __init__(self, code: int, message: str) -> None:
-        self.code = code
-        self.message = message
+        self.code: int = code
+        self.message: str = message
         super().__init__(f"RPC error {code}: {message}")
+
+    @classmethod
+    def from_data(cls, data: RPCErrorData) -> "RPCError":
+        """Create an RPCError from RPC error data."""
+        return cls(code=data["code"], message=data["message"])
 
 
 class RPCConnectionError(Exception):

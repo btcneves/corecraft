@@ -43,6 +43,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Install shared corecraft package
+COPY src/ ./src/
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir ./
+
 # Copy and install Python dependencies first for better layer caching
 COPY atividade-2/backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt \
@@ -69,4 +74,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:${APP_PORT}/health || exit 1
 
 # Run with gunicorn for production
-CMD ["gunicorn", "-b", "0.0.0.0:${APP_PORT}", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", "app.main:app"]
+CMD gunicorn -b 0.0.0.0:${APP_PORT} -w 2 -k uvicorn.workers.UvicornWorker app.main:app
