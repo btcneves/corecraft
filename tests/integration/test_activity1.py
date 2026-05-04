@@ -39,7 +39,9 @@ _MEMPOOL_RPC = {
 }
 
 
-def test_health_returns_ok(monkeypatch: pytest.MonkeyPatch, tmp_path: pytest.TempPathFactory) -> None:
+def test_health_returns_ok(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: pytest.TempPathFactory
+) -> None:
     main = _setup(monkeypatch, tmp_path)
     with TestClient(main.app) as client:  # type: ignore[attr-defined]
         resp = client.get("/health")
