@@ -40,9 +40,7 @@ def _node_rpc(extra: dict[str, Any] | None = None) -> FakeRPC:
         "listwallets": [],
         "loadwallet": {},
         "getwalletinfo": {"walletname": "wallet1", "balance": 10.0, "txcount": 5},
-        "getbalances": {
-            "mine": {"trusted": 10.0, "untrusted_pending": 0.0, "immature": 0.0}
-        },
+        "getbalances": {"mine": {"trusted": 10.0, "untrusted_pending": 0.0, "immature": 0.0}},
         "listunspent": [{}, {}],
         "walletcreatefundedpsbt": {"psbt": "base64-psbt"},
         "walletprocesspsbt": {"psbt": "signed-psbt"},
@@ -58,6 +56,7 @@ def _node_rpc(extra: dict[str, Any] | None = None) -> FakeRPC:
 
 
 # ── Basic endpoints ───────────────────────────────────────────────────────────
+
 
 def test_health(monkeypatch: pytest.MonkeyPatch, tmp_path: pytest.TempPathFactory) -> None:
     main = _setup(monkeypatch, tmp_path)
@@ -78,6 +77,7 @@ def test_metrics_includes_psbt_counter(
 
 
 # ── Wallet flow ───────────────────────────────────────────────────────────────
+
 
 def test_list_wallets_returns_available(
     monkeypatch: pytest.MonkeyPatch, tmp_path: pytest.TempPathFactory
@@ -166,6 +166,7 @@ def test_wallet_status_409_when_no_wallet_selected(
 
 # ── PSBT transaction flow ─────────────────────────────────────────────────────
 
+
 def test_send_without_wallet_returns_409(
     monkeypatch: pytest.MonkeyPatch, tmp_path: pytest.TempPathFactory
 ) -> None:
@@ -175,9 +176,7 @@ def test_send_without_wallet_returns_409(
     assert resp.status_code == 409
 
 
-def test_full_psbt_flow(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: pytest.TempPathFactory
-) -> None:
+def test_full_psbt_flow(monkeypatch: pytest.MonkeyPatch, tmp_path: pytest.TempPathFactory) -> None:
     """
     End-to-end PSBT flow:
     POST /wallet/select → POST /tx/send → GET /tx/{txid}
@@ -222,15 +221,17 @@ def test_psbt_finalization_failure_returns_400(
     tx_service = importlib.import_module("app.tx_service")
     wallet_service = importlib.import_module("app.wallet_service")
 
-    bad_node = FakeRPC({
-        "listwalletdir": {"wallets": [{"name": "wallet1"}]},
-        "listwallets": [],
-        "loadwallet": {},
-        "getwalletinfo": {"walletname": "wallet1", "balance": 1.0, "txcount": 0},
-        "walletcreatefundedpsbt": {"psbt": "base64-psbt"},
-        "walletprocesspsbt": {"psbt": "signed-psbt"},
-        "finalizepsbt": {"complete": False},  # ← finalization fails
-    })
+    bad_node = FakeRPC(
+        {
+            "listwalletdir": {"wallets": [{"name": "wallet1"}]},
+            "listwallets": [],
+            "loadwallet": {},
+            "getwalletinfo": {"walletname": "wallet1", "balance": 1.0, "txcount": 0},
+            "walletcreatefundedpsbt": {"psbt": "base64-psbt"},
+            "walletprocesspsbt": {"psbt": "signed-psbt"},
+            "finalizepsbt": {"complete": False},  # ← finalization fails
+        }
+    )
     monkeypatch.setattr(main, "_node", lambda: bad_node)
     monkeypatch.setattr(wallet_service, "rpc_wallet", lambda name: bad_node)
     monkeypatch.setattr(tx_service, "rpc_wallet", lambda name: bad_node)
@@ -250,10 +251,12 @@ def test_tx_status_confirmed(
     tx_service = importlib.import_module("app.tx_service")
     wallet_service = importlib.import_module("app.wallet_service")
 
-    confirmed_node = _node_rpc({
-        "gettransaction": {"confirmations": 3, "blockhash": "blockabc"},
-        "getmempoolentry": tx_service.RPCError(-5, "not in mempool"),
-    })
+    confirmed_node = _node_rpc(
+        {
+            "gettransaction": {"confirmations": 3, "blockhash": "blockabc"},
+            "getmempoolentry": tx_service.RPCError(-5, "not in mempool"),
+        }
+    )
     monkeypatch.setattr(main, "_node", lambda: confirmed_node)
     monkeypatch.setattr(wallet_service, "rpc_wallet", lambda name: confirmed_node)
     monkeypatch.setattr(tx_service, "rpc_wallet", lambda name: confirmed_node)
@@ -293,5 +296,6 @@ def test_psbt_counter_increments_in_metrics(
         resp = client.get("/metrics")
 
     import re
-    match = re.search(r'corecraft_psbt_sent_total\{[^}]+\} (\d+)', resp.text)
+
+    match = re.search(r"corecraft_psbt_sent_total\{[^}]+\} (\d+)", resp.text)
     assert match and int(match.group(1)) >= 1

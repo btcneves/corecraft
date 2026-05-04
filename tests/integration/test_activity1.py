@@ -191,5 +191,6 @@ def test_requests_total_increments(
     assert "corecraft_requests_total" in resp.text
     # At least 4 requests (3 health + 1 metrics)
     import re
-    match = re.search(r'corecraft_requests_total\{[^}]+\} (\d+)', resp.text)
+
+    match = re.search(r"corecraft_requests_total\{[^}]+\} (\d+)", resp.text)
     assert match and int(match.group(1)) >= 4
