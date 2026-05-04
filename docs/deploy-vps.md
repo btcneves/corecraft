@@ -55,7 +55,7 @@ bitcoin-cli -regtest getblockchaininfo
 ## 5. Clone the repository
 
 ```bash
-git clone https://github.com/btcneves/corecraft.git
+git clone https://github.com/btcneves/CoreCraft.git
 cd corecraft
 ```
 

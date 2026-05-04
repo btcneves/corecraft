@@ -527,7 +527,7 @@ docker compose version
 **Workaround:** Clone the repository within the WSL file system (not in `/mnt/c/`):
 ```bash
 cd ~
-git clone https://github.com/btcneves/corecraft.git
+git clone https://github.com/btcneves/CoreCraft.git
 cd corecraft
 ./scripts/quickstart.sh
 ```

@@ -68,16 +68,16 @@ Public demo evidence: [`docs/demo-publica.md`](demo-publica.md)
 
 ```
 Name: Pedro Neves
-GitHub: https://github.com/btcneves/corecraft
+GitHub: https://github.com/btcneves/CoreCraft
 
 Activity 1:
-https://github.com/btcneves/corecraft/tree/main/atividade-1
+https://github.com/btcneves/CoreCraft/tree/main/atividade-1
 
 Activity 2:
-https://github.com/btcneves/corecraft/tree/main/atividade-2
+https://github.com/btcneves/CoreCraft/tree/main/atividade-2
 
 Activity 3:
-https://github.com/btcneves/corecraft/tree/main/atividade-3
+https://github.com/btcneves/CoreCraft/tree/main/atividade-3
 
 Notes:
 Single repository organized as required, with backend, frontend,

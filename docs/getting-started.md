@@ -9,7 +9,7 @@ This guide takes any user, on any operating system, from zero to running three a
 > Three commands and the stack is running.
 
 ```bash
-git clone https://github.com/btcneves/corecraft.git
+git clone https://github.com/btcneves/CoreCraft.git
 cd corecraft
 ./scripts/quickstart.sh        # Linux / macOS
 # scripts\setup-windows.bat   # Windows
@@ -151,7 +151,7 @@ docker compose version
 ### 2. Clone the repository
 
 ```bash
-git clone https://github.com/btcneves/corecraft.git
+git clone https://github.com/btcneves/CoreCraft.git
 cd corecraft
 ```
 
@@ -413,7 +413,7 @@ winget install OpenJS.NodeJS
 ### 4. Clone the repository
 
 ```bash
-git clone https://github.com/btcneves/corecraft.git
+git clone https://github.com/btcneves/CoreCraft.git
 cd corecraft
 ```
 

@@ -9,9 +9,9 @@
 [![Português do Brasil](https://img.shields.io/badge/idioma-PT--BR-009739?style=flat-square)](README.md)
 [![English US](https://img.shields.io/badge/language-EN--US-3C3B6E?style=flat-square)](README.en-US.md)
 
-[![GitHub Release](https://img.shields.io/github/v/release/btcneves/corecraft?style=flat-square&label=release)](https://github.com/btcneves/corecraft/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/btcneves/corecraft/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/btcneves/corecraft/actions/workflows/ci.yml)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fbtcneves%2Fcorecraft-blue?style=flat-square&logo=docker)](https://github.com/btcneves/corecraft/pkgs/container/corecraft-atividade-1)
+[![GitHub Release](https://img.shields.io/github/v/release/btcneves/CoreCraft?style=flat-square&label=release)](https://github.com/btcneves/CoreCraft/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/btcneves/CoreCraft/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/btcneves/CoreCraft/actions/workflows/ci.yml)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fbtcneves%2Fcorecraft-blue?style=flat-square&logo=docker)](https://github.com/btcneves/CoreCraft/pkgs/container/corecraft-atividade-1)
 
 </div>
 
@@ -20,7 +20,7 @@
 > **Início rápido — tem Docker? São três comandos:**
 >
 > ```bash
-> git clone https://github.com/btcneves/corecraft.git && cd corecraft
+> git clone https://github.com/btcneves/CoreCraft.git && cd corecraft
 > ./scripts/quickstart.sh        # Linux / macOS  |  scripts\setup-windows.bat no Windows
 > docker compose up
 > ```
