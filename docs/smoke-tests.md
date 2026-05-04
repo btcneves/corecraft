@@ -139,6 +139,56 @@ bitcoin-cli -regtest generatetoaddress 1 $ADDR
 curl -s http://127.0.0.1:8003/tx/$TXID | python3 -m json.tool
 ```
 
+**Expected (`/wallets`):**
+
+```json
+{
+  "available_wallets": ["wallet1", "wallet2"],
+  "loaded_wallets": ["wallet1", "wallet2"],
+  "selected_wallet": "wallet1"
+}
+```
+
+**Expected (`/wallet/status`):**
+
+```json
+{
+  "wallet": "wallet1",
+  "balance": 50.0,
+  "utxos": 1
+}
+```
+
+**Expected after `POST /tx/send`:**
+
+```text
+TXID: <64-character transaction id>
+```
+
+**Expected before mining a confirmation block:**
+
+```json
+{
+  "txid": "<txid>",
+  "status": "mempool",
+  "confirmed": false,
+  "confirmations": 0
+}
+```
+
+Depending on node timing, the first lookup can briefly return `"status": "broadcast"` before the transaction appears in the mempool.
+
+**Expected after mining one block:**
+
+```json
+{
+  "txid": "<txid>",
+  "status": "confirmed",
+  "confirmed": true,
+  "confirmations": 1
+}
+```
+
 ---
 
 ## Node offline (expected HTTP 503)

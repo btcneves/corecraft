@@ -198,10 +198,25 @@ docker compose up --build
 
 When the stack is ready, you will see in the log:
 
+```text
+corecraft-bitcoind             | Bitcoin Core starting
+corecraft-bitcoin-init         | Initial funding complete
+corecraft-suite-atividade-1    | INFO: Application startup complete.
+corecraft-suite-atividade-2    | INFO: Application startup complete.
+corecraft-suite-atividade-3    | INFO: Application startup complete.
+corecraft-caddy                | serving initial configuration
 ```
-atividade-1  | INFO: Application startup complete.
-atividade-2  | INFO: Application startup complete.
-atividade-3  | INFO: Application startup complete.
+
+In another terminal, `docker compose ps` should show healthy services:
+
+```text
+NAME                            STATUS
+corecraft-bitcoind              Up ... (healthy)
+corecraft-bitcoin-init          Exited (0)
+corecraft-suite-atividade-1     Up ... (healthy)
+corecraft-suite-atividade-2     Up ... (healthy)
+corecraft-suite-atividade-3     Up ... (healthy)
+corecraft-caddy                 Up ...
 ```
 
 ### 5. Access the interfaces
@@ -225,6 +240,16 @@ With the stack running, in a separate terminal:
 
 # Alternative (any OS)
 make smoke
+```
+
+Expected result:
+
+```text
+CoreCraft — Smoke Tests
+Atividade 1 — Mempool Snapshot      2/2 OK
+Atividade 2 — Eventos ZMQ           3/3 OK
+Atividade 3 — Multi-Wallet PSBT     2/2 OK
+RESULTADO: 7/7 endpoints OK
 ```
 
 ### 7. Start just one activity
@@ -503,6 +528,34 @@ bitcoin-cli -regtest generatetoaddress 101 $ADDR
 bitcoin-cli -regtest -rpcwallet=wallet1 getbalances
 ```
 
+Expected output highlights:
+
+```json
+{
+  "chain": "regtest",
+  "blocks": 101,
+  "headers": 101,
+  "verificationprogress": 1
+}
+```
+
+```json
+[
+  { "type": "pubrawblock", "address": "tcp://127.0.0.1:28332", "hwm": 1000 },
+  { "type": "pubrawtx", "address": "tcp://127.0.0.1:28333", "hwm": 1000 }
+]
+```
+
+```json
+{
+  "mine": {
+    "trusted": 50.00000000,
+    "untrusted_pending": 0.00000000,
+    "immature": 5000.00000000
+  }
+}
+```
+
 **Windows (Command Prompt):**
 
 ```cmd
@@ -669,6 +722,20 @@ curl -s http://127.0.0.1:8002/api/events/summary   | python3 -m json.tool
 curl -s http://127.0.0.1:8002/api/events/state-comparison | python3 -m json.tool
 
 curl -s http://127.0.0.1:8003/wallets              | python3 -m json.tool
+```
+
+Expected output highlights:
+
+```json
+{"tx_count": 0, "fee_distribution": {"low": 0, "medium": 0, "high": 0}}
+```
+
+```json
+{"blocks": 101, "headers": 101, "lag": 0}
+```
+
+```json
+{"available_wallets": ["wallet1", "wallet2"], "selected_wallet": "wallet1"}
 ```
 
 **Windows (PowerShell — requires curl ≥ 7.71 or Invoke-WebRequest):**

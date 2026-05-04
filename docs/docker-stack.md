@@ -47,6 +47,17 @@ docker compose up -d --build
 docker compose up
 ```
 
+Expected startup signals:
+
+```text
+corecraft-bitcoind             | Bitcoin Core starting
+corecraft-bitcoin-init         | Initial funding complete
+corecraft-suite-atividade-1    | INFO: Application startup complete.
+corecraft-suite-atividade-2    | INFO: Application startup complete.
+corecraft-suite-atividade-3    | INFO: Application startup complete.
+corecraft-caddy                | serving initial configuration
+```
+
 ### Run Individual Activities
 
 Use Docker Compose profiles to run specific activities:
@@ -104,6 +115,17 @@ bitcoin-cli -regtest -rpcuser=user -rpcpassword=password getblockchaininfo
 
 # From container
 docker compose exec bitcoind bitcoin-cli -regtest getblockchaininfo
+```
+
+Expected output highlights:
+
+```json
+{
+  "chain": "regtest",
+  "blocks": 101,
+  "headers": 101,
+  "verificationprogress": 1
+}
 ```
 
 ## Useful Commands
@@ -230,6 +252,19 @@ docker compose ps
 curl -s http://localhost:8001/health
 curl -s http://localhost:8002/health
 curl -s http://localhost:8003/health
+```
+
+Expected output:
+
+```text
+corecraft-bitcoind              Up ... (healthy)
+corecraft-suite-atividade-1     Up ... (healthy)
+corecraft-suite-atividade-2     Up ... (healthy)
+corecraft-suite-atividade-3     Up ... (healthy)
+```
+
+```json
+{"status":"ok"}
 ```
 
 ## Logging

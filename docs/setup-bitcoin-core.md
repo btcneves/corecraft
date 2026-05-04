@@ -282,6 +282,17 @@ bitcoin-cli -regtest listwallets
 bitcoin-cli -regtest listwalletdir
 ```
 
+Expected output highlights:
+
+```json
+{
+  "chain": "regtest",
+  "blocks": 0,
+  "headers": 0,
+  "initialblockdownload": false
+}
+```
+
 Expected output of `getzmqnotifications` with ZMQ configured:
 
 ```json
@@ -302,6 +313,15 @@ bitcoin-cli -regtest createwallet wallet1
 bitcoin-cli -regtest createwallet wallet2
 ```
 
+Expected output:
+
+```json
+{
+  "name": "wallet1",
+  "warning": ""
+}
+```
+
 ### Generate address and mine balance
 
 ```bash
@@ -312,6 +332,17 @@ echo "Address: $ADDR"
 # Mine 101 blocks (the first 100 coinbases remain immature;
 # the 101st block makes the balance from block 1 spendable)
 bitcoin-cli -regtest generatetoaddress 101 $ADDR
+```
+
+Expected output:
+
+```text
+Address: bcrt1...
+[
+  "block_hash_1",
+  "...",
+  "block_hash_101"
+]
 ```
 
 **Windows (Command Prompt):**
@@ -332,6 +363,26 @@ bitcoin-cli -regtest -rpcwallet=wallet1 getwalletinfo
 
 # List available UTXOs
 bitcoin-cli -regtest -rpcwallet=wallet1 listunspent
+```
+
+Expected output highlights:
+
+```json
+{
+  "mine": {
+    "trusted": 50.00000000,
+    "untrusted_pending": 0.00000000,
+    "immature": 5000.00000000
+  }
+}
+```
+
+```json
+{
+  "walletname": "wallet1",
+  "txcount": 101,
+  "balance": 50.00000000
+}
 ```
 
 ---

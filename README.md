@@ -243,6 +243,17 @@ docker compose up --build
 #   http://localhost:8003
 ```
 
+Sinais esperados quando a stack estiver pronta:
+
+```text
+corecraft-bitcoind             | Bitcoin Core starting
+corecraft-bitcoin-init         | Initial funding complete
+corecraft-suite-atividade-1    | INFO: Application startup complete.
+corecraft-suite-atividade-2    | INFO: Application startup complete.
+corecraft-suite-atividade-3    | INFO: Application startup complete.
+corecraft-caddy                | serving initial configuration
+```
+
 O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial para `wallet1`, executa os tres backends e expõe as interfaces pelo Caddy. Detalhes em [`docs/docker-stack.md`](docs/docker-stack.md).
 
 Variáveis principais:
@@ -317,6 +328,13 @@ pytest tests/ --cov
 python -m mypy --config-file mypy-atividade-1.ini atividade-1/backend/app/
 python -m mypy --config-file mypy-atividade-2.ini atividade-2/backend/app/
 python -m mypy --config-file mypy-atividade-3.ini atividade-3/backend/app/
+```
+
+Saídas esperadas:
+
+```text
+pytest: tests passed, coverage >= 70%
+mypy: Success: no issues found
 ```
 
 | Módulo coberto | Cobertura |
