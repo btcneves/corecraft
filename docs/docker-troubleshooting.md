@@ -463,13 +463,112 @@ If you're still stuck:
    - Your OS and Docker version
    - Steps to reproduce
 
+## macOS — Apple Silicon (M1/M2/M3)
+
+### Sintoma: arranque muito lento (>5 min) ou timeout nos health checks
+
+**Causa:** As imagens Docker do Bitcoin Core são x86_64. No Apple Silicon, o Docker Desktop executa-as via Rosetta 2, o que adiciona latência de arranque (~30–60 s extra na primeira execução) e maior consumo de RAM.
+
+**Solução:**
+
+1. Abrir Docker Desktop → **Settings** → **Resources** → **Memory**: definir para pelo menos **4 GB** (recomendado 6 GB).
+2. Verificar se o Rosetta está ativado: Docker Desktop → **Features in development** → ativar **"Use Rosetta for x86/amd64 emulation on Apple Silicon"**.
+3. Aumentar o timeout dos health checks se necessário:
+   ```bash
+   # No docker-compose.yml, ajuste start_period para os serviços Bitcoin:
+   # start_period: 120s   (em vez de 60s)
+   ```
+
+### Sintoma: `exec format error` ou `no matching manifest`
+
+**Causa:** A imagem não tem variante arm64.
+
+**Solução:** Forçar a plataforma no Compose:
+```bash
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up
+```
+
+Ou adicionar ao `.env`:
+```bash
+DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+### Sintoma: `brew` não encontrado após instalar Homebrew
+
+No Apple Silicon, o Homebrew instala em `/opt/homebrew/bin`, não em `/usr/local/bin`. Adicionar ao PATH:
+```bash
+echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+---
+
+## Windows — WSL 2
+
+### Sintoma: `docker: command not found` no terminal WSL
+
+**Causa:** Docker Desktop não está a expor o socket dentro do WSL 2.
+
+**Solução:**
+1. Abrir Docker Desktop → **Settings** → **Resources** → **WSL Integration**.
+2. Ativar a integração para a sua distribuição Ubuntu (ou outra).
+3. Reiniciar o terminal WSL.
+
+Verificar:
+```bash
+docker --version    # deve mostrar a versão do Docker Desktop
+docker compose version
+```
+
+### Sintoma: `./scripts/quickstart.sh: Permission denied`
+
+**Causa:** O ficheiro foi clonado num sistema de ficheiros Windows (ex: `/mnt/c/...`) e as permissões POSIX não se aplicam.
+
+**Solução:** Clonar o repositório dentro do sistema de ficheiros do WSL (não em `/mnt/c/`):
+```bash
+cd ~
+git clone https://github.com/btcneves/corecraft.git
+cd corecraft
+./scripts/quickstart.sh
+```
+
+### Sintoma: portas já em uso — conflito com Windows nativo
+
+O Windows pode ter serviços a ouvir nas mesmas portas. Verificar:
+```powershell
+# PowerShell (fora do WSL)
+netstat -ano | findstr ":8001 "
+netstat -ano | findstr ":18443 "
+```
+
+Se alguma porta estiver ocupada, terminar o processo ou mudar a porta no `docker-compose.yml`.
+
+### Sintoma: `Activate.ps1 cannot be loaded` ao ativar venv no PowerShell
+
+**Causa:** Política de execução do PowerShell bloqueia scripts.
+
+**Solução** (execute uma vez, afeta apenas o utilizador atual):
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### bitcoin-cli não reconhecido no Prompt de Comando
+
+Após instalar o Bitcoin Core no Windows nativo, adicionar ao PATH:
+1. Painel de Controlo → Sistema → Variáveis de Ambiente → PATH → Editar.
+2. Adicionar: `C:\Program Files\Bitcoin\daemon\`
+3. Abrir novo terminal e verificar: `bitcoin-cli --version`
+
+---
+
 ## Prevention
 
 To avoid issues:
 
 1. **Keep Docker updated** - Use latest Docker Desktop
-2. **Allocate sufficient resources** - 4GB+ RAM, 2+ CPUs
+2. **Allocate sufficient resources** - 4GB+ RAM (6GB+ on Apple Silicon), 2+ CPUs
 3. **Regular cleanup** - `docker system prune` weekly
 4. **Don't modify .env** unless you understand the implications
 5. **Use profiles** - Only run what you need
 6. **Monitor disk space** - Bitcoin data grows over time
+7. **Apple Silicon** - Always allocate ≥4GB RAM and use Rosetta emulation

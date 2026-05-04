@@ -2,6 +2,20 @@
 
 All notable changes to CoreCraft are documented here.
 
+## [1.3.0] — 2026-05-04
+
+### Added
+
+- Integration test suite (`tests/integration/`) — 34 tests covering full HTTP stack via TestClient: Activity 1 endpoints, ZMQ→EventStore→API pipeline (Activity 2), and PSBT end-to-end flow (Activity 3).
+- Expanded Prometheus metrics: per-path request counters (`corecraft_requests_by_path_total`), last request latency gauge (`corecraft_last_request_latency_ms`), ZMQ event counters for Activity 2 (`corecraft_zmq_blocks_total`, `corecraft_zmq_tx_total`), and PSBT transaction counter for Activity 3 (`corecraft_psbt_sent_total`).
+- `docs/docker-troubleshooting.md`: macOS Apple Silicon section (Rosetta 2, memory allocation, `exec format error`) and Windows WSL 2 section (integration, permissions, path issues).
+- README badges (GitHub Release, CI status, Docker/GHCR).
+- README "O que você verá" section with expected `docker compose up` output and smoke test output.
+
+### Changed
+
+- Coverage threshold raised from 70% to 80% (current: 89%).
+
 ## [1.2.0] — 2026-05-04
 
 ### Added

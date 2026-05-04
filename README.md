@@ -6,6 +6,10 @@
 
 `Python 3.12` · `FastAPI` · `Uvicorn` · `pyzmq` · `React` · `Vite` · `TypeScript` · `Docker Compose`
 
+[![GitHub Release](https://img.shields.io/github/v/release/btcneves/corecraft?style=flat-square&label=release)](https://github.com/btcneves/corecraft/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/btcneves/corecraft/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/btcneves/corecraft/actions/workflows/ci.yml)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fbtcneves%2Fcorecraft-blue?style=flat-square&logo=docker)](https://github.com/btcneves/corecraft/pkgs/container/corecraft-atividade-1)
+
 </div>
 
 ---
@@ -20,6 +24,40 @@
 >
 > Acede às atividades em `http://localhost:8001`, `8002` e `8003`.  
 > Guia completo (incluindo sem Docker): [**docs/getting-started.md**](docs/getting-started.md)
+
+### O que você verá após `docker compose up`
+
+```
+✔ Container corecraft-bitcoind       Healthy
+✔ Container corecraft-bitcoin-init   Exited (0)
+✔ Container corecraft-atividade-1    Healthy
+✔ Container corecraft-atividade-2    Healthy
+✔ Container corecraft-atividade-3    Healthy
+✔ Container corecraft-caddy          Started
+```
+
+| URL | Descrição |
+|-----|-----------|
+| `http://localhost:8001` | Atividade 1 — Mempool Snapshot (RPC) |
+| `http://localhost:8002` | Atividade 2 — Eventos ZMQ em tempo real |
+| `http://localhost:8003` | Atividade 3 — Multi-wallet + PSBT |
+| `http://localhost/atividade-1/` | Atividade 1 via Caddy (proxy reverso) |
+
+Verificar que tudo funciona:
+
+```bash
+./scripts/smoke-test.sh
+# ══════════════════════════════════════
+#   CoreCraft — Smoke Tests
+# ══════════════════════════════════════
+# Atividade 1 — Mempool Snapshot (porta 8001)
+#   ✔  GET /api/mempool/summary  (200)
+#   ✔  GET /api/blockchain/lag   (200)
+# Atividade 2 — Eventos ZMQ (porta 8002)
+#   ✔  GET /api/events/summary   (200)
+# ...
+#   RESULTADO: 7/7 endpoints OK
+```
 
 ---
 

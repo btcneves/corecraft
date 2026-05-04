@@ -11,6 +11,7 @@ from corecraft import (
     WalletProcessPSBTResponse,
 )
 
+from .observability import increment_domain
 from .rpc_client import RPCError, rpc_node, rpc_wallet
 from .tx_interpreter import interpret
 
@@ -43,6 +44,7 @@ def send_tx(
     txid: str = n_rpc.call("sendrawtransaction", raw_hex)
 
     tracked_txs[txid] = TrackedTx(wallet=wallet_name, broadcast_ts=time.time())
+    increment_domain("psbt_sent_total")
 
     return SendTxResponse(txid=txid, wallet=wallet_name, status="broadcast")
 
