@@ -80,16 +80,48 @@ echo "  CoreCraft Setup - macOS"
 echo "=========================================="
 echo ""
 
+# ── Detetar arquitetura ───────────────────────────────────────────────────────
+ARCH=$(uname -m)
+if [[ "$ARCH" == "arm64" ]]; then
+  info "Apple Silicon (arm64) detetado."
+  warn "As imagens Docker do Bitcoin Core são x86_64 — correrão via Rosetta 2."
+  warn "Isto pode aumentar o tempo de arranque (~30 s extra) e o consumo de RAM."
+  warn "Recomendação: alocar pelo menos 4 GB de RAM no Docker Desktop."
+  RECOMMENDED_MEM=4000000000
+else
+  info "Intel (x86_64) detetado."
+  RECOMMENDED_MEM=2000000000
+fi
+echo ""
+
+# ── Verificar Homebrew ────────────────────────────────────────────────────────
+if ! command -v brew &> /dev/null; then
+  warn "Homebrew não encontrado. Não é obrigatório para Docker, mas é recomendado."
+  warn "Para instalar: https://brew.sh"
+else
+  if [[ "$ARCH" == "arm64" ]] && [[ "$(brew --prefix 2>/dev/null)" != "/opt/homebrew" ]]; then
+    warn "Homebrew encontrado mas não no caminho Apple Silicon (/opt/homebrew)."
+    warn "Considere reinstalar a versão nativa: https://brew.sh"
+  else
+    success "Homebrew detetado ($(brew --prefix))"
+  fi
+fi
+echo ""
+
 # Step 1: Check Docker installation
 info "Checking Docker installation..."
 
 if ! command -v docker &> /dev/null; then
   error "Docker is not installed. Please install Docker Desktop for Mac first."
   echo ""
-  echo "Download from: https://www.docker.com/products/docker-desktop/"
+  if [[ "$ARCH" == "arm64" ]]; then
+    echo "  Descarregar a versão 'Apple Chip': https://www.docker.com/products/docker-desktop/"
+  else
+    echo "  Download: https://www.docker.com/products/docker-desktop/"
+  fi
   echo ""
-  echo "Or using Homebrew:"
-  echo "  brew install --cask docker"
+  echo "  Ou via Homebrew:"
+  echo "    brew install --cask docker"
   exit 1
 fi
 
@@ -117,10 +149,15 @@ success "Docker daemon is running"
 # Step 3: Check Docker Desktop resources
 info "Checking Docker resources..."
 DOCKER_MEM=$(docker info --format '{{.MemTotal}}' 2>/dev/null || echo "0")
-if [[ "$DOCKER_MEM" -lt 2000000000 ]]; then
-  warn "Docker has less than 2GB memory allocated. Consider increasing in Docker Desktop settings."
+if [[ "$DOCKER_MEM" -lt "$RECOMMENDED_MEM" ]]; then
+  MEM_GB=$(( RECOMMENDED_MEM / 1000000000 ))
+  warn "Docker tem menos de ${MEM_GB} GB de RAM alocados."
+  warn "Ajuste em: Docker Desktop → Settings → Resources → Memory → ${MEM_GB} GB"
+  if [[ "$ARCH" == "arm64" ]]; then
+    warn "(Apple Silicon: o overhead do Rosetta 2 exige mais memória que o normal)"
+  fi
 else
-  success "Docker memory allocation looks good"
+  success "Memória Docker adequada"
 fi
 
 # Step 4: Check for port conflicts

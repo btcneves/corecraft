@@ -79,6 +79,22 @@ if errorlevel 1 (
 for /f "tokens=3" %%a in ('docker --version') do set DOCKER_VERSION=%%a
 echo [OK] Docker %DOCKER_VERSION% detected
 
+REM Verificar WSL 2 (recomendado para melhor desempenho)
+echo [INFO] Checking WSL 2...
+wsl --list -v >nul 2>&1
+if errorlevel 1 (
+    echo [WARN] WSL 2 nao detetado ou nao esta instalado.
+    echo.
+    echo   Para instalar WSL 2 com Ubuntu (PowerShell como Administrador):
+    echo     wsl --install -d Ubuntu
+    echo.
+    echo   O Docker Desktop funciona sem WSL 2, mas e recomendado para melhor
+    echo   desempenho e compatibilidade com comandos Linux.
+    echo.
+) else (
+    echo [OK] WSL 2 disponivel
+)
+
 REM Step 2: Check Docker daemon is running
 echo [INFO] Checking Docker daemon...
 
@@ -202,6 +218,14 @@ echo   docker compose ps            # Check service status
 echo   docker compose down          # Stop all services
 echo.
 echo [INFO] Documentation: docs/docker-stack.md
+echo.
+echo [INFO] Notas para uso manual (sem Docker):
+echo   - Para usar bitcoin-cli no Windows nativo, adicione ao PATH:
+echo       C:\Program Files\Bitcoin\daemon\
+echo     (Painel de Controlo ^> Sistema ^> Variaveis de Ambiente ^> PATH)
+echo.
+echo   - Se o PowerShell bloquear scripts .ps1 (ex: Activate.ps1 do venv):
+echo       Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 echo.
 
 endlocal
