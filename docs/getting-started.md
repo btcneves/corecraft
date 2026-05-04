@@ -4,6 +4,30 @@ Este guia leva qualquer utilizador, em qualquer sistema operativo, do zero até 
 
 ---
 
+## TL;DR — Já tens Docker? Começa aqui
+
+> Três comandos e a stack está a correr.
+
+```bash
+git clone https://github.com/btcneves/corecraft.git
+cd corecraft
+./scripts/quickstart.sh        # Linux / macOS
+# scripts\setup-windows.bat   # Windows
+```
+
+Depois de concluído:
+
+```bash
+docker compose up              # inicia tudo
+./scripts/smoke-test.sh        # confirma que está a funcionar
+```
+
+Acede a [http://localhost:8001](http://localhost:8001) (Atividade 1), [http://localhost:8002](http://localhost:8002) (Atividade 2) e [http://localhost:8003](http://localhost:8003) (Atividade 3).
+
+> Não tens Docker? Segue o [Caminho B — Manual, sem Docker](#caminho-b--manual-sem-docker).
+
+---
+
 ## Sumário
 
 - [Pré-requisitos](#pré-requisitos)

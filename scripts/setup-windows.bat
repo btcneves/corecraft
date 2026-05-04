@@ -77,7 +77,7 @@ if errorlevel 1 (
 )
 
 for /f "tokens=3" %%a in ('docker --version') do set DOCKER_VERSION=%%a
-echo [OK] Docker detected
+echo [OK] Docker %DOCKER_VERSION% detected
 
 REM Step 2: Check Docker daemon is running
 echo [INFO] Checking Docker daemon...
@@ -96,7 +96,7 @@ echo [INFO] Checking for port conflicts...
 
 set PORT_CONFLICTS=false
 for %%P in (80 8001 8002 8003 18443 28332 28333) do (
-    netstat -ano ^| findstr ":%%P " >nul 2>&1
+    netstat -ano ^| findstr ":%%P " ^| findstr "LISTENING" >nul 2>&1
     if not errorlevel 1 (
         echo [WARN] Port %%P is already in use
         set PORT_CONFLICTS=true
