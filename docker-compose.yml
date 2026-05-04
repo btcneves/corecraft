@@ -6,8 +6,6 @@ services:
     container_name: corecraft-bitcoind
     command:
       - -conf=/etc/bitcoin/bitcoin.conf
-      - -rpcuser=${BTC_RPC_USER:-user}
-      - -rpcpassword=${BTC_RPC_PASSWORD:-password}
     environment:
       BTC_RPC_USER: ${BTC_RPC_USER:-user}
       BTC_RPC_PASSWORD: ${BTC_RPC_PASSWORD:-password}
@@ -65,7 +63,7 @@ services:
     ports:
       - "8001:8001"
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/', timeout=3).read()\""]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=3).read()\""]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -94,7 +92,7 @@ services:
     ports:
       - "8002:8002"
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/', timeout=3).read()\""]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health', timeout=3).read()\""]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -121,7 +119,7 @@ services:
     ports:
       - "8003:8003"
     healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/', timeout=3).read()\""]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/health', timeout=3).read()\""]
       interval: 15s
       timeout: 5s
       retries: 10

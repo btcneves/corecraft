@@ -1,13 +1,14 @@
+from typing import Any
+
 from .rpc_client import BitcoinRPC, RPCError, rpc_wallet
 
+JsonDict = dict[str, Any]
 
-def list_wallets(node_rpc: BitcoinRPC, state: dict) -> dict:
+
+def list_wallets(node_rpc: BitcoinRPC, state: JsonDict) -> JsonDict:
     raw_dir = node_rpc.call("listwalletdir")
     wallets_raw = raw_dir.get("wallets", [])
-    available = [
-        w["name"] if isinstance(w, dict) else str(w)
-        for w in wallets_raw
-    ]
+    available = [w["name"] if isinstance(w, dict) else str(w) for w in wallets_raw]
     loaded = node_rpc.call("listwallets")
     return {
         "available_wallets": available,
@@ -16,13 +17,10 @@ def list_wallets(node_rpc: BitcoinRPC, state: dict) -> dict:
     }
 
 
-def select_wallet(name: str, node_rpc: BitcoinRPC, state: dict) -> dict:
+def select_wallet(name: str, node_rpc: BitcoinRPC, state: JsonDict) -> JsonDict:
     # Confirm wallet exists
     raw_dir = node_rpc.call("listwalletdir")
-    available = [
-        w["name"] if isinstance(w, dict) else str(w)
-        for w in raw_dir.get("wallets", [])
-    ]
+    available = [w["name"] if isinstance(w, dict) else str(w) for w in raw_dir.get("wallets", [])]
     if name not in available:
         raise ValueError(f"Wallet '{name}' not found in listwalletdir")
 
@@ -48,7 +46,7 @@ def select_wallet(name: str, node_rpc: BitcoinRPC, state: dict) -> dict:
     }
 
 
-def wallet_status(name: str) -> dict:
+def wallet_status(name: str) -> JsonDict:
     w_rpc = rpc_wallet(name)
     info = w_rpc.call("getwalletinfo")
     utxos = w_rpc.call("listunspent")

@@ -1,10 +1,14 @@
 import os
+from typing import Any
+
 import requests
 from requests.auth import HTTPBasicAuth
 
+JsonValue = Any
+
 
 class RPCError(Exception):
-    def __init__(self, code: int, message: str):
+    def __init__(self, code: int, message: str) -> None:
         self.code = code
         self.message = message
         super().__init__(f"RPC error {code}: {message}")
@@ -15,11 +19,11 @@ class RPCConnectionError(Exception):
 
 
 class BitcoinRPC:
-    def __init__(self, host: str, port: int, user: str, password: str):
+    def __init__(self, host: str, port: int, user: str, password: str) -> None:
         self._url = f"http://{host}:{port}/"
         self._auth = HTTPBasicAuth(user, password)
 
-    def call(self, method: str, *params):
+    def call(self, method: str, *params: JsonValue) -> JsonValue:
         payload = {"jsonrpc": "2.0", "id": method, "method": method, "params": list(params)}
         try:
             resp = requests.post(self._url, json=payload, auth=self._auth, timeout=10)

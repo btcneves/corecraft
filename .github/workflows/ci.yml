@@ -5,36 +5,106 @@ on:
   pull_request:
 
 jobs:
-  validate:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install Python tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -r atividade-1/backend/requirements.txt -r atividade-2/backend/requirements.txt -r atividade-3/backend/requirements.txt
+      - name: Ruff format
+        run: python -m ruff format --check .
+      - name: Ruff lint
+        run: python -m ruff check .
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+  type:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          node-version: "22"
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -r atividade-1/backend/requirements.txt -r atividade-2/backend/requirements.txt -r atividade-3/backend/requirements.txt
+      - name: mypy strict
+        run: |
+          python -m mypy --no-incremental --config-file mypy-atividade-1.ini
+          python -m mypy --no-incremental --config-file mypy-atividade-2.ini
+          python -m mypy --no-incremental --config-file mypy-atividade-3.ini
 
-      - name: Compile Python backends
-        run: python -m compileall -q atividade-1/backend/app atividade-2/backend/app atividade-3/backend/app
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -r atividade-1/backend/requirements.txt -r atividade-2/backend/requirements.txt -r atividade-3/backend/requirements.txt
+      - name: Pytest
+        run: python -m pytest
 
-      - name: Build Activity 1 frontend
-        working-directory: atividade-1/frontend
-        run: npm ci && npm run build
+  frontend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        activity: [atividade-1, atividade-2, atividade-3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.12.0"
+          cache: npm
+          cache-dependency-path: ${{ matrix.activity }}/frontend/package-lock.json
+      - name: Install
+        working-directory: ${{ matrix.activity }}/frontend
+        run: npm ci
+      - name: Audit
+        working-directory: ${{ matrix.activity }}/frontend
+        run: npm audit --audit-level=moderate
+      - name: Build
+        working-directory: ${{ matrix.activity }}/frontend
+        run: npm run build
 
-      - name: Build Activity 2 frontend
-        working-directory: atividade-2/frontend
-        run: npm ci && npm run build
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: pip-audit
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip_audit -r atividade-1/backend/requirements.txt -r atividade-2/backend/requirements.txt -r atividade-3/backend/requirements.txt
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: "1"
+          ignore-unfixed: true
+          format: table
 
-      - name: Build Activity 3 frontend
-        working-directory: atividade-3/frontend
-        run: npm ci && npm run build
-
-      - name: Validate Compose file
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose
         run: docker compose config

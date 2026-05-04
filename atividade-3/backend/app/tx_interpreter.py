@@ -1,8 +1,16 @@
 import time
+from typing import Any
+
+JsonDict = dict[str, Any]
 
 
-def interpret(txid: str, wallet_name: str | None, gettx_result: dict | None,
-              mempool_entry: dict | None, tracked: dict | None) -> dict:
+def interpret(
+    txid: str,
+    wallet_name: str | None,
+    gettx_result: JsonDict | None,
+    mempool_entry: JsonDict | None,
+    tracked: JsonDict | None,
+) -> JsonDict:
     """
     Build an interpreted transaction state dict.
 

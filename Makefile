@@ -1,7 +1,8 @@
 SHELL := /bin/sh
 COMPOSE := docker compose
+PYTHON ?= python3
 
-.PHONY: up down build logs ps restart clean bitcoin-cli mine smoke config
+.PHONY: up down build logs ps restart clean bitcoin-cli mine smoke config format-check lint type test security frontend audit ci
 
 up:
 	$(COMPOSE) up --build
@@ -35,3 +36,32 @@ smoke:
 
 config:
 	$(COMPOSE) config
+
+format-check:
+	$(PYTHON) -m ruff format --check .
+
+lint:
+	$(PYTHON) -m ruff check .
+
+type:
+	$(PYTHON) -m mypy --no-incremental --config-file mypy-atividade-1.ini
+	$(PYTHON) -m mypy --no-incremental --config-file mypy-atividade-2.ini
+	$(PYTHON) -m mypy --no-incremental --config-file mypy-atividade-3.ini
+
+test:
+	$(PYTHON) -m pytest
+
+security:
+	$(PYTHON) -m pip_audit -r atividade-1/backend/requirements.txt -r atividade-2/backend/requirements.txt -r atividade-3/backend/requirements.txt
+
+frontend:
+	cd atividade-1/frontend && npm ci && npm run build
+	cd atividade-2/frontend && npm ci && npm run build
+	cd atividade-3/frontend && npm ci && npm run build
+
+audit:
+	cd atividade-1/frontend && npm audit --audit-level=moderate
+	cd atividade-2/frontend && npm audit --audit-level=moderate
+	cd atividade-3/frontend && npm audit --audit-level=moderate
+
+ci: format-check lint type test frontend security audit config

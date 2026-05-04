@@ -1,7 +1,11 @@
+from typing import Any
+
 from .rpc_client import BitcoinRPC
 
+JsonDict = dict[str, Any]
 
-def summary(rpc: BitcoinRPC) -> dict:
+
+def summary(rpc: BitcoinRPC) -> JsonDict:
     info = rpc.call("getmempoolinfo")
     tx_count = info["size"]
     total_vsize = info.get("bytes", 0)
@@ -43,7 +47,7 @@ def summary(rpc: BitcoinRPC) -> dict:
     }
 
 
-def lag(rpc: BitcoinRPC) -> dict:
+def lag(rpc: BitcoinRPC) -> JsonDict:
     info = rpc.call("getblockchaininfo")
     blocks = info["blocks"]
     headers = info["headers"]

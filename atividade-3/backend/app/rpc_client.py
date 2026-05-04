@@ -1,10 +1,15 @@
 import os
+from typing import Any
+
 import requests
 from requests.auth import HTTPBasicAuth
 
+JsonValue = Any
+JsonDict = dict[str, Any]
+
 
 class RPCError(Exception):
-    def __init__(self, code: int, message: str):
+    def __init__(self, code: int, message: str) -> None:
         self.code = code
         self.message = message
         super().__init__(f"RPC error {code}: {message}")
@@ -15,12 +20,14 @@ class RPCConnectionError(Exception):
 
 
 class BitcoinRPC:
-    def __init__(self, host: str, port: int, user: str, password: str, wallet: str | None = None):
+    def __init__(
+        self, host: str, port: int, user: str, password: str, wallet: str | None = None
+    ) -> None:
         base = f"http://{host}:{port}"
         self._url = f"{base}/wallet/{wallet}" if wallet else f"{base}/"
         self._auth = HTTPBasicAuth(user, password)
 
-    def call(self, method: str, *params):
+    def call(self, method: str, *params: JsonValue) -> JsonValue:
         payload = {"jsonrpc": "2.0", "id": method, "method": method, "params": list(params)}
         try:
             resp = requests.post(self._url, json=payload, auth=self._auth, timeout=10)
@@ -36,7 +43,7 @@ class BitcoinRPC:
         return data["result"]
 
 
-def _base_params() -> dict:
+def _base_params() -> JsonDict:
     return {
         "host": os.getenv("BTC_RPC_HOST", "127.0.0.1"),
         "port": int(os.getenv("BTC_RPC_PORT", "18443")),

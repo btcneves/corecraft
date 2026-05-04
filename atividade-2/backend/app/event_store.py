@@ -2,6 +2,9 @@ import hashlib
 import time
 from collections import deque
 from threading import Lock
+from typing import Any
+
+JsonDict = dict[str, Any]
 
 
 def _block_hash(raw: bytes) -> str:
@@ -11,10 +14,10 @@ def _block_hash(raw: bytes) -> str:
 
 
 class EventStore:
-    def __init__(self, max_blocks: int = 20, max_txs: int = 200):
+    def __init__(self, max_blocks: int = 20, max_txs: int = 200) -> None:
         self._lock = Lock()
-        self.blocks: deque = deque(maxlen=max_blocks)
-        self.txs: deque = deque(maxlen=max_txs)
+        self.blocks: deque[JsonDict] = deque(maxlen=max_blocks)
+        self.txs: deque[JsonDict] = deque(maxlen=max_txs)
         self.last_event_time: float | None = None
         self._total_tx_count: int = 0
 
@@ -32,7 +35,7 @@ class EventStore:
             self.last_event_time = ts
             self._total_tx_count += 1
 
-    def snapshot(self) -> dict:
+    def snapshot(self) -> JsonDict:
         with self._lock:
             blocks = list(self.blocks)
             txs = list(self.txs)
@@ -56,5 +59,6 @@ class EventStore:
     def last_block_hash(self) -> str | None:
         with self._lock:
             if self.blocks:
-                return self.blocks[-1]["hash"]
+                block_hash = self.blocks[-1]["hash"]
+                return str(block_hash)
         return None
