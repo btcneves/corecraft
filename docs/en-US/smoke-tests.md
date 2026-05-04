@@ -211,4 +211,4 @@ curl -s http://127.0.0.1:8003/wallets
 
 ## Live validation evidence
 
-Full session output with real Bitcoin Core v31.0 responses: [`docs/validacao-ao-vivo.md`](validacao-ao-vivo.md)
+Full session output with real Bitcoin Core v31.0 responses: [`live-validation.md`](live-validation.md)

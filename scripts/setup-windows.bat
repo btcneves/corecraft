@@ -217,7 +217,7 @@ echo   docker compose logs -f       # View logs
 echo   docker compose ps            # Check service status
 echo   docker compose down          # Stop all services
 echo.
-echo [INFO] Documentation: docs/docker-stack.md
+echo [INFO] Documentation: docs/README.md
 echo.
 echo [INFO] Notas para uso manual (sem Docker):
 echo   - Para usar bitcoin-cli no Windows nativo, adicione ao PATH:

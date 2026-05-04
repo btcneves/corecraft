@@ -178,7 +178,7 @@ chmod +x scripts/setup-mac.sh
 </details>
 
 <details>
-<summary><b>Windows (PowerShell ou Prompt de Comando)</b></summary>
+<summary><b>Windows (PowerShell or Command Prompt)</b></summary>
 
 ```cmd
 scripts\setup-windows.bat
@@ -246,10 +246,10 @@ Expected result:
 
 ```text
 CoreCraft — Smoke Tests
-Atividade 1 — Mempool Snapshot      2/2 OK
-Atividade 2 — Eventos ZMQ           3/3 OK
-Atividade 3 — Multi-Wallet PSBT     2/2 OK
-RESULTADO: 7/7 endpoints OK
+Activity 1 — Mempool Snapshot      2/2 OK
+Activity 2 — ZMQ Events            3/3 OK
+Activity 3 — Multi-Wallet PSBT     2/2 OK
+RESULT: 7/7 endpoints OK
 ```
 
 ### 7. Start just one activity
@@ -270,10 +270,10 @@ Replace `atividade-1` with `atividade-2` or `atividade-3` as needed.
 
 ```bash
 make up              # Start all services (with build)
-make up-detached     # Em background
+make up-detached     # Run in the background
 make down            # Stop all services
-make logs            # Ver logs em tempo real
-make ps              # Ver estado dos contentores
+make logs            # View real-time logs
+make ps              # View container status
 make mine            # Mine 1 block for wallet1
 make mine-10         # Mine 10 blocks
 make wallet-balance  # Check wallet1 balance
@@ -288,7 +288,7 @@ Use this path when you want to develop, debug, or do not have Docker available.
 
 ### 1. Install Bitcoin Core
 
-See the complete guide: [**`docs/setup-bitcoin-core.md`**](setup-bitcoin-core.md)
+See the complete guide: [**`setup-bitcoin-core.md`**](setup-bitcoin-core.md)
 
 Quick summary by OS:
 
@@ -353,7 +353,7 @@ bitcoin-cli --version
 
 ```bash
 sudo apt-get install -y python3 python3-pip python3-venv
-python3 --version   # deve mostrar 3.11 ou superior
+python3 --version   # should show 3.11 or higher
 ```
 
 If the version is lower than 3.11:
@@ -403,7 +403,7 @@ Only needed to compile or modify React frontends. If you only want to run the ba
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-source ~/.bashrc   # ou ~/.zshrc
+source ~/.bashrc   # or ~/.zshrc
 nvm install 22
 nvm use 22
 node --version
@@ -748,7 +748,7 @@ curl -s http://127.0.0.1:8001/api/blockchain/lag
 curl -s http://127.0.0.1:8003/wallets
 ```
 
-Complete smoke testing guide: [**`docs/smoke-tests.md`**](smoke-tests.md)
+Complete smoke testing guide: [**`smoke-tests.md`**](smoke-tests.md)
 
 ---
 
@@ -878,9 +878,9 @@ If the problem persists: `docker compose down -v` to remove volumes as well.
 
 ## Next steps
 
-- Contribution and testing guide: [**`CONTRIBUTING.md`**](../CONTRIBUTING.md)
-- Architecture and design decisions: [**`docs/architecture.md`**](architecture.md)
-- Deploy on Ubuntu VPS: [**`docs/deploy-vps.md`**](deploy-vps.md)
-- Public exposure via Cloudflare Tunnel: [**`docs/deploy-cloudflare-tunnel.md`**](deploy-cloudflare-tunnel.md)
-- Complete Docker Stack: [**`docs/docker-stack.md`**](docker-stack.md)
-- Troubleshooting Docker: [**`docs/docker-troubleshooting.md`**](docker-troubleshooting.md)
+- Contribution and testing guide: [**`CONTRIBUTING.md`**](../../CONTRIBUTING.md)
+- Architecture and design decisions: [**`architecture.md`**](architecture.md)
+- Deploy on Ubuntu VPS: [**`deploy-vps.md`**](deploy-vps.md)
+- Public exposure via Cloudflare Tunnel: [**`deploy-cloudflare-tunnel.md`**](deploy-cloudflare-tunnel.md)
+- Complete Docker Stack: [**`docker-stack.md`**](docker-stack.md)
+- Troubleshooting Docker: [**`docker-troubleshooting.md`**](docker-troubleshooting.md)

@@ -222,7 +222,7 @@ curl -s http://127.0.0.1:8003/tx/$TXID | python3 -m json.tool
 cloudflared tunnel --url http://localhost:8003
 ```
 
-Detalhes em [`docs/deploy-cloudflare-tunnel.md`](../docs/deploy-cloudflare-tunnel.md) e [`docs/deploy-vps.md`](../docs/deploy-vps.md).
+Detalhes em [`docs/pt-BR/deploy-cloudflare-tunnel.md`](../docs/pt-BR/deploy-cloudflare-tunnel.md) e [`docs/pt-BR/deploy-vps.md`](../docs/pt-BR/deploy-vps.md).
 
 ## Limitações conhecidas
 

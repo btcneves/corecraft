@@ -23,7 +23,7 @@ A aplicação assina `rawblock` e `rawtx`, mantém buffers limitados e expõe um
 | Latência | Limitada pela frequência de polling | Praticamente em tempo real |
 | Uso ideal | Consultar estado, enviar tx | Detectar novos blocos/txs |
 
-Mais detalhes: [`docs/rpc-zmq.md`](../docs/rpc-zmq.md).
+Mais detalhes: [`docs/pt-BR/rpc-zmq.md`](../docs/pt-BR/rpc-zmq.md).
 
 ## Arquitetura
 
@@ -186,7 +186,7 @@ curl -s http://127.0.0.1:8002/api/events/state-comparison | python3 -m json.tool
 cloudflared tunnel --url http://localhost:8002
 ```
 
-Detalhes em [`docs/deploy-cloudflare-tunnel.md`](../docs/deploy-cloudflare-tunnel.md) e [`docs/deploy-vps.md`](../docs/deploy-vps.md).
+Detalhes em [`docs/pt-BR/deploy-cloudflare-tunnel.md`](../docs/pt-BR/deploy-cloudflare-tunnel.md) e [`docs/pt-BR/deploy-vps.md`](../docs/pt-BR/deploy-vps.md).
 
 ## Checklist desta atividade
 

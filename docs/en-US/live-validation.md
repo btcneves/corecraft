@@ -32,7 +32,7 @@ Actual execution against `bitcoind -regtest` on host (Bitcoin Core v31.0). All m
 - [x] Bitcoin Core running
 - [x] RPC responding
 - [x] ZMQ configured
-- [x] Wallets criadas/carregadas
+- [x] Wallets created/loaded
 - [x] Activity 1 validated
 - [x] Activity 2 validated
 - [x] Activity 3 validated
@@ -122,7 +122,7 @@ curl http://127.0.0.1:8003/wallet/status
 
 curl -X POST http://127.0.0.1:8003/tx/send \
   -H "Content-Type: application/json" \
-  -d '{"to_address":"ENDERECO_REGTEST","amount":0.001}'
+  -d '{"to_address":"REGTEST_ADDRESS","amount":0.001}'
 
 curl http://127.0.0.1:8003/tx/TXID
 ```
@@ -266,7 +266,7 @@ Immediately after starting the backend, before any ZMQ events arrive:
     "last_seen_block": null,
     "divergence": null,
     "status": "waiting_for_zmq_block",
-    "message": "Nenhum bloco observado via ZMQ ainda."
+    "message": "No block observed via ZMQ yet."
 }
 ```
 
@@ -427,7 +427,7 @@ Response (tx broadcast):
     "confirmations": 0,
     "block_hash": null,
     "age_seconds": 10,
-    "message": "Transa\u00e7\u00e3o aceita na mempool, aguardando inclus\u00e3o em bloco."
+    "message": "Transaction accepted into the mempool, waiting for inclusion in a block."
 }
 ```
 
@@ -459,7 +459,7 @@ Changing the active wallet to `wallet2` (which **did not send** this tx) and con
     "confirmations": 0,
     "block_hash": null,
     "age_seconds": 23,
-    "message": "Transa\u00e7\u00e3o aceita na mempool, aguardando inclus\u00e3o em bloco."
+    "message": "Transaction accepted into the mempool, waiting for inclusion in a block."
 }
 ```
 
@@ -489,7 +489,7 @@ bitcoin-cli -regtest generatetoaddress 1 $ADDR
     "confirmations": 1,
     "block_hash": "0cff68eccfe79d9088e78673d17bb8c7bc2c9eb375eafb790c9edd2bbcab2785",
     "age_seconds": 38,
-    "message": "Transa\u00e7\u00e3o confirmada em bloco."
+    "message": "Transaction confirmed in block."
 }
 ```
 
@@ -542,7 +542,7 @@ All 9 mandatory endpoints + PSBT cycle + Activity 3 bug fix + path 503 were exer
 | Activity 3 | OK | Section 4 | `/wallets`, full PSBT, bug fix wallet tracking, `balance` fixed via `getbalances()` |
 | Path 503 | OK | Section 5 | All routes return structured `node_unavailable` |
 | Frontend | OK | Local (2026-05-02) + public (2026-05-03) | Verified via Cloudflare Tunnel on all three services |
-| External access | OK | `docs/demo-publica.md` | Tunnels active on 2026-05-03; Real JSON responses captured |
+| External access | OK | `public-demo.md` | Tunnels active on 2026-05-03; Real JSON responses captured |
 
 ---
 
@@ -559,4 +559,4 @@ Backends exposed via `cloudflared tunnel --url` on 2026-05-03. Bitcoin Core v31.
 
 **Conclusion:** external access verified, frontend served correctly by FastAPI via HTTPS from Cloudflare Tunnel.
 
-Complete evidence: [`docs/demo-publica.md`](demo-publica.md).
+Complete evidence: [`public-demo.md`](public-demo.md).

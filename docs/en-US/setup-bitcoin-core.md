@@ -112,7 +112,7 @@ bitcoind --version
 # Add to PATH (place in ~/.zshrc or ~/.bash_profile)
 export PATH="/Applications/Bitcoin-Qt.app/Contents/MacOS:$PATH"
 
-source ~/.zshrc   # ou source ~/.bash_profile
+source ~/.zshrc   # or source ~/.bash_profile
 bitcoind --version
 ```
 
@@ -418,7 +418,7 @@ bitcoin-cli -regtest -rpcwallet=wallet1 listtransactions
 bitcoin-cli -regtest loadwallet wallet2
 ```
 
-### Download wallet
+### Unload wallet
 
 ```bash
 bitcoin-cli -regtest unloadwallet wallet2

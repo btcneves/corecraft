@@ -55,7 +55,7 @@ else
   echo ""
   echo -e "    ${BOLD}./scripts/quickstart.sh${NC}"
   echo ""
-  echo "  Guia completo: docs/getting-started.md"
+  echo "  Guia completo: docs/README.md"
   echo ""
   exit 1
 fi

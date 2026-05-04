@@ -8,7 +8,8 @@ All notable changes to CoreCraft are documented here.
 
 - Integration test suite (`tests/integration/`) — 34 tests covering full HTTP stack via TestClient: Activity 1 endpoints, ZMQ→EventStore→API pipeline (Activity 2), and PSBT end-to-end flow (Activity 3).
 - Expanded Prometheus metrics: per-path request counters (`corecraft_requests_by_path_total`), last request latency gauge (`corecraft_last_request_latency_ms`), ZMQ event counters for Activity 2 (`corecraft_zmq_blocks_total`, `corecraft_zmq_tx_total`), and PSBT transaction counter for Activity 3 (`corecraft_psbt_sent_total`).
-- `docs/docker-troubleshooting.md`: macOS Apple Silicon section (Rosetta 2, memory allocation, `exec format error`) and Windows WSL 2 section (integration, permissions, path issues).
+- `docs/en-US/docker-troubleshooting.md`: macOS Apple Silicon section (Rosetta 2, memory allocation, `exec format error`) and Windows WSL 2 section (integration, permissions, path issues).
+- Bilingual documentation structure with `docs/pt-BR/`, `docs/en-US/`, and `docs/README.md`.
 - README badges (GitHub Release, CI status, Docker/GHCR).
 - README "O que você verá" section with expected `docker compose up` output and smoke test output.
 
@@ -33,7 +34,7 @@ All notable changes to CoreCraft are documented here.
 - `scripts/smoke-test.sh`: rewritten with wait-for-services loop, per-endpoint PASS/FAIL, `--timeout` flag, and correct exit code.
 - `README.md`: prominent 3-command quickstart block at the top; docs section now shows beginner-first ordering.
 - `.env.example`: comments explaining each variable.
-- `docs/getting-started.md`: TL;DR 3-step block at the top.
+- `docs/en-US/getting-started.md`: TL;DR 3-step block at the top.
 
 ## [1.1.0] — 2026-05-03
 
@@ -79,7 +80,7 @@ All notable changes to CoreCraft are documented here.
   - `GET /tx/{txid}` — interpreted transaction state: `broadcast → mempool → confirmed → unknown`
 - Frontend dashboards for all three activities (plain HTML/CSS/JS, polling-based)
 - Docker Compose configuration to run all three backends simultaneously
-- Documentation: `docs/setup-bitcoin-core.md`, `docs/rpc-zmq.md`, `docs/deploy-vps.md`, `docs/deploy-cloudflare-tunnel.md`, `docs/smoke-tests.md`, `docs/validacao-ao-vivo.md`
+- Documentation: `docs/pt-BR/` and `docs/en-US/` language tracks, including setup, RPC/ZMQ, deploy, smoke tests, and validation evidence.
 - MIT licence
 
 ### Fixed
