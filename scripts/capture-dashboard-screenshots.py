@@ -9,9 +9,9 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 ASSETS_DIR = ROOT_DIR / "docs" / "assets"
 VIEWPORT = {"width": 1440, "height": 900}
 DASHBOARDS = [
-    ("http://localhost/atividade-1/", "atividade-1-dashboard.png"),
-    ("http://localhost/atividade-2/", "atividade-2-events.png"),
-    ("http://localhost/atividade-3/", "atividade-3-wallet.png"),
+    ("http://localhost/atividade-1/", "activity-1-dashboard.png"),
+    ("http://localhost/atividade-2/", "activity-2-events.png"),
+    ("http://localhost/atividade-3/", "activity-3-wallet.png"),
 ]
 
 

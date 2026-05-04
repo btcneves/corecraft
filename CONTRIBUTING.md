@@ -18,7 +18,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --port 8001 --reload
 ```
 
-See [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md) for Bitcoin Core configuration.
+See [`docs/en-US/setup-bitcoin-core.md`](docs/en-US/setup-bitcoin-core.md) for Bitcoin Core configuration.
 
 ## Project conventions
 
@@ -29,7 +29,7 @@ See [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md) for Bitcoin Core 
 
 ## Testing
 
-Test against a live `bitcoind -regtest` node. The smoke tests in [`docs/smoke-tests.md`](docs/smoke-tests.md) cover the full flow for each activity.
+Test against a live `bitcoind -regtest` node. The smoke tests in [`docs/en-US/smoke-tests.md`](docs/en-US/smoke-tests.md) cover the full flow for each activity.
 
 ## Submitting changes
 

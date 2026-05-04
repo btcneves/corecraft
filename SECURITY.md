@@ -16,8 +16,8 @@ CoreCraft is a **local development and learning tool** designed to run against a
 
 If you need to expose a backend externally (e.g., for a demo), use a tunnel with access controls:
 
-- [Cloudflare Tunnel](docs/deploy-cloudflare-tunnel.md) — restrict access by IP or authentication policy
-- [VPS deploy](docs/deploy-vps.md) — configure `ufw` to allow only trusted IPs
+- [Cloudflare Tunnel](docs/en-US/deploy-cloudflare-tunnel.md) — restrict access by IP or authentication policy
+- [VPS deploy](docs/en-US/deploy-vps.md) — configure `ufw` to allow only trusted IPs
 
 ## Reporting a vulnerability
 

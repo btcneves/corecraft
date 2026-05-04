@@ -25,8 +25,8 @@
 > docker compose up
 > ```
 >
-> Acede às atividades em `http://localhost:8001`, `8002` e `8003`.  
-> Guia completo (incluindo sem Docker): [**docs/getting-started.md**](docs/getting-started.md)
+> Acesse as atividades em `http://localhost:8001`, `8002` e `8003`.  
+> Guia completo (incluindo sem Docker): [**docs/pt-BR/getting-started.md**](docs/pt-BR/getting-started.md)
 
 ### O que você verá após `docker compose up`
 
@@ -93,7 +93,7 @@ flowchart LR
     bitcoind --- wallets
 ```
 
-Diagramas técnicos completos: [`docs/architecture.md`](docs/architecture.md).
+Diagramas técnicos completos: [`docs/pt-BR/architecture.md`](docs/pt-BR/architecture.md).
 
 ---
 
@@ -113,7 +113,7 @@ Todos os backends expõem `/health`, `/metrics` e logs JSON com `correlation_id`
 
 ---
 
-## Key Concepts
+## Conceitos principais
 
 | Conceito | Onde aparece | Resumo |
 |----------|--------------|--------|
@@ -126,7 +126,7 @@ Todos os backends expõem `/health`, `/metrics` e logs JSON com `correlation_id`
 | Wallet-scoped RPC | Atividade 3 | Chamadas feitas em `/wallet/<nome>` para manter operações de saldo, UTXO, assinatura e histórico isoladas por wallet. |
 | Estado interpretado | Atividade 3 | Camada de domínio que traduz respostas do nó em estados como `broadcast`, `mempool`, `confirmed` e `unknown`. |
 
-Referências aprofundadas: [`docs/rpc-zmq.md`](docs/rpc-zmq.md), [`docs/architecture.md`](docs/architecture.md) e [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md).
+Referências aprofundadas: [`docs/pt-BR/rpc-zmq.md`](docs/pt-BR/rpc-zmq.md), [`docs/pt-BR/architecture.md`](docs/pt-BR/architecture.md) e [`docs/pt-BR/setup-bitcoin-core.md`](docs/pt-BR/setup-bitcoin-core.md).
 
 ---
 
@@ -183,14 +183,20 @@ corecraft/
 │   └── atividade_3/              testes unitários da Atividade 3
 │
 ├── docs/
-│   ├── getting-started.md        ← começa aqui (Docker + manual, todos os OS)
-│   ├── setup-bitcoin-core.md     instalação e configuração do Bitcoin Core
-│   ├── docker-stack.md           referência completa da stack Docker
-│   ├── architecture.md           decisões de design e trade-offs
-│   ├── rpc-zmq.md                conceitos RPC vs ZMQ
-│   ├── smoke-tests.md            como verificar os endpoints manualmente
-│   ├── deploy-vps.md             deploy em Ubuntu 22.04
-│   └── deploy-cloudflare-tunnel.md  exposição pública via Cloudflare
+│   ├── README.md                 índice bilíngue da documentação
+│   ├── pt-BR/                    documentação em Português do Brasil
+│   │   ├── getting-started.md    comece aqui (Docker + manual)
+│   │   ├── architecture.md       arquitetura e decisões técnicas
+│   │   ├── setup-bitcoin-core.md setup do Bitcoin Core
+│   │   ├── docker-stack.md       referência da stack Docker
+│   │   └── smoke-tests.md        validação dos endpoints
+│   ├── en-US/                    documentação em Inglês (US)
+│   │   ├── getting-started.md
+│   │   ├── architecture.md
+│   │   ├── setup-bitcoin-core.md
+│   │   ├── docker-stack.md
+│   │   └── smoke-tests.md
+│   └── assets/                   screenshots e evidências visuais
 │
 ├── CHANGELOG.md                  histórico de versões e correções
 ├── CONTRIBUTING.md               guia de contribuição
@@ -213,16 +219,16 @@ corecraft/
 | `pip` | atualizado | Instala `fastapi`, `uvicorn`, `requests`, `python-dotenv`, `pyzmq` |
 | Node.js | 18+ local, 22.12 no CI/Docker | Frontends React/Vite |
 
-> Setup completo do Bitcoin Core: [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md)
+> Setup completo do Bitcoin Core: [`docs/pt-BR/setup-bitcoin-core.md`](docs/pt-BR/setup-bitcoin-core.md)
 
 ---
 
-## Quickstart
+## Início rápido
 
 ### 1. Configurar o Bitcoin Core (uma única vez)
 
 ```bash
-# bitcoin.conf — ver docs/setup-bitcoin-core.md para o conteúdo completo
+# bitcoin.conf — ver docs/pt-BR/setup-bitcoin-core.md para o conteúdo completo
 bitcoind -regtest -daemon
 bitcoin-cli -regtest createwallet wallet1
 bitcoin-cli -regtest createwallet wallet2
@@ -271,7 +277,7 @@ corecraft-suite-atividade-3    | INFO: Application startup complete.
 corecraft-caddy                | serving initial configuration
 ```
 
-O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial para `wallet1`, executa os tres backends e expõe as interfaces pelo Caddy. Detalhes em [`docs/docker-stack.md`](docs/docker-stack.md).
+O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial para `wallet1`, executa os tres backends e expõe as interfaces pelo Caddy. Detalhes em [`docs/pt-BR/docker-stack.md`](docs/pt-BR/docker-stack.md).
 
 Variáveis principais:
 
@@ -303,7 +309,7 @@ LOG_LEVEL=INFO
 | POST | `/tx/send` | 3 | Cria, assina e transmite tx via PSBT |
 | GET | `/tx/{txid}` | 3 | Estado interpretado da transação |
 
-Smoke tests completos com `curl`: [`docs/smoke-tests.md`](docs/smoke-tests.md).
+Smoke tests completos com `curl`: [`docs/pt-BR/smoke-tests.md`](docs/pt-BR/smoke-tests.md).
 
 ---
 
@@ -311,16 +317,16 @@ Smoke tests completos com `curl`: [`docs/smoke-tests.md`](docs/smoke-tests.md).
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`docs/architecture.md`](docs/architecture.md) | Decisões de design, padrões de implementação e trade-offs |
-| [`docs/setup-bitcoin-core.md`](docs/setup-bitcoin-core.md) | `bitcoin.conf`, regtest, wallets, ZMQ, geração de saldo |
-| [`docs/rpc-zmq.md`](docs/rpc-zmq.md) | Conceitos: pull (RPC) vs push (ZMQ) e justificativa por atividade |
-| [`docs/deploy-vps.md`](docs/deploy-vps.md) | Deploy em VPS Ubuntu 22.04 com `tmux` e `ufw` |
-| [`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md) | Exposição pública via Cloudflare Tunnel ou ngrok |
-| [`docs/smoke-tests.md`](docs/smoke-tests.md) | Smoke tests `curl` por atividade |
-| [`docs/docker-stack.md`](docs/docker-stack.md) | Stack Docker completa, variáveis e comandos Make |
-| [`docs/docker-troubleshooting.md`](docs/docker-troubleshooting.md) | Diagnóstico de RPC auth, healthchecks, ZMQ e Caddy |
-| [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md) | Saída completa de validação contra Bitcoin Core v31.0 |
-| [`docs/demo-publica.md`](docs/demo-publica.md) | Evidências de demo pública via Cloudflare Tunnel (2026-05-03) |
+| [`docs/pt-BR/architecture.md`](docs/pt-BR/architecture.md) | Decisões de design, padrões de implementação e trade-offs |
+| [`docs/pt-BR/setup-bitcoin-core.md`](docs/pt-BR/setup-bitcoin-core.md) | `bitcoin.conf`, regtest, wallets, ZMQ, geração de saldo |
+| [`docs/pt-BR/rpc-zmq.md`](docs/pt-BR/rpc-zmq.md) | Conceitos: pull (RPC) vs push (ZMQ) e justificativa por atividade |
+| [`docs/pt-BR/deploy-vps.md`](docs/pt-BR/deploy-vps.md) | Deploy em VPS Ubuntu 22.04 com `tmux` e `ufw` |
+| [`docs/pt-BR/deploy-cloudflare-tunnel.md`](docs/pt-BR/deploy-cloudflare-tunnel.md) | Exposição pública via Cloudflare Tunnel ou ngrok |
+| [`docs/pt-BR/smoke-tests.md`](docs/pt-BR/smoke-tests.md) | Smoke tests `curl` por atividade |
+| [`docs/pt-BR/docker-stack.md`](docs/pt-BR/docker-stack.md) | Stack Docker completa, variáveis e comandos Make |
+| [`docs/pt-BR/docker-troubleshooting.md`](docs/pt-BR/docker-troubleshooting.md) | Diagnóstico de RPC auth, healthchecks, ZMQ e Caddy |
+| [`docs/pt-BR/live-validation.md`](docs/pt-BR/live-validation.md) | Resumo da validação contra Bitcoin Core v31.0 |
+| [`docs/pt-BR/public-demo.md`](docs/pt-BR/public-demo.md) | Resumo da demo pública via Cloudflare Tunnel (2026-05-03) |
 
 Cada atividade tem seu próprio README detalhado:
 
@@ -374,7 +380,7 @@ Os testes usam `monkeypatch` para isolar cada módulo de domínio. `FakeRPC` sim
 - **Erro 503 estruturado.** Quando o nó está offline, todas as rotas que dependem dele retornam `{"detail": {"error": "node_unavailable", "detail": "..."}}` com HTTP 503.
 - **Observabilidade mínima.** Logs são emitidos em JSON com `service` e `correlation_id`; cada backend expõe `/health` e `/metrics`.
 - **Frontend isolado.** Cada atividade tem frontend React/Vite/TypeScript próprio. URLs relativas e Caddy com prefixos permitem acesso direto (`:8001`/`:8002`/`:8003`) ou por `/atividade-N/`.
-- **Decisões de arquitetura completas em [`docs/architecture.md`](docs/architecture.md).**
+- **Decisões de arquitetura completas em [`docs/pt-BR/architecture.md`](docs/pt-BR/architecture.md).**
 
 ---
 
@@ -403,13 +409,13 @@ cloudflared tunnel --url http://localhost:8003
 ngrok http 8001
 ```
 
-Detalhes (instalação, deploy permanente em VPS, firewall): [`docs/deploy-cloudflare-tunnel.md`](docs/deploy-cloudflare-tunnel.md) e [`docs/deploy-vps.md`](docs/deploy-vps.md).
+Detalhes (instalação, deploy permanente em VPS, firewall): [`docs/pt-BR/deploy-cloudflare-tunnel.md`](docs/pt-BR/deploy-cloudflare-tunnel.md) e [`docs/pt-BR/deploy-vps.md`](docs/pt-BR/deploy-vps.md).
 
 ---
 
 ## Validação e demonstração
 
-O projeto foi validado ao vivo contra Bitcoin Core v31.0 em `regtest` em 2026-05-02. A validação completa — incluindo saídas reais dos endpoints, ciclo PSBT e caminho de erro 503 — está documentada em [`docs/validacao-ao-vivo.md`](docs/validacao-ao-vivo.md).
+O projeto foi validado ao vivo contra Bitcoin Core v31.0 em `regtest` em 2026-05-02. A validação completa — incluindo saídas reais dos endpoints, ciclo PSBT e caminho de erro 503 — está documentada em [`docs/pt-BR/live-validation.md`](docs/pt-BR/live-validation.md).
 
 Para reproduzir localmente (requer `bitcoind -regtest` nas portas padrão):
 
@@ -423,9 +429,9 @@ Demo pública executada em 2026-05-03 via Cloudflare Tunnel:
 
 Placeholders versionados para evidências visuais estão em [`docs/assets/README.md`](docs/assets/README.md). Ao gerar novos screenshots/GIFs dos dashboards React, salve-os como:
 
-- `docs/assets/atividade-1-dashboard.png`
-- `docs/assets/atividade-2-dashboard.gif`
-- `docs/assets/atividade-3-dashboard.png`
+- `docs/assets/activity-1-dashboard.png`
+- `docs/assets/activity-2-events.png`
+- `docs/assets/activity-3-wallet.png`
 
 | Atividade | URL | Endpoint validado | Resposta |
 |-----------|-----|-------------------|----------|
@@ -433,7 +439,7 @@ Placeholders versionados para evidências visuais estão em [`docs/assets/README
 | 2 | https://dice-garcia-hub-particular.trycloudflare.com | `/api/events/summary` | `{"blocks_observed":1,"tx_observed":4,...}` |
 | 3 | https://move-after-salaries-kde.trycloudflare.com | `/wallets` | `{"available_wallets":[...],"selected_wallet":"wallet1"}` |
 
-> URLs temporárias (trycloudflare.com) — ativas enquanto os processos `cloudflared` estavam rodando. Evidências completas: [`docs/demo-publica.md`](docs/demo-publica.md).
+> URLs temporárias (trycloudflare.com) — ativas enquanto os processos `cloudflared` estavam rodando. Evidências completas: [`docs/pt-BR/public-demo.md`](docs/pt-BR/public-demo.md).
 
 ---
 

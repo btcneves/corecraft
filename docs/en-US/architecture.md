@@ -247,4 +247,4 @@ except ValueError as exc:
 
 ## Known limitations
 
-See [Known Limitations](../README.md#limitações-conhecidas) in the root README.
+See [Known Limitations](../../README.en-US.md#known-limitations) in the English root README.

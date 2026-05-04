@@ -34,7 +34,7 @@ fallbackfee=0.0001
 
 [regtest]
 rpcuser=user
-rpcpassword=TROQUE_ESTA_SENHA
+rpcpassword=CHANGE_THIS_PASSWORD
 rpcbind=127.0.0.1
 rpcallowip=127.0.0.1
 zmqpubrawblock=tcp://127.0.0.1:28332
@@ -120,7 +120,7 @@ Frontends use relative URLs, so they work automatically when accessed through th
 
 Access via browser:
 ```
-http://<IP_DA_VPS>:8001  → Activity 1
-http://<IP_DA_VPS>:8002  → Activity 2
-http://<IP_DA_VPS>:8003  → Activity 3
+http://<VPS_IP>:8001  → Activity 1
+http://<VPS_IP>:8002  → Activity 2
+http://<VPS_IP>:8003  → Activity 3
 ```

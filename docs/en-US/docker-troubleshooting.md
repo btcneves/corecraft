@@ -522,7 +522,7 @@ docker compose version
 
 ### Symptom: `./scripts/quickstart.sh: Permission denied`
 
-**Cause:** The file was cloned into a Windows file system (ex: `/mnt/c/...`) and POSIX permissions do not apply.
+**Cause:** The file was cloned into a Windows file system (for example, `/mnt/c/...`) and POSIX permissions do not apply.
 
 **Workaround:** Clone the repository within the WSL file system (not in `/mnt/c/`):
 ```bash

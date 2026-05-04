@@ -25,7 +25,7 @@ Three independent microservices for integration with Bitcoin Core (regtest):
 | Activity 2 | https://dice-garcia-hub-particular.trycloudflare.com |
 | Activity 3 | https://move-after-salaries-kde.trycloudflare.com |
 
-> Temporary Cloudflare Tunnels generated on 2026-05-03. Complete evidence in [`docs/demo-publica.md`](demo-publica.md).
+> Temporary Cloudflare Tunnels generated on 2026-05-03. Complete evidence in [`public-demo.md`](public-demo.md).
 
 ## Actual endpoint responses (external access)
 
@@ -59,8 +59,8 @@ bitcoin-cli -regtest getblockchaininfo
 ./scripts/smoke-test.sh
 ```
 
-Complete local validation evidence: [`docs/validacao-ao-vivo.md`](validacao-ao-vivo.md)
-Public demo evidence: [`docs/demo-publica.md`](demo-publica.md)
+Complete local validation evidence: [`live-validation.md`](live-validation.md)
+Public demo evidence: [`public-demo.md`](public-demo.md)
 
 ---
 
