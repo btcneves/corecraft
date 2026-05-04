@@ -13,12 +13,12 @@ cd corecraft
 cp .env.example .env
 
 # Build and start all services
-docker compose up --build
+docker compose --profile all up --build
 
 # Or use the setup script for your platform
 ./scripts/setup-linux.sh      # Linux
 ./scripts/setup-mac.sh        # macOS
-scripts\setup-windows.bat     # Windows
+powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1  # Windows
 ```
 
 ## Services Overview
@@ -38,13 +38,13 @@ scripts\setup-windows.bat     # Windows
 
 ```bash
 # Build and start (foreground)
-docker compose up --build
+docker compose --profile all up --build
 
 # Start in detached mode (background)
-docker compose up -d --build
+docker compose --profile all up -d --build
 
 # Start without rebuilding
-docker compose up
+docker compose --profile all up
 ```
 
 Expected startup signals:
@@ -83,7 +83,7 @@ The setup scripts handle everything automatically:
 ./scripts/setup-mac.sh --single-activity atividade-2
 
 # Windows
-scripts\setup-windows.bat --single-activity atividade-3
+powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1 -SingleActivity atividade-3
 
 # Skip build (use existing images)
 ./scripts/setup-linux.sh --no-build
@@ -180,6 +180,7 @@ BTC_RPC_AUTH=user:corecraft$55eef9f3661634839386ead63a2e72d60d0ef27470547ec7b4b1
 
 # Application logging
 LOG_LEVEL=INFO
+COMPOSE_PROFILES=all
 ```
 
 ### Internal Service Environment
@@ -391,7 +392,7 @@ docker compose build --no-cache
 
 # Restart services
 docker compose down
-docker compose up -d
+docker compose --profile all up -d
 ```
 
 ## Architecture

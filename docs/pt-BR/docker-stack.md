@@ -8,7 +8,7 @@ O Docker Compose sobe o ambiente completo do CoreCraft: Bitcoin Core em `regtest
 
 ```bash
 cp .env.example .env
-docker compose up --build
+docker compose --profile all up --build
 ```
 
 ## Servicos
@@ -53,7 +53,7 @@ O arquivo `.env` deve manter credenciais consistentes com o Bitcoin Core:
 ```env
 BTC_RPC_USER=user
 BTC_RPC_PASSWORD=password
+COMPOSE_PROFILES=all
 ```
 
 Para detalhes de diagnostico, veja [`docker-troubleshooting.md`](docker-troubleshooting.md).
-

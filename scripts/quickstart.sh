@@ -2,7 +2,7 @@
 #
 # CoreCraft — Quickstart
 # ======================
-# Ponto de entrada único. Deteta o sistema operativo e delega
+# Ponto de entrada unico. Detecta o sistema operacional e delega
 # para o script de setup correto.
 #
 # Uso:
@@ -27,7 +27,7 @@ echo -e "${BOLD}║       CoreCraft — Quickstart         ║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════╝${NC}"
 echo ""
 
-# Detetar OS
+# Detect OS
 OS="unknown"
 if [[ "$(uname)" == "Darwin" ]]; then
   OS="macos"
@@ -35,7 +35,7 @@ elif [[ "$(uname)" == "Linux" ]]; then
   OS="linux"
 fi
 
-echo -e "${BLUE}[INFO]${NC} Sistema detetado: $OS"
+echo -e "${BLUE}[INFO]${NC} Sistema detectado: $OS"
 echo ""
 
 if [[ "$OS" == "linux" ]]; then
@@ -45,13 +45,17 @@ elif [[ "$OS" == "macos" ]]; then
   exec "$SCRIPT_DIR/setup-mac.sh" "$@"
 
 else
-  echo -e "${YELLOW}[AVISO]${NC} Sistema não reconhecido ou Windows detetado."
+  echo -e "${YELLOW}[WARN]${NC} Sistema nao reconhecido ou Windows detectado."
   echo ""
-  echo "  No Windows, execute num terminal (Prompt de Comando ou PowerShell):"
+  echo "  No Windows, execute em PowerShell:"
+  echo ""
+  echo -e "    ${BOLD}.\\scripts\\setup-windows.ps1${NC}"
+  echo ""
+  echo "  Compatibilidade com Prompt de Comando:"
   echo ""
   echo -e "    ${BOLD}scripts\\setup-windows.bat${NC}"
   echo ""
-  echo "  Alternativa recomendada — usar WSL 2 com Ubuntu e correr:"
+  echo "  Alternativa recomendada: WSL 2 com Ubuntu:"
   echo ""
   echo -e "    ${BOLD}./scripts/quickstart.sh${NC}"
   echo ""

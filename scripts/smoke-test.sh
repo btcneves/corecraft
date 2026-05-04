@@ -2,18 +2,18 @@
 #
 # CoreCraft Smoke Tests
 # =====================
-# Verifica se as três atividades estão a responder corretamente.
-# Aguarda até os serviços ficarem prontos (útil logo após docker compose up).
+# Verifies that all three activities are responding correctly.
+# Waits until services are ready (useful right after docker compose --profile all up).
 #
-# Uso:
-#   ./scripts/smoke-test.sh              # testa tudo, aguarda até 60s
-#   ./scripts/smoke-test.sh --no-wait    # falha imediatamente se não estiver pronto
+# Usage:
+#   ./scripts/smoke-test.sh              # test everything, wait up to 60s
+#   ./scripts/smoke-test.sh --no-wait    # fail immediately if not ready
 #   ./scripts/smoke-test.sh --timeout 120
 #
 
 set -uo pipefail
 
-# ── Cores ────────────────────────────────────────────────────────────────────
+# ── Colors ───────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -21,20 +21,32 @@ BLUE='\033[0;34m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# ── Opções ───────────────────────────────────────────────────────────────────
+# ── Options ──────────────────────────────────────────────────────────────────
 WAIT=true
 TIMEOUT=60
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     --no-wait)   WAIT=false; shift ;;
-    --timeout)   TIMEOUT="$2"; shift 2 ;;
+    --timeout)
+      if [[ $# -lt 2 || "$2" == -* ]]; then
+        echo -e "${RED}Missing value for --timeout${NC}"
+        exit 1
+      fi
+      TIMEOUT="$2"
+      shift 2
+      ;;
     -h|--help)
-      echo "Uso: $0 [--no-wait] [--timeout SEGUNDOS]"
+      echo "Usage: $0 [--no-wait] [--timeout SECONDS]"
       exit 0 ;;
-    *) echo -e "${RED}Opção desconhecida: $1${NC}"; exit 1 ;;
+    *) echo -e "${RED}Unknown option: $1${NC}"; exit 1 ;;
   esac
 done
+
+if ! [[ "$TIMEOUT" =~ ^[0-9]+$ ]]; then
+  echo -e "${RED}Invalid timeout: $TIMEOUT${NC}"
+  exit 1
+fi
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 PASS=0
@@ -64,30 +76,30 @@ wait_for_port() {
   while ! curl -s --max-time 2 "http://127.0.0.1:$port/health" -o /dev/null 2>/dev/null &&
         ! curl -s --max-time 2 "http://127.0.0.1:$port/" -o /dev/null 2>/dev/null; do
     if (( elapsed >= TIMEOUT )); then
-      echo -e "  ${RED}✘${NC}  $label não respondeu após ${TIMEOUT}s"
+      echo -e "  ${RED}✘${NC}  $label did not respond after ${TIMEOUT}s"
       return 1
     fi
     sleep 2
     (( elapsed += 2 )) || true
-    echo -ne "  ${YELLOW}…${NC}  aguardando $label (${elapsed}s/${TIMEOUT}s)\r"
+    echo -ne "  ${YELLOW}…${NC}  waiting for $label (${elapsed}s/${TIMEOUT}s)\r"
   done
-  echo -ne "\033[2K"  # limpa a linha do spinner
+  echo -ne "\033[2K"  # clear spinner line
   return 0
 }
 
-# ── Cabeçalho ────────────────────────────────────────────────────────────────
+# ── Header ───────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}══════════════════════════════════════${NC}"
 echo -e "${BOLD}   CoreCraft — Smoke Tests${NC}"
 echo -e "${BOLD}══════════════════════════════════════${NC}"
 echo ""
 
-# ── Aguardar serviços ────────────────────────────────────────────────────────
+# ── Wait for services ────────────────────────────────────────────────────────
 if [[ "$WAIT" == "true" ]]; then
-  echo -e "${BLUE}[INFO]${NC} Aguardando serviços ficarem prontos..."
+  echo -e "${BLUE}[INFO]${NC} Waiting for services to be ready..."
   echo ""
   SERVICES_OK=true
-  for spec in "8001:Atividade 1" "8002:Atividade 2" "8003:Atividade 3"; do
+  for spec in "8001:Activity 1" "8002:Activity 2" "8003:Activity 3"; do
     port="${spec%%:*}"
     name="${spec#*:}"
     if ! wait_for_port "$port" "$name"; then
@@ -97,42 +109,42 @@ if [[ "$WAIT" == "true" ]]; then
 
   if [[ "$SERVICES_OK" == "false" ]]; then
     echo ""
-    echo -e "${RED}[ERRO]${NC} Um ou mais serviços não iniciaram. Verifique os logs:"
+    echo -e "${RED}[ERROR]${NC} One or more services did not start. Check logs:"
     echo "  docker compose logs --tail=30"
     exit 1
   fi
-  echo -e "${GREEN}[OK]${NC} Todos os serviços estão prontos."
+  echo -e "${GREEN}[OK]${NC} All services are ready."
   echo ""
 fi
 
-# ── Atividade 1 ──────────────────────────────────────────────────────────────
-echo -e "${BOLD}Atividade 1 — Mempool Snapshot (porta 8001)${NC}"
+# ── Activity 1 ───────────────────────────────────────────────────────────────
+echo -e "${BOLD}Activity 1 — Mempool Snapshot (port 8001)${NC}"
 check "GET /api/mempool/summary"   "http://127.0.0.1:8001/api/mempool/summary"
 check "GET /api/blockchain/lag"    "http://127.0.0.1:8001/api/blockchain/lag"
 echo ""
 
-# ── Atividade 2 ──────────────────────────────────────────────────────────────
-echo -e "${BOLD}Atividade 2 — Eventos ZMQ (porta 8002)${NC}"
+# ── Activity 2 ───────────────────────────────────────────────────────────────
+echo -e "${BOLD}Activity 2 — ZMQ Events (port 8002)${NC}"
 check "GET /api/events/summary"         "http://127.0.0.1:8002/api/events/summary"
 check "GET /api/events/latest"          "http://127.0.0.1:8002/api/events/latest"
 check "GET /api/events/state-comparison" "http://127.0.0.1:8002/api/events/state-comparison"
 echo ""
 
-# ── Atividade 3 ──────────────────────────────────────────────────────────────
-echo -e "${BOLD}Atividade 3 — Multi-Wallet PSBT (porta 8003)${NC}"
+# ── Activity 3 ───────────────────────────────────────────────────────────────
+echo -e "${BOLD}Activity 3 — Multi-Wallet PSBT (port 8003)${NC}"
 check "GET /wallets"        "http://127.0.0.1:8003/wallets"
 check "GET /wallet/status"  "http://127.0.0.1:8003/wallet/status"
 echo ""
 
-# ── Resultado ────────────────────────────────────────────────────────────────
+# ── Result ───────────────────────────────────────────────────────────────────
 TOTAL=$(( PASS + FAIL ))
 echo -e "${BOLD}══════════════════════════════════════${NC}"
 if (( FAIL == 0 )); then
-  echo -e "${GREEN}${BOLD}  RESULTADO: $PASS/$TOTAL endpoints OK${NC}"
+  echo -e "${GREEN}${BOLD}  RESULT: $PASS/$TOTAL endpoints OK${NC}"
 else
-  echo -e "${RED}${BOLD}  RESULTADO: $PASS/$TOTAL OK — $FAIL falharam${NC}"
+  echo -e "${RED}${BOLD}  RESULT: $PASS/$TOTAL OK — $FAIL failed${NC}"
   echo ""
-  echo -e "${YELLOW}  Dica:${NC} verifique os logs com  docker compose logs --tail=50"
+  echo -e "${YELLOW}  Tip:${NC} check logs with  docker compose logs --tail=50"
 fi
 echo -e "${BOLD}══════════════════════════════════════${NC}"
 echo ""

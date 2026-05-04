@@ -1,5 +1,6 @@
 SHELL := /bin/sh
 COMPOSE := docker compose
+COMPOSE_ALL := $(COMPOSE) --profile all
 PYTHON ?= python3
 
 # Default activity for single-activity targets
@@ -68,16 +69,16 @@ help:
 # ==============================================================================
 
 up:
-	$(COMPOSE) up --build
+	$(COMPOSE_ALL) up --build
 
 up-detached:
-	$(COMPOSE) up -d --build
+	$(COMPOSE_ALL) up -d --build
 
 down:
 	$(COMPOSE) down
 
 build:
-	$(COMPOSE) build
+	$(COMPOSE_ALL) build
 
 logs:
 	$(COMPOSE) logs -f
@@ -102,7 +103,7 @@ clean:
 	$(COMPOSE) rm -f
 
 config:
-	$(COMPOSE) config
+	$(COMPOSE_ALL) config
 
 # ==============================================================================
 # Single Activity (using profiles)

@@ -12,14 +12,14 @@ Use este caminho para validar o projeto rapidamente.
 git clone https://github.com/btcneves/CoreCraft.git
 cd CoreCraft
 ./scripts/quickstart.sh
-docker compose up --build
+docker compose --profile all up --build
 ```
 
 No Windows, use:
 
 ```cmd
-scripts\setup-windows.bat
-docker compose up --build
+powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1
+docker compose --profile all up --build
 ```
 
 Ao final, acesse:
