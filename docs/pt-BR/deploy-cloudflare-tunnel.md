@@ -31,6 +31,29 @@ O comando exibira uma URL `https://...trycloudflare.com`.
 
 As frontends usam URLs relativas por padrao, entao funcionam quando servidas pelo proprio backend.
 
+## Tunnel nomeado para VPS
+
+Para deploy repetivel em VPS, crie um Cloudflare Tunnel nomeado no dashboard da Cloudflare e configure hostnames publicos apontando para o Caddy:
+
+| Hostname publico | Service |
+|------------------|---------|
+| `corecraft.example.com` | `http://caddy:80` |
+
+Depois salve o token do tunnel no secret `CLOUDFLARE_TUNNEL_TOKEN` do GitHub e execute o workflow **Deploy** com target `vps-cloudflare`.
+
+O workflow usa [`docker-compose.cloudflare.yml`](../../docker-compose.cloudflare.yml), que sobe um sidecar `cloudflared` na mesma rede Docker do Caddy:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.cloudflare.yml \
+  --profile all \
+  --profile cloudflare \
+  up -d --build
+```
+
+Assim, nao e necessario expor as portas da aplicacao diretamente no firewall da VPS.
+
 ## Alternativa
 
 ```bash
@@ -38,4 +61,3 @@ ngrok http 8001
 ngrok http 8002
 ngrok http 8003
 ```
-

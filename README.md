@@ -21,14 +21,15 @@
 >
 > ```bash
 > git clone https://github.com/btcneves/CoreCraft.git && cd corecraft
-> ./scripts/quickstart.sh        # Linux / macOS  |  scripts\setup-windows.bat no Windows
-> docker compose up
+> ./scripts/quickstart.sh        # Linux / macOS
+> .\scripts\setup-windows.ps1    # Windows PowerShell
+> docker compose --profile all up
 > ```
 >
 > Acesse as atividades em `http://localhost:8001`, `8002` e `8003`.  
 > Guia completo (incluindo sem Docker): [**docs/pt-BR/getting-started.md**](docs/pt-BR/getting-started.md)
 
-### O que você verá após `docker compose up`
+### O que você verá após `docker compose --profile all up`
 
 ```
 ✔ Container corecraft-bitcoind       Healthy
@@ -53,13 +54,13 @@ Verificar que tudo funciona:
 # ══════════════════════════════════════
 #   CoreCraft — Smoke Tests
 # ══════════════════════════════════════
-# Atividade 1 — Mempool Snapshot (porta 8001)
+# Activity 1 — Mempool Snapshot (port 8001)
 #   ✔  GET /api/mempool/summary  (200)
 #   ✔  GET /api/blockchain/lag   (200)
-# Atividade 2 — Eventos ZMQ (porta 8002)
+# Activity 2 — ZMQ Events (port 8002)
 #   ✔  GET /api/events/summary   (200)
 # ...
-#   RESULTADO: 7/7 endpoints OK
+#   RESULT: 7/7 endpoints OK
 ```
 
 ---
@@ -255,9 +256,9 @@ Frontend disponível em `http://localhost:8001` (servido pelo próprio FastAPI).
 
 ```bash
 cp .env.example .env
-docker compose up --build
+docker compose --profile all up --build
 # Caddy:
-#   http://localhost/atividade-1/
+﻿#   http://localhost/atividade-1/
 #   http://localhost/atividade-2/
 #   http://localhost/atividade-3/
 # Portas diretas:
@@ -327,6 +328,8 @@ Smoke tests completos com `curl`: [`docs/pt-BR/smoke-tests.md`](docs/pt-BR/smoke
 | [`docs/pt-BR/docker-troubleshooting.md`](docs/pt-BR/docker-troubleshooting.md) | Diagnóstico de RPC auth, healthchecks, ZMQ e Caddy |
 | [`docs/pt-BR/live-validation.md`](docs/pt-BR/live-validation.md) | Resumo da validação contra Bitcoin Core v31.0 |
 | [`docs/pt-BR/public-demo.md`](docs/pt-BR/public-demo.md) | Resumo da demo pública via Cloudflare Tunnel (2026-05-03) |
+
+Deploy automatizado: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) executa deploy manual para VPS ou VPS + Cloudflare Tunnel usando GitHub Secrets.
 
 Cada atividade tem seu próprio README detalhado:
 

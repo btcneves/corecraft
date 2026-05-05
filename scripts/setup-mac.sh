@@ -27,6 +27,7 @@ cd "$SCRIPT_DIR"
 # Default options
 DO_BUILD=true
 SINGLE_ACTIVITY=""
+VALID_ACTIVITIES="atividade-1 atividade-2 atividade-3"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -36,6 +37,10 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --single-activity)
+      if [[ $# -lt 2 || "$2" == -* ]]; then
+        echo -e "${RED}Missing value for --single-activity${NC}"
+        exit 1
+      fi
       SINGLE_ACTIVITY="$2"
       shift 2
       ;;
@@ -56,6 +61,12 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -n "$SINGLE_ACTIVITY" && ! " $VALID_ACTIVITIES " =~ " $SINGLE_ACTIVITY " ]]; then
+  echo -e "${RED}Invalid activity: $SINGLE_ACTIVITY${NC}"
+  echo "Valid values: $VALID_ACTIVITIES"
+  exit 1
+fi
 
 # Logging functions
 info() {
@@ -80,30 +91,30 @@ echo "  CoreCraft Setup - macOS"
 echo "=========================================="
 echo ""
 
-# ── Detetar arquitetura ───────────────────────────────────────────────────────
+# ── Detectar arquitetura ──────────────────────────────────────────────────────
 ARCH=$(uname -m)
 if [[ "$ARCH" == "arm64" ]]; then
-  info "Apple Silicon (arm64) detetado."
-  warn "As imagens Docker do Bitcoin Core são x86_64 — correrão via Rosetta 2."
-  warn "Isto pode aumentar o tempo de arranque (~30 s extra) e o consumo de RAM."
-  warn "Recomendação: alocar pelo menos 4 GB de RAM no Docker Desktop."
+  info "Apple Silicon (arm64) detected."
+  warn "Bitcoin Core Docker images are x86_64 and may run through Rosetta 2."
+  warn "This can increase startup time and RAM usage."
+  warn "Recommendation: allocate at least 4 GB of RAM in Docker Desktop."
   RECOMMENDED_MEM=4000000000
 else
-  info "Intel (x86_64) detetado."
+  info "Intel (x86_64) detected."
   RECOMMENDED_MEM=2000000000
 fi
 echo ""
 
-# ── Verificar Homebrew ────────────────────────────────────────────────────────
+# ── Check Homebrew ────────────────────────────────────────────────────────────
 if ! command -v brew &> /dev/null; then
-  warn "Homebrew não encontrado. Não é obrigatório para Docker, mas é recomendado."
-  warn "Para instalar: https://brew.sh"
+  warn "Homebrew not found. It is not required for Docker, but it is recommended."
+  warn "Install from: https://brew.sh"
 else
   if [[ "$ARCH" == "arm64" ]] && [[ "$(brew --prefix 2>/dev/null)" != "/opt/homebrew" ]]; then
-    warn "Homebrew encontrado mas não no caminho Apple Silicon (/opt/homebrew)."
-    warn "Considere reinstalar a versão nativa: https://brew.sh"
+    warn "Homebrew was found outside the native Apple Silicon path (/opt/homebrew)."
+    warn "Consider installing the native version: https://brew.sh"
   else
-    success "Homebrew detetado ($(brew --prefix))"
+    success "Homebrew detected ($(brew --prefix))"
   fi
 fi
 echo ""
@@ -115,7 +126,7 @@ if ! command -v docker &> /dev/null; then
   error "Docker is not installed. Please install Docker Desktop for Mac first."
   echo ""
   if [[ "$ARCH" == "arm64" ]]; then
-    echo "  Descarregar a versão 'Apple Chip': https://www.docker.com/products/docker-desktop/"
+    echo "  Download the Apple Chip version: https://www.docker.com/products/docker-desktop/"
   else
     echo "  Download: https://www.docker.com/products/docker-desktop/"
   fi
@@ -151,13 +162,13 @@ info "Checking Docker resources..."
 DOCKER_MEM=$(docker info --format '{{.MemTotal}}' 2>/dev/null || echo "0")
 if [[ "$DOCKER_MEM" -lt "$RECOMMENDED_MEM" ]]; then
   MEM_GB=$(( RECOMMENDED_MEM / 1000000000 ))
-  warn "Docker tem menos de ${MEM_GB} GB de RAM alocados."
-  warn "Ajuste em: Docker Desktop → Settings → Resources → Memory → ${MEM_GB} GB"
+  warn "Docker has less than ${MEM_GB} GB of RAM allocated."
+  warn "Adjust it in: Docker Desktop → Settings → Resources → Memory → ${MEM_GB} GB"
   if [[ "$ARCH" == "arm64" ]]; then
-    warn "(Apple Silicon: o overhead do Rosetta 2 exige mais memória que o normal)"
+    warn "(Apple Silicon: Rosetta 2 overhead requires more memory than usual)"
   fi
 else
-  success "Memória Docker adequada"
+  success "Docker memory allocation is adequate"
 fi
 
 # Step 4: Check for port conflicts
@@ -209,6 +220,19 @@ else
   success "Environment file is valid"
 fi
 
+if ! grep -q "^COMPOSE_PROFILES=" .env; then
+  warn "COMPOSE_PROFILES is not set in .env. Adding COMPOSE_PROFILES=all for full-stack defaults."
+  printf "\nCOMPOSE_PROFILES=all\n" >> .env
+fi
+
+info "Validating Docker Compose configuration..."
+if [[ -n "$SINGLE_ACTIVITY" ]]; then
+  docker compose --profile "$SINGLE_ACTIVITY" config >/dev/null
+else
+  docker compose --profile all config >/dev/null
+fi
+success "Docker Compose configuration is valid"
+
 # Step 7: Build Docker images
 if [[ "$DO_BUILD" == "true" ]]; then
   info "Building Docker images..."
@@ -216,10 +240,10 @@ if [[ "$DO_BUILD" == "true" ]]; then
   
   if [[ -n "$SINGLE_ACTIVITY" ]]; then
     success "Building images for $SINGLE_ACTIVITY..."
-    docker compose build $SINGLE_ACTIVITY
+    docker compose build "$SINGLE_ACTIVITY"
   else
     success "Building all images (this may take a few minutes)..."
-    docker compose build
+    docker compose --profile all build
   fi
   
   success "Docker images built successfully"
@@ -245,16 +269,16 @@ if [[ -n "$SINGLE_ACTIVITY" ]]; then
 else
   success "To start all services, run:"
   echo ""
-  echo "  docker compose up"
+  echo "  docker compose --profile all up"
   echo ""
   echo "Or in detached mode:"
   echo ""
-  echo "  docker compose up -d"
+  echo "  docker compose --profile all up -d"
   echo ""
   echo "To start a specific activity:"
-  echo "  docker compose --profile atividade-1 up   # Only Atividade 1"
-  echo "  docker compose --profile atividade-2 up   # Only Atividade 2"
-  echo "  docker compose --profile atividade-3 up   # Only Atividade 3"
+  echo "  docker compose --profile atividade-1 up   # Activity 1 only"
+  echo "  docker compose --profile atividade-2 up   # Activity 2 only"
+  echo "  docker compose --profile atividade-3 up   # Activity 3 only"
 fi
 
 echo ""

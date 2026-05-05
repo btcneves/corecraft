@@ -21,14 +21,15 @@
 >
 > ```bash
 > git clone https://github.com/btcneves/CoreCraft.git && cd corecraft
-> ./scripts/quickstart.sh        # Linux / macOS  |  scripts\setup-windows.bat on Windows
-> docker compose up
+> ./scripts/quickstart.sh        # Linux / macOS
+> .\scripts\setup-windows.ps1    # Windows PowerShell
+> docker compose --profile all up
 > ```
 >
 > Open the activities at `http://localhost:8001`, `8002`, and `8003`.  
 > Full guide, including the non-Docker setup: [**docs/en-US/getting-started.md**](docs/en-US/getting-started.md)
 
-### What you should see after `docker compose up`
+### What you should see after `docker compose --profile all up`
 
 ```text
 ✔ Container corecraft-bitcoind       Healthy
@@ -255,7 +256,7 @@ The frontend is available at `http://localhost:8001`, served by the FastAPI app 
 
 ```bash
 cp .env.example .env
-docker compose up --build
+docker compose --profile all up --build
 # Caddy:
 #   http://localhost/atividade-1/
 #   http://localhost/atividade-2/
@@ -327,6 +328,8 @@ Full smoke tests with `curl`: [`docs/en-US/smoke-tests.md`](docs/en-US/smoke-tes
 | [`docs/en-US/docker-troubleshooting.md`](docs/en-US/docker-troubleshooting.md) | RPC auth, healthcheck, ZMQ, and Caddy diagnostics |
 | [`docs/en-US/live-validation.md`](docs/en-US/live-validation.md) | Full validation output against Bitcoin Core v31.0 |
 | [`docs/en-US/public-demo.md`](docs/en-US/public-demo.md) | Public demo evidence through Cloudflare Tunnel (2026-05-03) |
+
+Automated deployment: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs manual deployments to VPS or VPS + Cloudflare Tunnel using GitHub Secrets.
 
 Each activity has its own detailed README:
 

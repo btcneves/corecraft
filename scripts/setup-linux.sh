@@ -27,6 +27,7 @@ cd "$SCRIPT_DIR"
 # Default options
 DO_BUILD=true
 SINGLE_ACTIVITY=""
+VALID_ACTIVITIES="atividade-1 atividade-2 atividade-3"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -36,6 +37,10 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --single-activity)
+      if [[ $# -lt 2 || "$2" == -* ]]; then
+        echo -e "${RED}Missing value for --single-activity${NC}"
+        exit 1
+      fi
       SINGLE_ACTIVITY="$2"
       shift 2
       ;;
@@ -56,6 +61,12 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ -n "$SINGLE_ACTIVITY" && ! " $VALID_ACTIVITIES " =~ " $SINGLE_ACTIVITY " ]]; then
+  echo -e "${RED}Invalid activity: $SINGLE_ACTIVITY${NC}"
+  echo "Valid values: $VALID_ACTIVITIES"
+  exit 1
+fi
 
 # Logging functions
 info() {
@@ -173,6 +184,19 @@ else
   success "Environment file is valid"
 fi
 
+if ! grep -q "^COMPOSE_PROFILES=" .env; then
+  warn "COMPOSE_PROFILES is not set in .env. Adding COMPOSE_PROFILES=all for full-stack defaults."
+  printf "\nCOMPOSE_PROFILES=all\n" >> .env
+fi
+
+info "Validating Docker Compose configuration..."
+if [[ -n "$SINGLE_ACTIVITY" ]]; then
+  docker compose --profile "$SINGLE_ACTIVITY" config >/dev/null
+else
+  docker compose --profile all config >/dev/null
+fi
+success "Docker Compose configuration is valid"
+
 # Step 6: Build Docker images
 if [[ "$DO_BUILD" == "true" ]]; then
   info "Building Docker images..."
@@ -180,10 +204,10 @@ if [[ "$DO_BUILD" == "true" ]]; then
   
   if [[ -n "$SINGLE_ACTIVITY" ]]; then
     success "Building images for $SINGLE_ACTIVITY..."
-    docker compose build $SINGLE_ACTIVITY
+    docker compose build "$SINGLE_ACTIVITY"
   else
     success "Building all images (this may take a few minutes)..."
-    docker compose build
+    docker compose --profile all build
   fi
   
   success "Docker images built successfully"
@@ -209,16 +233,16 @@ if [[ -n "$SINGLE_ACTIVITY" ]]; then
 else
   success "To start all services, run:"
   echo ""
-  echo "  docker compose up"
+  echo "  docker compose --profile all up"
   echo ""
   echo "Or in detached mode:"
   echo ""
-  echo "  docker compose up -d"
+  echo "  docker compose --profile all up -d"
   echo ""
   echo "To start a specific activity:"
-  echo "  docker compose --profile atividade-1 up   # Only Atividade 1"
-  echo "  docker compose --profile atividade-2 up   # Only Atividade 2"
-  echo "  docker compose --profile atividade-3 up   # Only Atividade 3"
+  echo "  docker compose --profile atividade-1 up   # Activity 1 only"
+  echo "  docker compose --profile atividade-2 up   # Activity 2 only"
+  echo "  docker compose --profile atividade-3 up   # Activity 3 only"
 fi
 
 echo ""

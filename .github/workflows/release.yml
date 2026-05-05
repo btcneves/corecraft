@@ -137,9 +137,9 @@ jobs:
             git clone https://github.com/btcneves/CoreCraft.git
             cd corecraft
             ./scripts/quickstart.sh   # Linux / macOS
-            docker compose up
+            docker compose --profile all up
             ```
 
-            Guia completo: [docs/getting-started.md](docs/getting-started.md)
+            Guia completo: [docs/README.md](docs/README.md)
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}

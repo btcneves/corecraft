@@ -13,6 +13,10 @@ REM
 
 setlocal EnableDelayedExpansion
 
+REM Ensure commands run from the repository root even when the script is called
+REM from another directory.
+pushd "%~dp0\.." >nul
+
 REM Default options
 set DO_BUILD=true
 set SINGLE_ACTIVITY=
@@ -26,6 +30,15 @@ if /i "%~1"=="--no-build" (
     goto :parse_args
 )
 if /i "%~1"=="--single-activity" (
+    if "%~2"=="" (
+        echo [ERROR] Missing value for --single-activity
+        goto :fail
+    )
+    echo %~2 | findstr /B "-" >nul 2>&1
+    if not errorlevel 1 (
+        echo [ERROR] Missing value for --single-activity
+        goto :fail
+    )
     set SINGLE_ACTIVITY=%~2
     shift
     shift
@@ -34,7 +47,7 @@ if /i "%~1"=="--single-activity" (
 if /i "%~1"=="-h" goto :show_help
 if /i "%~1"=="--help" goto :show_help
 echo [ERROR] Unknown option: %~1
-exit /b 1
+goto :fail
 
 :show_help
 echo CoreCraft Setup Script for Windows
@@ -45,9 +58,17 @@ echo Options:
 echo   --no-build           Skip building images (use existing images)
 echo   --single-activity    Start only one activity (atividade-1, atividade-2, or atividade-3)
 echo   -h, --help           Show this help message
-exit /b 0
+goto :success
 
 :after_parse
+
+if not "%SINGLE_ACTIVITY%"=="" (
+    if /i not "%SINGLE_ACTIVITY%"=="atividade-1" if /i not "%SINGLE_ACTIVITY%"=="atividade-2" if /i not "%SINGLE_ACTIVITY%"=="atividade-3" (
+        echo [ERROR] Invalid activity: %SINGLE_ACTIVITY%
+        echo [ERROR] Valid values: atividade-1, atividade-2, atividade-3
+        goto :fail
+    )
+)
 
 echo.
 echo ==========================================
@@ -65,7 +86,7 @@ if errorlevel 1 (
     echo Download from: https://www.docker.com/products/docker-desktop/
     echo.
     echo Make sure to enable WSL 2 backend during installation.
-    exit /b 1
+    goto :fail
 )
 
 docker compose version >nul 2>&1
@@ -73,26 +94,26 @@ if errorlevel 1 (
     echo [ERROR] Docker Compose v2 is not installed. Docker Desktop should include this.
     echo.
     echo Please reinstall Docker Desktop and ensure Compose v2 is selected.
-    exit /b 1
+    goto :fail
 )
 
 for /f "tokens=3" %%a in ('docker --version') do set DOCKER_VERSION=%%a
 echo [OK] Docker %DOCKER_VERSION% detected
 
-REM Verificar WSL 2 (recomendado para melhor desempenho)
+REM Check WSL 2, which is recommended for developer experience on Windows.
 echo [INFO] Checking WSL 2...
 wsl --list -v >nul 2>&1
 if errorlevel 1 (
-    echo [WARN] WSL 2 nao detetado ou nao esta instalado.
+    echo [WARN] WSL 2 was not detected.
     echo.
-    echo   Para instalar WSL 2 com Ubuntu (PowerShell como Administrador):
+    echo   To install WSL 2 with Ubuntu, run in PowerShell as Administrator:
     echo     wsl --install -d Ubuntu
     echo.
-    echo   O Docker Desktop funciona sem WSL 2, mas e recomendado para melhor
-    echo   desempenho e compatibilidade com comandos Linux.
+    echo   Docker Desktop can work without WSL 2, but WSL 2 is recommended
+    echo   for performance and Linux command compatibility.
     echo.
 ) else (
-    echo [OK] WSL 2 disponivel
+    echo [OK] WSL 2 detected
 )
 
 REM Step 2: Check Docker daemon is running
@@ -103,7 +124,7 @@ if errorlevel 1 (
     echo [ERROR] Docker daemon is not running. Please start Docker Desktop first.
     echo.
     echo Open Docker Desktop and wait for it to fully start.
-    exit /b 1
+    goto :fail
 )
 echo [OK] Docker daemon is running
 
@@ -135,7 +156,7 @@ if exist .env (
         echo [OK] Created .env from .env.example
     ) else (
         echo [ERROR] .env.example not found. Cannot create .env file.
-        exit /b 1
+        goto :fail
     )
 )
 
@@ -159,7 +180,27 @@ if not "!MISSING_VARS!"=="" (
     echo [OK] Environment file is valid
 )
 
-REM Step 6: Build Docker images
+findstr /B "^COMPOSE_PROFILES=" .env >nul 2>&1
+if errorlevel 1 (
+    echo [WARN] COMPOSE_PROFILES is not set in .env. Adding COMPOSE_PROFILES=all.
+    echo.>> .env
+    echo COMPOSE_PROFILES=all>> .env
+)
+
+REM Step 6: Validate Docker Compose configuration
+echo [INFO] Validating Docker Compose configuration...
+if not "%SINGLE_ACTIVITY%"=="" (
+    docker compose --profile %SINGLE_ACTIVITY% config >nul
+) else (
+    docker compose --profile all config >nul
+)
+if errorlevel 1 (
+    echo [ERROR] Docker Compose configuration is invalid
+    goto :fail
+)
+echo [OK] Docker Compose configuration is valid
+
+REM Step 7: Build Docker images
 if "%DO_BUILD%"=="true" (
     echo [INFO] Building Docker images...
     echo.
@@ -169,19 +210,19 @@ if "%DO_BUILD%"=="true" (
         docker compose build %SINGLE_ACTIVITY%
     ) else (
         echo [OK] Building all images (this may take a few minutes)...
-        docker compose build
+        docker compose --profile all build
     )
     
     if errorlevel 1 (
         echo [ERROR] Docker build failed
-        exit /b 1
+        goto :fail
     )
     echo [OK] Docker images built successfully
 ) else (
     echo [INFO] Skipping Docker build (--no-build flag set)
 )
 
-REM Step 7: Show next steps
+REM Step 8: Show next steps
 echo.
 echo ==========================================
 echo   Setup Complete!
@@ -199,16 +240,16 @@ if not "%SINGLE_ACTIVITY%"=="" (
 ) else (
     echo [OK] To start all services, run:
     echo.
-    echo   docker compose up
+    echo   docker compose --profile all up
     echo.
     echo Or in detached mode:
     echo.
-    echo   docker compose up -d
+    echo   docker compose --profile all up -d
     echo.
     echo To start a specific activity:
-    echo   docker compose --profile atividade-1 up   # Only Atividade 1
-    echo   docker compose --profile atividade-2 up   # Only Atividade 2
-    echo   docker compose --profile atividade-3 up   # Only Atividade 3
+    echo   docker compose --profile atividade-1 up   # Activity 1 only
+    echo   docker compose --profile atividade-2 up   # Activity 2 only
+    echo   docker compose --profile atividade-3 up   # Activity 3 only
 )
 
 echo.
@@ -219,13 +260,23 @@ echo   docker compose down          # Stop all services
 echo.
 echo [INFO] Documentation: docs/README.md
 echo.
-echo [INFO] Notas para uso manual (sem Docker):
-echo   - Para usar bitcoin-cli no Windows nativo, adicione ao PATH:
+echo [INFO] Manual setup notes without Docker:
+echo   - To use bitcoin-cli on native Windows, add this directory to PATH:
 echo       C:\Program Files\Bitcoin\daemon\
-echo     (Painel de Controlo ^> Sistema ^> Variaveis de Ambiente ^> PATH)
+echo     (Control Panel ^> System ^> Environment Variables ^> PATH)
 echo.
-echo   - Se o PowerShell bloquear scripts .ps1 (ex: Activate.ps1 do venv):
+echo   - If PowerShell blocks .ps1 scripts, for example venv Activate.ps1:
 echo       Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 echo.
 
+goto :success
+
+:success
+popd >nul
 endlocal
+exit /b 0
+
+:fail
+popd >nul
+endlocal
+exit /b 1

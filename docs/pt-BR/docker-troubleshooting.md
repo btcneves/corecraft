@@ -68,6 +68,6 @@ Pare o processo conflitante ou altere as portas em `docker-compose.yml`.
 ```bash
 docker compose down -v
 docker system prune -a --volumes
-docker compose up --build
+docker compose --profile all up --build
 ```
 

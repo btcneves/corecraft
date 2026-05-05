@@ -10,6 +10,8 @@ All notable changes to CoreCraft are documented here.
 - Expanded Prometheus metrics: per-path request counters (`corecraft_requests_by_path_total`), last request latency gauge (`corecraft_last_request_latency_ms`), ZMQ event counters for Activity 2 (`corecraft_zmq_blocks_total`, `corecraft_zmq_tx_total`), and PSBT transaction counter for Activity 3 (`corecraft_psbt_sent_total`).
 - `docs/en-US/docker-troubleshooting.md`: macOS Apple Silicon section (Rosetta 2, memory allocation, `exec format error`) and Windows WSL 2 section (integration, permissions, path issues).
 - Bilingual documentation structure with `docs/pt-BR/`, `docs/en-US/`, and `docs/README.md`.
+- Manual GitHub Actions deploy workflow for VPS and VPS + Cloudflare Tunnel targets.
+- `docker-compose.cloudflare.yml` sidecar for named Cloudflare Tunnel deployments.
 - README badges (GitHub Release, CI status, Docker/GHCR).
 - README "O que você verá" section with expected `docker compose up` output and smoke test output.
 

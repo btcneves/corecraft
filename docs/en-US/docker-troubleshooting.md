@@ -68,7 +68,7 @@ Should show:
    - Reset everything:
      ```bash
      docker compose down -v
-     docker compose up --build
+     docker compose --profile all up --build
      ```
 
 3. Test connectivity:
@@ -412,7 +412,7 @@ ERROR: failed to solve: failed to compute cache key
    ```bash
    docker compose down
    docker network rm corecraft-network
-   docker compose up -d
+   docker compose --profile all up -d
    ```
 
 ## Complete Reset
@@ -433,7 +433,7 @@ docker rm -f $(docker ps -aq) 2>/dev/null || true
 docker network prune -f
 
 # Rebuild from scratch
-docker compose up --build
+docker compose --profile all up --build
 
 # Verify
 docker compose ps
@@ -485,7 +485,7 @@ If you're still stuck:
 
 **Solution:** Force the platform in Compose:
 ```bash
-DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose --profile all up
 ```
 
 Or add to `.env`:

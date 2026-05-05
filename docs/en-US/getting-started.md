@@ -12,13 +12,13 @@ This guide takes any user, on any operating system, from zero to running three a
 git clone https://github.com/btcneves/CoreCraft.git
 cd corecraft
 ./scripts/quickstart.sh        # Linux / macOS
-# scripts\setup-windows.bat   # Windows
+# powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1  # Windows
 ```
 
 Once completed:
 
 ```bash
-docker compose up              # starts everything
+docker compose --profile all up  # starts everything
 ./scripts/smoke-test.sh        # confirms it is working
 ```
 
@@ -142,7 +142,7 @@ docker --version
 docker compose version
 ```
 
-> **Note:** On Windows, all of the `docker` and `make` commands below work in the WSL 2 terminal, Git Bash, or PowerShell. If you prefer PowerShell, replace `./scripts/setup-linux.sh` with `scripts\setup-windows.bat`.
+> **Note:** On Windows, all of the `docker` and `make` commands below work in the WSL 2 terminal, Git Bash, or PowerShell. If you prefer PowerShell, replace `./scripts/setup-linux.sh` with `powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1`.
 
 </details>
 
@@ -181,7 +181,7 @@ chmod +x scripts/setup-mac.sh
 <summary><b>Windows (PowerShell or Command Prompt)</b></summary>
 
 ```cmd
-scripts\setup-windows.bat
+powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1
 ```
 
 </details>
@@ -191,7 +191,7 @@ The script checks Docker, creates `.env` from `.env.example` and builds the imag
 ### 4. Start full stack
 
 ```bash
-docker compose up --build
+docker compose --profile all up --build
 ```
 
 > First run takes 3–5 min while Docker builds the images and downloads Bitcoin Core.
@@ -869,7 +869,7 @@ Stop the stack and remove containers:
 
 ```bash
 docker compose down
-docker compose up --build
+docker compose --profile all up --build
 ```
 
 If the problem persists: `docker compose down -v` to remove volumes as well.
