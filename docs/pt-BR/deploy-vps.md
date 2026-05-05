@@ -7,6 +7,7 @@
 - Ubuntu 22.04+ ou Debian 12+
 - 2 GB de RAM ou mais
 - Portas dos backends liberadas no firewall
+- Docker Engine com Docker Compose v2 para o fluxo recomendado de producao
 
 ## Instalacao Base
 
@@ -63,3 +64,36 @@ sudo ufw allow 8003/tcp
 
 Nao exponha a porta RPC `18443` publicamente.
 
+## Deploy via GitHub Actions
+
+O CoreCraft inclui um workflow manual de deploy: [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml).
+
+Use em GitHub Actions → **Deploy** → **Run workflow**.
+
+### Secrets obrigatorios
+
+| Secret | Descricao |
+|--------|-----------|
+| `VPS_HOST` | Hostname ou IP da VPS |
+| `VPS_USER` | Usuario SSH usado para deploy |
+| `VPS_SSH_KEY` | Chave privada SSH com acesso a VPS |
+
+### Secrets opcionais
+
+| Secret | Descricao |
+|--------|-----------|
+| `VPS_PORT` | Porta SSH. Padrao: `22` |
+| `DEPLOY_PATH` | Caminho remoto. Padrao: `~/corecraft` |
+| `VPS_ENV_FILE` | Conteudo completo do `.env` para gravar na VPS |
+| `CLOUDFLARE_TUNNEL_TOKEN` | Obrigatorio apenas para o target `vps-cloudflare` |
+
+### Targets
+
+| Target | Comportamento |
+|--------|---------------|
+| `vps` | Faz deploy da stack Docker Compose completa na VPS |
+| `vps-cloudflare` | Faz deploy da stack e do sidecar `cloudflared` definido em `docker-compose.cloudflare.yml` |
+
+O workflow valida o Compose, executa `docker compose --profile all up -d --build` e pode rodar `./scripts/smoke-test.sh --timeout 120` apos o deploy.
+
+> Mantenha `VPS_SSH_KEY`, `VPS_ENV_FILE` e `CLOUDFLARE_TUNNEL_TOKEN` apenas em GitHub Secrets. Nunca commite esses valores.

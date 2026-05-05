@@ -109,4 +109,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate Compose
-        run: docker compose config
+        env:
+          CLOUDFLARE_TUNNEL_TOKEN: dummy-token-for-config-validation
+        run: |
+          docker compose --profile all config
+          docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile all --profile cloudflare config

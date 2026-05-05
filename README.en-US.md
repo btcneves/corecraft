@@ -329,6 +329,8 @@ Full smoke tests with `curl`: [`docs/en-US/smoke-tests.md`](docs/en-US/smoke-tes
 | [`docs/en-US/live-validation.md`](docs/en-US/live-validation.md) | Full validation output against Bitcoin Core v31.0 |
 | [`docs/en-US/public-demo.md`](docs/en-US/public-demo.md) | Public demo evidence through Cloudflare Tunnel (2026-05-03) |
 
+Automated deployment: [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs manual deployments to VPS or VPS + Cloudflare Tunnel using GitHub Secrets.
+
 Each activity has its own detailed README:
 
 - [`atividade-1/README.md`](atividade-1/README.md) — goal, constraints, endpoints, examples

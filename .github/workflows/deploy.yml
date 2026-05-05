@@ -1,0 +1,178 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy"
+        required: true
+        default: "main"
+      target:
+        description: "Deployment target"
+        required: true
+        type: choice
+        default: "vps"
+        options:
+          - vps
+          - vps-cloudflare
+      run_smoke_tests:
+        description: "Run smoke tests after deployment"
+        required: true
+        type: boolean
+        default: true
+
+concurrency:
+  group: deploy-${{ inputs.target }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.target }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target }}
+
+    steps:
+      - name: Validate required secrets
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$VPS_HOST" || { echo "Missing secret: VPS_HOST"; exit 1; }
+          test -n "$VPS_USER" || { echo "Missing secret: VPS_USER"; exit 1; }
+          test -n "$VPS_SSH_KEY" || { echo "Missing secret: VPS_SSH_KEY"; exit 1; }
+
+          if [[ "${{ inputs.target }}" == "vps-cloudflare" ]]; then
+            test -n "$CLOUDFLARE_TUNNEL_TOKEN" || { echo "Missing secret: CLOUDFLARE_TUNNEL_TOKEN"; exit 1; }
+          fi
+
+      - name: Configure SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/corecraft_deploy
+          chmod 600 ~/.ssh/corecraft_deploy
+          ssh-keyscan -p "$VPS_PORT" "$VPS_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy over SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '~/corecraft' }}
+          DEPLOY_REF: ${{ inputs.ref }}
+          DEPLOY_TARGET: ${{ inputs.target }}
+          RUN_SMOKE_TESTS: ${{ inputs.run_smoke_tests }}
+          VPS_ENV_FILE: ${{ secrets.VPS_ENV_FILE }}
+          CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          REMOTE_ENV_FILE=""
+          REMOTE_CF_TOKEN_FILE=""
+
+          if [[ -n "${VPS_ENV_FILE:-}" ]]; then
+            LOCAL_ENV_FILE="$RUNNER_TEMP/corecraft.env"
+            printf '%s\n' "$VPS_ENV_FILE" > "$LOCAL_ENV_FILE"
+            REMOTE_ENV_FILE="/tmp/corecraft.env.${GITHUB_RUN_ID}"
+            scp -i ~/.ssh/corecraft_deploy -P "$VPS_PORT" "$LOCAL_ENV_FILE" "$VPS_USER@$VPS_HOST:$REMOTE_ENV_FILE"
+          fi
+
+          if [[ "$DEPLOY_TARGET" == "vps-cloudflare" ]]; then
+            LOCAL_CF_TOKEN_FILE="$RUNNER_TEMP/corecraft-cloudflare-token"
+            printf '%s' "$CLOUDFLARE_TUNNEL_TOKEN" > "$LOCAL_CF_TOKEN_FILE"
+            REMOTE_CF_TOKEN_FILE="/tmp/corecraft-cloudflare-token.${GITHUB_RUN_ID}"
+            scp -i ~/.ssh/corecraft_deploy -P "$VPS_PORT" "$LOCAL_CF_TOKEN_FILE" "$VPS_USER@$VPS_HOST:$REMOTE_CF_TOKEN_FILE"
+          fi
+
+          ssh -i ~/.ssh/corecraft_deploy -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" \
+            bash -s -- "$DEPLOY_PATH" "$DEPLOY_REF" "$DEPLOY_TARGET" "$RUN_SMOKE_TESTS" "$REMOTE_ENV_FILE" "$REMOTE_CF_TOKEN_FILE" <<'REMOTE'
+          set -euo pipefail
+
+          DEPLOY_PATH="$1"
+          DEPLOY_REF="$2"
+          DEPLOY_TARGET="$3"
+          RUN_SMOKE_TESTS="$4"
+          REMOTE_ENV_FILE="$5"
+          REMOTE_CF_TOKEN_FILE="$6"
+
+          REPO_URL="https://github.com/btcneves/CoreCraft.git"
+          DEPLOY_PATH="${DEPLOY_PATH/#\~/$HOME}"
+
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "Docker is required on the VPS."
+            exit 1
+          fi
+
+          if ! command -v git >/dev/null 2>&1; then
+            echo "Git is required on the VPS."
+            exit 1
+          fi
+
+          if ! docker compose version >/dev/null 2>&1; then
+            echo "Docker Compose v2 is required on the VPS."
+            exit 1
+          fi
+
+          mkdir -p "$(dirname "$DEPLOY_PATH")"
+
+          if [[ ! -d "$DEPLOY_PATH/.git" ]]; then
+            git clone "$REPO_URL" "$DEPLOY_PATH"
+          fi
+
+          cd "$DEPLOY_PATH"
+          git fetch --prune origin
+          git checkout "$DEPLOY_REF"
+          git pull --ff-only origin "$DEPLOY_REF" || true
+
+          cleanup() {
+            [[ -n "$REMOTE_ENV_FILE" ]] && rm -f "$REMOTE_ENV_FILE"
+            [[ -n "$REMOTE_CF_TOKEN_FILE" ]] && rm -f "$REMOTE_CF_TOKEN_FILE"
+          }
+          trap cleanup EXIT
+
+          if [[ -n "$REMOTE_ENV_FILE" && -f "$REMOTE_ENV_FILE" ]]; then
+            cp "$REMOTE_ENV_FILE" .env
+          elif [[ ! -f .env ]]; then
+            cp .env.example .env
+          fi
+
+          if ! grep -q '^COMPOSE_PROFILES=' .env; then
+            printf '\nCOMPOSE_PROFILES=all\n' >> .env
+          fi
+
+          if [[ "$DEPLOY_TARGET" == "vps-cloudflare" ]]; then
+            if [[ -z "$REMOTE_CF_TOKEN_FILE" || ! -f "$REMOTE_CF_TOKEN_FILE" ]]; then
+              echo "Cloudflare tunnel token file was not provided."
+              exit 1
+            fi
+
+            grep -v '^CLOUDFLARE_TUNNEL_TOKEN=' .env > .env.tmp
+            mv .env.tmp .env
+            printf '\nCLOUDFLARE_TUNNEL_TOKEN=%s\n' "$(cat "$REMOTE_CF_TOKEN_FILE")" >> .env
+
+            docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile all --profile cloudflare config >/dev/null
+            docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile all --profile cloudflare pull || true
+            docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile all --profile cloudflare up -d --build
+            docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml --profile all --profile cloudflare ps
+          else
+            docker compose --profile all config >/dev/null
+            docker compose --profile all pull || true
+            docker compose --profile all up -d --build
+            docker compose --profile all ps
+          fi
+
+          if [[ "$RUN_SMOKE_TESTS" == "true" ]]; then
+            ./scripts/smoke-test.sh --timeout 120
+          fi
+          REMOTE

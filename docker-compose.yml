@@ -4,11 +4,11 @@ name: corecraft
 # Supports running all services or individual activities using profiles
 # 
 # Usage:
-#   docker compose up --build              # Start all services
+#   docker compose --profile all up --build # Start all services
 #   docker compose --profile atividade-1 up # Start only atividade-1 + dependencies
 #   docker compose --profile atividade-2 up # Start only atividade-2 + dependencies
 #   docker compose --profile atividade-3 up # Start only atividade-3 + dependencies
-#   docker compose up --build --profile ""  # Start without optional services
+#   docker compose up bitcoind bitcoin-init # Start base services only
 
 x-logging: &default-logging
   driver: "json-file"

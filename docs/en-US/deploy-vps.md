@@ -5,6 +5,7 @@
 - Ubuntu 22.04+ (or Debian 12+)
 - 2 GB RAM minimum (Bitcoin Core in regtest is light)
 - Backend port released on firewall
+- Docker Engine with Docker Compose v2 for the recommended production workflow
 
 ## 1. Install dependencies
 
@@ -124,3 +125,37 @@ http://<VPS_IP>:8001  → Activity 1
 http://<VPS_IP>:8002  → Activity 2
 http://<VPS_IP>:8003  → Activity 3
 ```
+
+## GitHub Actions Deployment
+
+CoreCraft includes a manual deployment workflow: [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml).
+
+Use it from GitHub Actions → **Deploy** → **Run workflow**.
+
+### Required repository secrets
+
+| Secret | Description |
+|--------|-------------|
+| `VPS_HOST` | VPS hostname or IP address |
+| `VPS_USER` | SSH user used for deployment |
+| `VPS_SSH_KEY` | Private SSH key with access to the VPS |
+
+### Optional repository secrets
+
+| Secret | Description |
+|--------|-------------|
+| `VPS_PORT` | SSH port. Defaults to `22` |
+| `DEPLOY_PATH` | Remote path. Defaults to `~/corecraft` |
+| `VPS_ENV_FILE` | Complete `.env` content to write on the VPS |
+| `CLOUDFLARE_TUNNEL_TOKEN` | Required only for the `vps-cloudflare` target |
+
+### Workflow targets
+
+| Target | Behavior |
+|--------|----------|
+| `vps` | Deploys the full Docker Compose stack on the VPS |
+| `vps-cloudflare` | Deploys the stack plus the `cloudflared` sidecar from `docker-compose.cloudflare.yml` |
+
+The workflow validates Docker Compose, deploys with `docker compose --profile all up -d --build`, and can run `./scripts/smoke-test.sh --timeout 120` after deployment.
+
+> Keep `VPS_SSH_KEY`, `VPS_ENV_FILE`, and `CLOUDFLARE_TUNNEL_TOKEN` only in GitHub Secrets. Never commit them to the repository.
