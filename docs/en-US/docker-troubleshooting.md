@@ -528,7 +528,7 @@ docker compose version
 ```bash
 cd ~
 git clone https://github.com/btcneves/CoreCraft.git
-cd corecraft
+cd CoreCraft
 ./scripts/quickstart.sh
 ```
 
