@@ -9,7 +9,7 @@
 [![Português do Brasil](https://img.shields.io/badge/idioma-PT--BR-009739?style=flat-square)](README.md)
 [![English US](https://img.shields.io/badge/language-EN--US-3C3B6E?style=flat-square)](README.en-US.md)
 
-[![GitHub Release](https://img.shields.io/github/v/release/btcneves/CoreCraft?style=flat-square&label=release)](https://github.com/btcneves/CoreCraft/releases/latest)
+[![GitHub Release](https://img.shields.io/github/v/release/btcneves/CoreCraft?sort=semver&style=flat-square&label=release&cacheSeconds=3600)](https://github.com/btcneves/CoreCraft/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/btcneves/CoreCraft/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/btcneves/CoreCraft/actions/workflows/ci.yml)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fbtcneves%2Fcorecraft--suite-blue?style=flat-square&logo=docker)](https://github.com/btcneves/CoreCraft/pkgs/container/corecraft-suite-atividade-1)
 
@@ -17,14 +17,15 @@
 
 ---
 
-> **Quick start — already have Docker? It takes three commands:**
+> **Quick start — with Docker:**
 >
 > ```bash
-> git clone https://github.com/btcneves/CoreCraft.git && cd corecraft
+> git clone https://github.com/btcneves/CoreCraft.git && cd CoreCraft
 > ./scripts/quickstart.sh        # Linux / macOS
-> .\scripts\setup-windows.ps1    # Windows PowerShell
 > docker compose --profile all up
 > ```
+>
+> On Windows PowerShell, use `.\scripts\setup-windows.ps1` instead of `./scripts/quickstart.sh`.
 >
 > Open the activities at `http://localhost:8001`, `8002`, and `8003`.  
 > Full guide, including the non-Docker setup: [**docs/en-US/getting-started.md**](docs/en-US/getting-started.md)
@@ -134,7 +135,7 @@ Deeper references: [`docs/en-US/rpc-zmq.md`](docs/en-US/rpc-zmq.md), [`docs/en-U
 ## Repository Structure
 
 ```text
-corecraft/
+CoreCraft/
 ├── atividade-1/                  RPC mempool snapshot
 │   ├── backend/                  FastAPI (port 8001)
 │   │   ├── app/
@@ -443,6 +444,12 @@ Versioned placeholders for visual evidence live in [`docs/assets/README.md`](doc
 | 3 | https://move-after-salaries-kde.trycloudflare.com | `/wallets` | `{"available_wallets":[...],"selected_wallet":"wallet1"}` |
 
 > Temporary `trycloudflare.com` URLs, active while the `cloudflared` processes were running. Full evidence: [`docs/en-US/public-demo.md`](docs/en-US/public-demo.md).
+
+---
+
+## Releases
+
+The release badge uses `shields.io/github/v/release/btcneves/CoreCraft` with SemVer sorting. To avoid `release: invalid`, publish GitHub releases with a clean, valid tag such as `v1.0.0`; do not use text like `CoreCraft v1.0.0` as the tag name. If needed, keep `CoreCraft v1.0.0` only as the GitHub release title.
 
 ---
 
