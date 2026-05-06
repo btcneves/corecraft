@@ -9,7 +9,7 @@
 [![Português do Brasil](https://img.shields.io/badge/idioma-PT--BR-009739?style=flat-square)](README.md)
 [![English US](https://img.shields.io/badge/language-EN--US-3C3B6E?style=flat-square)](README.en-US.md)
 
-[![GitHub Release](https://img.shields.io/github/v/release/btcneves/CoreCraft?style=flat-square&label=release)](https://github.com/btcneves/CoreCraft/releases/latest)
+[![GitHub Release](https://img.shields.io/github/v/release/btcneves/CoreCraft?sort=semver&style=flat-square&label=release&cacheSeconds=3600)](https://github.com/btcneves/CoreCraft/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/btcneves/CoreCraft/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/btcneves/CoreCraft/actions/workflows/ci.yml)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fbtcneves%2Fcorecraft--suite-blue?style=flat-square&logo=docker)](https://github.com/btcneves/CoreCraft/pkgs/container/corecraft-suite-atividade-1)
 
@@ -17,14 +17,15 @@
 
 ---
 
-> **Início rápido — tem Docker? São três comandos:**
+> **Início rápido — com Docker:**
 >
 > ```bash
-> git clone https://github.com/btcneves/CoreCraft.git && cd corecraft
+> git clone https://github.com/btcneves/CoreCraft.git && cd CoreCraft
 > ./scripts/quickstart.sh        # Linux / macOS
-> .\scripts\setup-windows.ps1    # Windows PowerShell
 > docker compose --profile all up
 > ```
+>
+> No Windows PowerShell, use `.\scripts\setup-windows.ps1` no lugar de `./scripts/quickstart.sh`.
 >
 > Acesse as atividades em `http://localhost:8001`, `8002` e `8003`.  
 > Guia completo (incluindo sem Docker): [**docs/pt-BR/getting-started.md**](docs/pt-BR/getting-started.md)
@@ -134,7 +135,7 @@ Referências aprofundadas: [`docs/pt-BR/rpc-zmq.md`](docs/pt-BR/rpc-zmq.md), [`d
 ## Estrutura do repositório
 
 ```
-corecraft/
+CoreCraft/
 ├── atividade-1/                  Snapshot da mempool via RPC
 │   ├── backend/                  FastAPI (porta 8001)
 │   │   ├── app/
@@ -258,7 +259,7 @@ Frontend disponível em `http://localhost:8001` (servido pelo próprio FastAPI).
 cp .env.example .env
 docker compose --profile all up --build
 # Caddy:
-﻿#   http://localhost/atividade-1/
+#   http://localhost/atividade-1/
 #   http://localhost/atividade-2/
 #   http://localhost/atividade-3/
 # Portas diretas:
@@ -278,7 +279,7 @@ corecraft-suite-atividade-3    | INFO: Application startup complete.
 corecraft-caddy                | serving initial configuration
 ```
 
-O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial para `wallet1`, executa os tres backends e expõe as interfaces pelo Caddy. Detalhes em [`docs/pt-BR/docker-stack.md`](docs/pt-BR/docker-stack.md).
+O Compose sobe `bitcoind` em regtest, inicializa wallets, minera saldo inicial para `wallet1`, executa os três backends e expõe as interfaces pelo Caddy. Detalhes em [`docs/pt-BR/docker-stack.md`](docs/pt-BR/docker-stack.md).
 
 Variáveis principais:
 
@@ -341,7 +342,7 @@ Cada atividade tem seu próprio README detalhado:
 
 ## Testes
 
-O projeto usa **pytest** com cobertura mínima de 70% (actualmente 85%).
+O projeto usa **pytest** com cobertura mínima de 70% (atualmente 85%).
 
 ```bash
 # instalar dependências de desenvolvimento
@@ -443,6 +444,12 @@ Placeholders versionados para evidências visuais estão em [`docs/assets/README
 | 3 | https://move-after-salaries-kde.trycloudflare.com | `/wallets` | `{"available_wallets":[...],"selected_wallet":"wallet1"}` |
 
 > URLs temporárias (trycloudflare.com) — ativas enquanto os processos `cloudflared` estavam rodando. Evidências completas: [`docs/pt-BR/public-demo.md`](docs/pt-BR/public-demo.md).
+
+---
+
+## Releases
+
+O badge de release usa `shields.io/github/v/release/btcneves/CoreCraft` com ordenação SemVer. Para evitar `release: invalid`, a tag publicada no GitHub deve ser limpa e válida, como `v1.0.0`; não use textos como `CoreCraft v1.0.0` no nome da tag. Se necessário, mantenha `CoreCraft v1.0.0` apenas como título da release no GitHub.
 
 ---
 

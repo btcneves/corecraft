@@ -57,7 +57,7 @@ bitcoin-cli -regtest getblockchaininfo
 
 ```bash
 git clone https://github.com/btcneves/CoreCraft.git
-cd corecraft
+cd CoreCraft
 ```
 
 ## 6. Create .env in each activity
@@ -102,9 +102,9 @@ uvicorn app.main:app --host 0.0.0.0 --port 8003
 
 ```bash
 sudo apt install -y tmux
-tmux new-session -d -s atividade1 "cd ~/corecraft/atividade-1/backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8001"
-tmux new-session -d -s atividade2 "cd ~/corecraft/atividade-2/backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8002"
-tmux new-session -d -s atividade3 "cd ~/corecraft/atividade-3/backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8003"
+tmux new-session -d -s atividade1 "cd ~/CoreCraft/atividade-1/backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8001"
+tmux new-session -d -s atividade2 "cd ~/CoreCraft/atividade-2/backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8002"
+tmux new-session -d -s atividade3 "cd ~/CoreCraft/atividade-3/backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8003"
 ```
 
 ## 9. Release ports on the firewall

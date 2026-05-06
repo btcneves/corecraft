@@ -7,7 +7,7 @@ CoreCraft uses Docker Compose to orchestrate all services needed for the Bitcoin
 ```bash
 # Clone the repository
 git clone https://github.com/btcneves/CoreCraft.git
-cd corecraft
+cd CoreCraft
 
 # Setup environment
 cp .env.example .env

@@ -10,7 +10,7 @@ This guide takes any user, on any operating system, from zero to running three a
 
 ```bash
 git clone https://github.com/btcneves/CoreCraft.git
-cd corecraft
+cd CoreCraft
 ./scripts/quickstart.sh        # Linux / macOS
 # powershell -ExecutionPolicy Bypass -File scripts\setup-windows.ps1  # Windows
 ```
@@ -152,7 +152,7 @@ docker compose version
 
 ```bash
 git clone https://github.com/btcneves/CoreCraft.git
-cd corecraft
+cd CoreCraft
 ```
 
 ### 3. Run the setup script
@@ -439,7 +439,7 @@ winget install OpenJS.NodeJS
 
 ```bash
 git clone https://github.com/btcneves/CoreCraft.git
-cd corecraft
+cd CoreCraft
 ```
 
 ---
